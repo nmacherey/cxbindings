@@ -1,0 +1,287 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<grammar type="xsd">
+
+  <!-- New version for type 
+  The first thing is to set a variable to the correct attribute value
+  Then define the type accordingly !
+  
+  The next variable is internal to the object, if you define 
+  variables outside the model it will be made common to all others.
+  here {} make a reference to a property defined in the object.
+  -->
+  <set var="GROUPTYPE">
+    <if cond="{minOccurs} &lt;= '1' &amp;&amp; {maxOccurs} == '1'">[var]</if>
+    <if cond="{maxOccurs} &gt; '1'">[array]</if>
+  </set>
+  
+  <set var="CHOICETYPE">
+    <if cond="{minOccurs} &lt;= '1' &amp;&amp; {maxOccurs} == '1'">[var]</if>
+    <if cond="{maxOccurs} &gt; '1'">[array]</if>
+  </set>
+  
+  <set var="ENUMRULE">
+    <if cond="hasChild('enumeration') == 1">child_enumerator</if>
+    <if cond="hasChild('enumeration') == 0">typedef</if>
+  </set>
+  
+  <set var="VARIANTRULE">
+    <if cond="{minOccurs} &lt;= '1' &amp;&amp; {maxOccurs} == '1'">property_any</if>
+    <if cond="{maxOccurs} &gt; '1'">property_any_array</if>
+  </set>
+	
+  <!-- Basic object for handling sequences and choices (applied for groups and complexTypes) -->
+  <model type="typeBase">
+  
+    <property name="name" required="true">
+        <if cond="hasParent('element')">{parent}{name}[Type]</if>
+    </property>
+	
+    <rule make="object">
+      <name template="object">{name}</name>
+    </rule>
+    
+    <!-- Sequence -->
+    <category name="sequence" minOccurs="0" maxOccurs="1">
+
+      <!-- Elements nodes -->
+      <child name="element" minOccurs="0" maxOccurs="unbounded">
+        <property name="name" required="true"/>
+		
+        <property name="type" required="true">
+          <if cond="hasChild('complexType')">{name}[Type]</if>
+          <if cond="hasChild('simpleType')">{name}[Type]</if>
+        </property>
+		
+        <property name="minOccurs" default="0"/>
+        <property name="maxOccurs" default="1"/>
+		  
+        <rule make="property" accessors="true">
+		  <type template="$(GROUPTYPE)">{type}</type> 
+          <name template="property">{name}</name>
+        </rule>
+      </child>
+	  
+	  <!-- Elements nodes -->
+      <child name="any" minOccurs="0" maxOccurs="unbounded">
+        <property name="namespace" required="true"/>
+		<property name="processContents" default="strict"/>
+        <property name="minOccurs" default="0"/>
+        <property name="maxOccurs" default="1"/>
+		  
+        <rule make="$(VARIANTRULE)" accessors="true">
+		  <type template="var">variant</type> 
+          <name template="property">any</name>
+        </rule>
+      </child>
+
+      <!-- Groups reference 
+		Groups are the same principle of inheritence than model and
+		objects. 
+		
+		We have to notify wxGrammar here that the group is referencing a
+		more global complex type and that all informations of it shall
+		be written in this object.
+	  -->
+      <child name="group" minOccurs="0" maxOccurs="unbounded">
+        <property name="ref" required="true"/>
+        <property name="minOccurs" default="0"/>
+        <property name="maxOccurs" default="1"/>
+        <rule make="import" accessors="true">
+			<type template="object">{ref}</type>
+		</rule>
+      </child>
+
+    </category>
+    
+    <!-- choices 
+      The problem of choices is very hard to solve...
+      Here we use the variant template to define a choice...
+      then a choice can have minOccurs and maxOccurs which means that it has to be associated into
+      an array in order to make it work properly.
+       
+      We have to take car of what to do here or we will get unexpected behavior in the generation.
+    -->
+    <childcontainer name="choice" minOccurs="0" maxOccurs="unbounded">
+      <property name="minOccurs" default="0"/>
+      <property name="maxOccurs" default="1"/>
+		
+      <!-- <rule make="property" accessors="true">
+		  
+		<type template="$(CHOICETYPE)">variant</type> 
+        <name template="property">{parent}{name}[Choice]</name>
+		
+      </rule>
+	  
+	  <foreach_child of="element">
+		  <rule make="$(VARIANTRULE)">
+			<name template="accessor">{name}</name>
+			<type template="accessor">{type}</type>
+			<variable>{parent}{parent}{name}[Choice]</variable>
+		  </rule>
+	  </foreach_child> -->
+      
+      <!-- Elements nodes -->
+      <child name="element" minOccurs="0" maxOccurs="unbounded">
+        <property name="name" required="true"/>
+		
+        <property name="type" required="true">
+          <if cond="hasChild('complexType')">{name}[Type]</if>
+          <if cond="hasChild('simpleType')">{name}[Type]</if>
+        </property>
+		
+        <property name="minOccurs" default="0"/>
+        <property name="maxOccurs" default="1"/>
+		  
+        <rule make="property" accessors="true">
+		  <type template="$(GROUPTYPE)">{type}</type> 
+          <name template="property">{name}</name>
+        </rule>
+      </child>
+      
+    </childcontainer>
+    
+  </model>
+
+	<!-- Rules and objects for complexTypes -->
+  <object type="complexType">
+    <inherits model="typeBase"/>
+    
+    <!-- attributes -->
+    <child name="attribute" minOccurs="0" maxOccurs="unbounded">
+      <property name="name" required="true"/>
+	  <property name="type" required="true">
+	    <if cond="hasChild('simpleType')">{name}[Enum]</if>
+	  </property>
+      <property name="use" default="optional"/>
+      <rule make="attribute" accessors="true">
+        <type template="var">{type}</type>
+        <name template="property">{name}</name>
+      </rule>
+    </child>
+	
+	<!-- Here me need to add support for complex type derivation 
+	in the xsd the node is like complexContent, extension sequence
+	this must always means that we need to derive from the original namespace
+	object and then implement the new version -->
+	
+	<category name="complexContent" minOccurs="0" maxOccurs="unbounded">
+	
+		<childcontainer name="extension" minOccurs="0" maxOccurs="unbounded">
+			<property name="base" required="true"/>
+			
+			<rule make="import">
+				<type template="object">{base}</type> 
+			</rule>
+	  
+			<!-- Sequence -->
+			<category name="sequence" minOccurs="0" maxOccurs="1">
+
+			  <!-- Elements nodes -->
+			  <child name="element" minOccurs="0" maxOccurs="unbounded">
+				<property name="name" required="true"/>
+				
+				<property name="type" required="true">
+				  <if cond="hasChild('complexType')">{name}[Type]</if>
+				  <if cond="hasChild('simpleType')">{name}[Type]</if>
+				</property>
+				
+				<property name="minOccurs" default="0"/>
+				<property name="maxOccurs" default="1"/>
+				  
+				<rule make="property" accessors="true">
+				  <type template="$(GROUPTYPE)">{type}</type> 
+				  <name template="property">{name}</name>
+				</rule>
+			  </child>
+			  
+			  <!-- Elements nodes -->
+			  <child name="any" minOccurs="0" maxOccurs="unbounded">
+				<property name="namespace" required="true"/>
+				<property name="processContents" default="strict"/>
+				<property name="minOccurs" default="0"/>
+				<property name="maxOccurs" default="1"/>
+				  
+				<rule make="$(VARIANTRULE)" accessors="true">
+				  <type template="var">variant</type> 
+				  <name template="property">any</name>
+				</rule>
+			  </child>
+
+			  <!-- Groups reference 
+				Groups are the same principle of inheritence than model and
+				objects. 
+				
+				We have to notify wxGrammar here that the group is referencing a
+				more global complex type and that all informations of it shall
+				be written in this object.
+			  -->
+			  <child name="group" minOccurs="0" maxOccurs="unbounded">
+				<property name="ref" required="true"/>
+				<property name="minOccurs" default="0"/>
+				<property name="maxOccurs" default="1"/>
+				<rule make="import" accessors="true">
+					<type template="object">{ref}</type>
+				</rule>
+			  </child>
+
+			</category>
+		</childcontainer>
+	</category>
+	
+  </object>
+  
+  <!-- Rules and objects for groups -->
+  <object type="group">
+    <inherits model="typeBase"/>
+    
+    <!-- attributes -->
+    <child name="attribute" minOccurs="0" maxOccurs="unbounded">
+      <property name="name" required="true"/>
+	  <property name="type" required="true">
+	    <if cond="hasChild('simpleType')">{name}[Enum]</if>
+	  </property>
+      <property name="use" default="optional"/>
+      <rule make="attribute" accessors="true">
+        <type template="var">{type}</type>
+        <name template="property">{name}</name>
+      </rule>
+    </child>
+
+  </object>
+  
+  <!-- Rules and objects for simpleType -->
+  <object type="simpleType">
+  
+	<property name="name" required="true">
+        <if cond="hasParent('element')">{parent}{name}[Type]</if>
+		<if cond="hasParent('attribute')">{parent}{name}[Enum]</if>
+    </property>
+    
+    <!-- Manage Restrictions -->
+    <childcontainer name="restriction" minOccurs="1" maxOccurs="1">
+	
+      <property name="base" required="true"/>
+	  <rule make="$(ENUMRULE)" accessors="true">
+		<name template="enum">{parent}{name}</name>
+		<type template="enum">{base}</type>
+		<variable>value</variable>
+	  </rule>
+      
+      <!-- enumeration child -->
+	  <child name="enumeration" minOccurs="0" maxOccurs="unbounded">
+		  <property name="value" required="true"/>
+	  </child>
+	  
+    </childcontainer>
+
+  </object>
+  
+  <info root="schema">
+	<generation>
+		<generate object="simpleType" level="all" template="global_scope"/>
+		<generate object="group" level="1" template="object_scope"/>
+		<generate object="complexType" level="all" template="object_scope"/>
+	</generation>
+  </info>
+
+</grammar>

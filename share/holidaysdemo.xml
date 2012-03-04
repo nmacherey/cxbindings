@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wxg:holidays xmlns:wxg="http://www.example.org/Hollidays" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.example.org/Hollidays Hollidays.xsd ">
+  <wxg:personHolidays>
+    <wxg:person firstname="Toto" lastname="Dupont">
+      <wxg:address>6 av des prés</wxg:address>
+      <wxg:zipcode>123 CP12</wxg:zipcode>
+      <wxg:city>Toto City</wxg:city>
+      <wxg:country>France</wxg:country>
+      <wxg:email>toto@toto.com</wxg:email>
+      <wxg:phone>123456</wxg:phone>
+	  <wxg:age>24</wxg:age>
+    </wxg:person>
+    <wxg:holiday>
+      <wxg:start>2010-01-01</wxg:start>
+      <wxg:end>2011-01-01</wxg:end>
+    </wxg:holiday>
+    <wxg:holiday>
+      <wxg:start>2011-01-01</wxg:start>
+      <wxg:end>2012-01-01</wxg:end>
+    </wxg:holiday>
+    <wxg:holiday>
+      <wxg:start>2013-01-01</wxg:start>
+      <wxg:end>2014-01-01</wxg:end>
+    </wxg:holiday>
+  </wxg:personHolidays>
+  <wxg:personHolidays>
+    <wxg:person firstname="Tata" lastname="Dupont">
+      <wxg:address>6 av des prés</wxg:address>
+      <wxg:zipcode>123 CP12</wxg:zipcode>
+      <wxg:city>Tata City</wxg:city>
+      <wxg:country>France</wxg:country>
+      <wxg:email>tata@tata.com</wxg:email>
+      <wxg:phone>123456</wxg:phone>
+    </wxg:person>
+    <wxg:holiday>
+      <wxg:start>2010-01-01</wxg:start>
+      <wxg:end>2011-01-01</wxg:end>
+    </wxg:holiday>
+    <wxg:holiday>
+      <wxg:start>2011-01-01</wxg:start>
+      <wxg:end>2012-01-01</wxg:end>
+    </wxg:holiday>
+    <wxg:holiday>
+      <wxg:start>2013-01-01</wxg:start>
+      <wxg:end>2014-01-01</wxg:end>
+    </wxg:holiday>
+  </wxg:personHolidays>
+</wxg:holidays>

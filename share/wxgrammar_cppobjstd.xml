@@ -1,0 +1,2947 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wxgrammar_generator_file lang="cpp">
+	<var name="header_doc">
+/** @file $(filename).h
+ * @author Nicolas Macherey (nm@graymat.fr) http://www.rheia-framework.com
+ * @date $(date)
+ */
+	</var>
+	<var name="src_doc">
+/** @file $(filename).cpp
+  * @author Nicolas Macherey (nm@graymat.fr) http://www.rheia-framework.com
+  * @date $(date)
+  */
+	</var>
+	<var name="extended_enumeration_hdr">
+/** @class stdEnumeration
+  * @brief Main class from which any enumeration class shall derive from
+  * @author Nicolas Macherey (nm@graymat.fr) http://www.rheia-framework.com
+  * @date $(date)
+  */
+class stdEnumeration : public stdObject
+{
+	DECLARE_ABSTRACT_CLASS_STD( stdEnumeration )
+	
+public :
+	
+	/** Get values all childrens must overload this method */
+	virtual const std::string* GetValues() const = 0;
+	
+	/** Get enumerated as a wxArrayInt */
+	virtual std::vector&lt;unsigned int&gt; GetFlags() const = 0;
+	
+	/** Get the total number of enumerated values */
+	virtual unsigned int GetCount() const = 0;
+	
+	/** Get the value from the flag */
+	virtual const std::string&amp; GetFromFlag( unsigned int value ) const = 0;
+	
+	/** get the falg from value */
+	virtual unsigned int GetUIntFromValue( const std::string&amp; value ) const = 0;
+	
+	/** get the flag */
+	virtual unsigned int GetUIntFlag() const = 0;
+	
+	/** get the value */
+	virtual const std::string&amp; GetValue() const = 0;
+	
+	/** Set the value */
+	virtual void SetFlag( unsigned int value ) = 0;
+	
+	/** Set the value */
+	virtual void SetValue( const std::string&amp; value ) = 0;
+
+};
+	</var>
+	<var name="extended_enumeration_src">
+/** Implement the wxWidgets RTTI dynamic calss information */
+IMPLEMENT_ABSTRACT_CLASS_STD( stdEnumeration , stdObject )
+	</var>
+	<var name="base_object">stdObject</var>
+	<var name="string_composer">"$(content)"</var>
+	<var name="ctor_var_composer"> const $(content_type)&amp; $(content)</var>
+	<var name="ctor_var_composer2"> $(content)</var>
+	<var name="var_eqop_composer">	m_$(content) = rhs.m_$(content);
+	m_has$(content) = rhs.m_has$(content);
+	</var>
+	<var name="var_eqeqop_composer">m_$(content) == rhs.m_$(content)</var>
+	<var name="var_property_composer"> </var>
+	<var name="var_definit_composer">,
+			m_has$(content)(false)</var>
+	<var name="var_init_composer">,
+			m_$(content)($(content)),
+			m_has$(content)(true)</var>
+	<var name="var_copy_composer">,
+			m_$(content)(rhs.m_$(content)),
+			m_has$(content)(rhs.m_has$(content))</var>
+	<var name="var_doc_composer">
+	  * @param $(content) value for $(content) property of type $(content_type)</var>
+	<var name="ext_eqop_composer">	if( m_$(content) != NULL ) {
+		delete m_$(content);
+		m_$(content) = NULL;
+		m_has$(content) = false;
+	}
+	
+	if( rhs.m$(content) != NULL ) {
+		m_$(content) = rhs.m_$(content)->Clone();
+		m_has$(content) = true;
+	}
+	</var>
+	<var name="ext_dtor_composer">	if( m_$(content) != NULL ) {
+		delete m_$(content);
+		m_$(content) = NULL;
+		m_has$(content) = false;
+	}</var>
+	<var name="ext_init_composer">,
+		m_$(content)(NULL)</var>
+	<var name="namespace_start">
+namespace $(ns) {
+	</var>
+	<var name="globals_start">
+$(header_doc)
+#ifndef $(ns)_globals_H
+#define $(ns)_globals_H
+
+#include &lt;iostream&gt;
+#include &lt;stdio.h&gt;
+#include &lt;cstdio&gt;
+#include &lt;iostream&gt;
+#include &lt;vector&gt;
+#include &lt;map&gt;
+#include &lt;stack&gt;
+#include &lt;set&gt;
+#include &lt;string&gt;
+
+#include &lt;libxml/xmlreader.h&gt;
+#include &lt;libxml/xpath.h&gt;
+
+#include "stdDefines.h"
+#include "stdException.h"
+#include "stdObject.h"
+#include "stdObjectFactory.h"
+
+#define $(exportmacro)
+	</var>
+	<var name="globals_end">
+
+#endif // $(ns)_globals_H
+	</var>
+	<var name="global_file_src">
+/** @file $(ns)_globals.cpp
+  * @breif Main file for implementing globals informations
+  * @author Nicolas Macherey (nm@graymat.fr) http://www.rheia-framework.com
+  * @date $(date)
+  */
+#include "$(ns)_globals.h"
+
+$(globals_code_src)
+	</var>
+	<var name="global_file">
+$(globals_start)
+
+$(globals_code)
+
+$(globals_end)
+	</var>
+	<var name="namespace_end">
+};
+	</var>
+	<var name="object_defines">
+#ifndef $(OBJECT)_H
+#define $(OBJECT)_H
+	</var>
+	<var name="object_defines_end">
+#endif // $(OBJECT)_H
+	</var>
+	<var name="object_simple_ctor_header">
+	/** Default Constructor */
+	$(object)():
+$(object_bases_default_ctor)
+	{};
+	</var>
+	<var name="object_complex_ctor_header">
+	/** Default Constructor */
+	$(object)():
+$(object_bases_default_ctor) $(parameters_default_init_list)
+	{};
+
+	/** Basic Constructor $(parameters_doc_list)
+	  */
+	$(object)($(parameters_ctor_list)):
+$(object_bases_init_list) $(parameters_init_list)
+	{};
+	</var>
+	<template name="object">
+		<objectpart file="header">
+$(header_doc)
+
+$(object_defines)
+
+#include &lt;iostream&gt;
+#include &lt;stdio.h&gt;
+#include &lt;cstdio&gt;
+#include &lt;iostream&gt;
+#include &lt;vector&gt;
+#include &lt;map&gt;
+#include &lt;stack&gt;
+
+#include &lt;libxml/xmlreader.h&gt;
+#include &lt;libxml/xpath.h&gt;
+
+$(local_includes)
+
+/** preliminary define to enable the variant definition for that object */
+$(object_imports)
+
+/** @class $(object)
+  * @brief Main class for handling $(object) nodes information in xml files
+  * @author Nicolas Macherey (nm@graymat.fr) http://www.rheia-framework.com
+  * @date $(date)
+  */
+class $(exportmacro) $(object) : $(object_bases)
+{
+	DECLARE_DYNAMIC_CLASS_STD( $(object) )
+public :
+	/**********************************************************************
+  	 * CONSTRUCTORS
+	 *********************************************************************/
+
+$(object_ctors)
+
+	/** Copy constructor */
+	$(object)( const $(object)&amp; rhs ):
+$(object_bases_copy_list) $(parameters_copy_list)
+	{};
+	
+	/** Clone method that any child must overload in order to enable the copy
+	 * from the base object */
+	virtual $(base_object)* Clone() {return new $(object)(*(this));}
+	
+	/** default destructor */
+	virtual ~$(object)();
+	
+	/**********************************************************************
+  	 * OPERATORS OVERLOAD
+	 *********************************************************************/
+	
+	/** operator= overload */
+	$(object)&amp; operator=( const $(object)&amp; rhs );
+
+	/** operator== overload */
+	bool operator==( const $(object)&amp; rhs ) const;
+
+	/**********************************************************************
+  	 * METHODS
+	 *********************************************************************/
+	
+$(childs_header_public_code)
+
+private :
+$(childs_header_private_code)
+
+protected:
+$(childs_header_protected_code)
+};
+
+$(object_defines_end)
+		</objectpart>
+		<objectpart file="src">
+$(src_doc)
+
+#include "$(object).h"
+
+IMPLEMENT_DYNAMIC_CLASS_STD( $(object) , $(object_bases_list) )
+
+$(object)::~$(object)() {
+$(parameters_dtor_list)
+}
+
+$(object)&amp; $(object)::operator=( const $(object)&amp; rhs )
+{
+$(parameters_eqop_list)
+
+	return (*this);
+}
+
+bool $(object)::operator==( const $(object)&amp; rhs ) const
+{
+	return  (
+$(parameters_eqeqop_list)
+	 	);
+}
+
+$(childs_src_code)
+
+		</objectpart>
+	</template>
+	<template name="property">
+		<objectpart file="header" permission="protected">	$(type) m_$(name);
+	bool m_has$(name);
+</objectpart>
+		<objectpart file="header" permission="public">
+	/** Set the $(name) property
+  	  * @param $(name) property value to set
+  	  */
+	void Set$(name_extension)( const $(type)&amp; $(name) );
+
+	/** Get the $(name) property
+  	  * @return The property value as a $(type) object
+	  */
+	$(type)&amp; Get$(name_extension)( );
+	
+	/** Set the property $(name) has used */
+	void SetHas$(name_extension)(bool value = true) {
+		m_has$(name) = value;
+	}
+	
+	/** Check if the object has the $(name) property set */
+	bool Has$(name_extension)() const { return m_has$(name);};
+		</objectpart>
+		<objectpart file="src">
+void $(object)::Set$(name_extension)( const $(type)&amp; $(name) )
+{
+	m_$(name) = $(name);
+	m_has$(name) = true;
+}
+
+$(type)&amp; $(object)::Get$(name_extension)( )
+{
+	return m_$(name);
+}
+		</objectpart>
+	</template>
+	<template name="attribute">
+		<objectpart file="header" permission="protected">	$(type) m_$(name);
+	bool m_has$(name);
+</objectpart>
+		<objectpart file="header" permission="public">
+	/** Set the $(name) property
+  	  * @param $(name) property value to set
+  	  */
+	void Set$(name_extension)( const $(type)&amp; $(name) );
+
+	/** Get the $(name) property
+  	  * @return The property value as a $(type) object
+	  */
+	$(type)&amp; Get$(name_extension)( );
+	
+	/** Set the property $(name) has used */
+	void SetHas$(name_extension)(bool value = true) {
+		m_has$(name) = value;
+	}
+	
+	/** Check if the object has the $(name) property set */
+	bool Has$(name_extension)() const {return m_has$(name);};
+		</objectpart>
+		<objectpart file="src">
+void $(object)::Set$(name_extension)( const $(type)&amp; $(name) )
+{
+	m_$(name) = $(name);
+	m_has$(name) = true;
+}
+
+$(type)&amp; $(object)::Get$(name_extension)( )
+{
+	return m_$(name);
+}
+		</objectpart>
+	</template>
+	<template name="property_any">
+		<objectpart file="header" permission="protected">	$(type)* m_$(name);
+	bool m_has$(name);
+</objectpart>
+		<objectpart file="header" permission="public">
+	/** Set the $(name) property
+  	  * @param $(name) property value to set
+  	  */
+	void Set$(name_extension)( $(type)* $(name) );
+
+	/** Get the $(name) property
+  	  * @return The property value as a $(type) object
+	  */
+	$(type)* Get$(name_extension)( );
+	
+	/** Set the property $(name) has used */
+	void SetHas$(name_extension)(bool value = true) {
+		m_has$(name) = value;
+	}
+	
+	/** Check if the object has the $(name) property set */
+	bool Has$(name_extension)() const {return m_has$(name);};
+		</objectpart>
+		<objectpart file="src">
+void $(object)::Set$(name_extension)( $(type)* $(name) )
+{
+	m_$(name) = $(name);
+	m_has$(name) = true;
+}
+
+$(type)* $(object)::Get$(name_extension)( )
+{
+	return m_$(name);
+}
+		</objectpart>
+	</template>
+	<template name="property_any_array">
+		<objectpart file="header" permission="protected">	std::vector&lt;$(type)*&gt; m_$(name);
+	bool m_has$(name);
+</objectpart>
+		<objectpart file="header" permission="public">
+	
+	/** Set the $(name) property
+  	 * @param $(name) property value to set
+  	 */
+	void Set$(name_extension)( const std::vector&lt;$(type)*&gt;&amp; $(name) );
+
+	/** Get the $(name) property
+  	 * @return The property value as a $(type) object
+  	 */
+	std::vector&lt;$(type)*&gt; Get$(name_extension)( );
+	
+	/** Set the $(name) property at the given index
+  	 * @param $(name) property value to set
+	 * @param index index of the element to set in the array
+  	 */
+	void Set$(name_extension)( $(type)* $(name) , unsigned int index );
+	
+	/** Add the $(name) property at the end of the array
+  	 * @param $(name) property value to set
+  	 */
+	void Add$(name_extension)( $(type)* $(name) );
+
+	/** Get the $(name) property at the given index
+	 * @param index property index to get
+  	 * @return The property value as a $(type) object
+  	 */
+	$(type)* Get$(name_extension)( unsigned int index );
+	
+	/** Set the property $(name) has used */
+	void SetHas$(name_extension)(bool value = true) {
+		m_has$(name) = value;
+	}
+	
+	/** Check if the object has the $(name) property set */
+	bool Has$(name_extension)() const {return m_has$(name);};
+		</objectpart>
+		<objectpart file="src">
+void $(object)::Set$(name_extension)( const std::vector&lt;$(type)*&gt;&amp; $(name) )
+{
+	m_$(name) = $(name);
+	m_has$(name) = m_$(name).size() &gt; 0;
+}
+
+std::vector&lt;$(type)*&gt;&amp; $(object)::Get$(name_extension)( )
+{
+	return m_$(name);
+}
+
+void $(object)::Set$(name_extension)( $(type)* $(name) , unsigned int index )
+{
+	if( index >= m_$(name).size() )
+		throw "error in $(object)::Set$(name) , index out of bounds";
+	
+	if( m_$(name)[index] != NULL )
+		delete m_$(name)[index];
+		
+	m_$(name)[index] = $(name);
+}
+
+void $(object)::Add$(name_extension)( $(type)* $(name) )
+{		
+	m_$(name).push_back($(name));
+}
+
+$(type)* $(object)::Get$(name_extension)( unsigned int index )
+{
+	if( index >= m_$(name).size() )
+		throw "error index out of bound in $(object)::Get$(name)";
+
+	return m_$(name)[index];
+}
+		</objectpart>
+	</template>
+	<template name="child_enumerator">
+		<objectpart file="header">
+/* basic imports */
+class $(name);
+
+/** correspondance values for $(name) enumerator */
+const $(type) $(name)Values [] = {
+$(child_string_enum_list)
+};
+	
+/** 
+ * @class $(name)
+ * @brief Class for managing enumerated types $(name)
+ * @author Nicolas MACHEREY (nm@graymat.fr) http://www.rheia-framework.com
+ * @date $(date)
+ */
+class $(name) : public stdEnumeration
+{
+public :
+
+	/** constructor */
+	$(name)():m_value(($(name)Flags)0){};
+	
+	/** copy ctor */
+	$(name)(const $(name)&amp; rhs):
+		m_value(rhs.m_value)
+		{};
+		
+	/** Clone method */
+	virtual stdObject* Clone() {return new $(name)(*this);};
+	
+	/** operator= overload */
+	$(name)&amp; operator=( const $(name)&amp; rhs ){
+		m_value = rhs.m_value;
+		return (*this);
+	}
+	
+	/** operator == overload */
+	bool operator==( const $(name)&amp; rhs ) const{
+		return (m_value==rhs.m_value);
+	}
+	
+	/** enumerates flgas for $(name) enumerator */
+	enum $(name)Flags {
+	$(child_enum_list)
+		// Always keep this one last in order to know the number of elements
+		$(name)Num
+	};	
+	
+	/** Get the total number of enumerated values */
+	virtual unsigned int GetCount() const { return (unsigned int) $(name)Num;};
+	
+	/** Get enumerated as a wxArrayInt */
+	virtual std::vector&lt;unsigned int&gt; GetFlags() const {
+		std::vector&lt;unsigned int&gt; ret;
+		for( unsigned int i = 0; i &lt; $(name)Num ; ++i )
+			ret.push_back(i);
+		return ret;
+	};
+	
+	/** Get values */
+	virtual const $(type)* GetValues() const {return $(name)Values;};
+	
+	/** Get the $(type) value assoiated to the given enumeration flag */
+	const $(type)&amp; GetFromFlag( $(name)Flags value ) const {
+		return $(name)Values[value];		
+	}
+	
+	/** Get the $(type) value assoiated to the given enumeration flag */
+	virtual const $(type)&amp; GetFromFlag( unsigned int value ) const {
+		return $(name)Values[value];		
+	}
+	
+	/** Get the flag associated to the given $(type) */
+	$(name)Flags GetFromValue( const $(type)&amp; value ) const {
+		for( unsigned int i = 0; i &lt; $(name)Num ; ++i )
+			if( $(name)Values[i] == value )
+				return ($(name)Flags) i;
+			
+			return $(name)Num;
+	}
+	
+	/** Get the flag associated to the given $(type) */
+	virtual unsigned int GetUIntFromValue( const $(type)&amp; value ) const {
+		for( unsigned int i = 0; i &lt; $(name)Num ; ++i )
+			if( $(name)Values[i] == value )
+				return i;
+			
+			return (unsigned int) $(name)Num;
+	}
+	
+	/** Get the flag */
+	$(name)Flags GetFlag() const { return m_value; };
+	
+	/** Get the flag */
+	virtual unsigned int GetUIntFlag() const { return (unsigned int) m_value; };
+	
+	/** Get the value from flag */
+	virtual const $(type)&amp; GetValue() const {
+		return GetFromFlag( m_value );
+	}
+	
+	/** Set the value */
+	void SetFlag( $(name)Flags value ) {m_value = value;};
+	
+	/** Set the value */
+	virtual void SetFlag( unsigned int value ) {m_value = ($(name)Flags) value;};
+	
+	/** Set the value */
+	virtual void SetValue( const $(type)&amp; value ) {
+		for( unsigned int i = 0; i &lt; $(name)Num ; ++i )
+			if( $(name)Values[i] == value )
+				m_value = ($(name)Flags) i;
+	}
+
+private :
+
+	$(name)Flags m_value;
+		
+	DECLARE_DYNAMIC_CLASS_STD( $(object) )
+};
+		</objectpart>
+		<objectpart file="src">
+/** Implement RTTI Information forenumeration class $(name) */
+IMPLEMENT_DYNAMIC_CLASS_STD( $(name) , stdObject )
+		</objectpart>
+	</template>
+	<template name="typedef">
+		<objectpart file="header">
+/** define a new type for $(name) */
+typedef $(type) $(name);
+		</objectpart>
+	</template>
+	<template name="array_addons">
+		<objectpart file="header">
+	/** Add a $(real_type) object in the container
+	 * @param $(name) object to add in the container
+	 */
+	virtual void Add$(name_extension)( const $(real_type)&amp; $(name) );
+	
+	/** Remove a $(real_type) object from the container at the given index
+	 * @param index Index of the object to remove from the container
+	 */
+	virtual void Remove$(name_extension)ByIndex( unsigned int index );
+	
+	/** Set the $(name) property at the given index
+  	 * @param $(name) property value to set
+	 * @param index index of the element to set in the array
+  	 */
+	virtual void Set$(name_extension)At( const $(real_type)&amp; $(name) , unsigned int index );
+
+	/** Get the $(name) property at the given index
+	 * @param index property index to get
+  	 * @return The property value as a $(real_type) object
+  	 */
+	virtual $(real_type)&amp; Get$(name_extension)At( unsigned int index );
+	
+	/** Find the $(real_type) object index by object
+	 * @param $(name) Object to find the index for
+	 * @return stdNOT_FOUND if the object wasn't found
+	 */
+	virtual int FindIndexBy$(name_extension)( const $(real_type)&amp; $(name) );
+	
+	/** Check the existance of the given $(real_type) object
+	 * @param $(name) Object to check the existance for
+	 * @return false if the object does not exists in the m_$(name) container
+	 */
+	virtual bool ExistsBy$(name_extension)( const $(real_type)&amp; $(name) );
+	
+	/** Get the number of $(name) elements */
+	virtual unsigned int Get$(name_extension)Count() {return m_$(name).size();}
+	
+	/** clear the container */
+	virtual void Clear$(name_extension)() {m_$(name).clear();}
+		</objectpart>
+		<objectpart file="src">
+void $(object)::Add$(name_extension)( const $(real_type)&amp; $(name) )
+{
+	m_$(name).push_back($(name));
+	m_has$(name) = true;
+}
+
+void $(object)::Remove$(name_extension)ByIndex( unsigned int index )
+{
+	if( index >= m_$(name).size() )
+		STD_THROW( "Error in $(object)::Remove$(name_extension)ByIndex , index out of bounds");
+		
+	std::vector&lt; $(real_type) &gt;::iterator it = m_$(name).begin() + index;
+	m_$(name).erase(it);
+}
+
+void $(object)::Set$(name_extension)At( const $(real_type)&amp; $(name) , unsigned int index )
+{
+	if( index >= m_$(name).size() )
+		STD_THROW( "Error in $(object)::Set$(name_extension)At , index out of bounds" );
+	
+	m_$(name)[index] = $(name);
+}
+
+$(real_type)&amp; $(object)::Get$(name_extension)At( unsigned int index )
+{
+	if( index >= m_$(name).size() )
+		STD_THROW( "Error index out of bound in $(object)::Get$(name)At" );
+
+	return m_$(name)[index];
+}
+
+int $(object)::FindIndexBy$(name_extension)( const $(real_type)&amp; $(name) )
+{
+	std::vector&lt; $(real_type) &gt;::iterator it = m_$(name).begin();
+		
+	for( int i = 0 ; it != m_$(name).end() ; ++it, ++i )
+		if( (*it) == $(name) )
+			return i;
+
+	return stdNOT_FOUND;
+}
+
+bool $(object)::ExistsBy$(name_extension)( const $(real_type)&amp; $(name) )
+{
+	std::vector&lt; $(real_type) &gt;::iterator it = m_$(name).begin();
+		
+	for( int i = 0 ; it != m_$(name).end() ; ++it, ++i )
+		if( (*it) == $(name) )
+			return true;
+
+	return false;
+}
+		</objectpart>
+	</template>
+	<template name="array_property_finder">
+		<objectpart file="header">
+	/** Find the $(type) object by it's $(property) attribute
+	 * @param $(property) property to find the object for
+	 * @return NULL if the object with the given property wasn't found
+	 */
+	virtual $(type)* Find$(name_extension)By$(property_extension)( const $(proprety_type)&amp; $(property) );
+	
+	/** Check if the property with the given name exists in the m_$(name) container
+	 * @param $(property) to chekc the assocated object existance for
+	 * @return false if the object with the given property wasn't found
+	 */
+	virtual bool $(name_extension)ExistsBy$(property_extension)( const $(property_type)&amp; $(property) );
+	
+	/** List all objects properties and return them in an array of string
+	 * @return an array of property containing all m_$(name) $(property)
+	 */
+	virtual std::vector&lt; $(property_type) &gt; Get$(name_extension)$(property_extension)List();
+		</objectpart>
+		<objectpart file="src">
+$(type)* $(object)::Find$(name_extension)By$(property_extension)( const $(proprety_type)&amp; $(property) )
+{
+	std::vector&lt; $(type) &gt;::iterator it = m_$(name).begin()
+		
+	for( int i = 0 ; it != m_$(name).end() ; ++it, ++i )
+		if( (*it).Get$(property_extension)() == $(property) )
+			return &amp;(*it);
+
+	return NULL;
+}
+
+bool $(object)::$(name_extension)ExistsBy$(property_extension)( const $(proprety_type)&amp; $(property) )
+{
+	std::vector&lt; $(type) &gt;::iterator it = m_$(name).begin()
+		
+	for( int i = 0 ; it != m_$(name).end() ; ++it, ++i )
+		if( (*it).Get$(property_extension)() == $(property) )
+			return true;
+
+	return false;
+}
+
+std::vector&lt; $(property_type) &gt; $(object)::Get$(name_extension)$(property_extension)List()
+{
+	std::vector&lt; $(property_type)&gt; ret;
+	std::vector&lt; $(type) &gt;::iterator it = m_$(name).begin()
+		
+	for( int i = 0 ; it != m_$(name).end() ; ++it, ++i )
+		ret.push_back((*it).Get$(property_extension)() );
+
+	return ret;
+}
+		</objectpart>
+	</template>
+	<!-- 
+	 Type infos are used to notify the interpreter that the related types in the xml shall be
+	 translated to the one given there.
+	 It will consist into a map of elements specifying the source as a key and the destination
+	 as a value.
+	 If a type is not found it is assumed to be complex or to be generated in the file.
+	-->
+	<types_info>
+		<typeinfo source="positiveInteger" destination="unsigned int"/>
+		<typeinfo source="variant" destination="stdObject"/>
+		<typeinfo source="string" destination="std::string"/>
+		<typeinfo source="boolean" destination="bool"/>
+		<typeinfo source="float" destination="double"/>
+		<typeinfo source="integer" destination="int"/>
+		<typeinfo source="duration" destination="std::string"/>
+		<typeinfo source="datetime" destination="std::string"/>
+		<typeinfo source="dateTime" destination="std::string"/>
+		<typeinfo source="date" destination="std::string"/>
+		<typeinfo source="time" destination="std::string"/>
+		<typeinfo source="gYear" destination="std::string"/>
+		<typeinfo source="gYearMonth" destination="std::string"/>
+		<typeinfo source="gMonth" destination="std::string"/>
+		<typeinfo source="gMonthDay" destination="std::string"/>
+		<typeinfo source="ID" destination="std::string"/>
+	</types_info>
+	<addin name="stdException">
+		<header>
+/**
+*   @file stdException.h
+*   @brief stdException is the basic class for std's error handling unit.
+*
+*   Two macros are defined to help error handling in std:
+*   STD_THROW() and STD_ASSERT().
+*
+*   @note STD_ASSERT() does nothing in release mode. For debug mode, compile with -D__WXDEBUG__
+*
+*	@author Nicolas Macherey (nm@graymat.fr)
+*	@version 0.0.1
+*	@date 03-Jan-2009
+*/
+#ifndef STD_EXCEPTION_H
+#define STD_EXCEPTION_H
+
+/**
+*	@class stdException
+*	@brief The base std exception object.
+*
+*	In the std FrameWork you can manage errors handled by the different elements and objects by using the stdExcpetion object.
+*	All errors and exeptions must use as base exception class stdException.
+*
+*	@author Nicolas Macherey (nm@graymat.fr)
+*	@version 0.0.1
+*	@date 03-Jan-2009
+*/
+class stdException
+{
+public:
+    stdException(const std::string&amp; msg, const std::string&amp; file, int line);
+    virtual ~stdException();
+
+    /**
+    *   @brief Display exception error message.
+    */
+    void ShowErrorMessage();
+	
+	std::string GetErrorMessage();
+
+    // public members
+    std::string m_message; ///&lt; The exception's error message.
+    std::string m_file; ///&lt; The file where the exception was raised.
+    int m_line; ///&lt; The line in the file where the exception was raised.
+};
+
+#define STD_THROW(message) throw stdException(message, __FILE__, __LINE__)
+
+#ifndef _DEBUG
+#define STD_ASSERT(expr)
+#else
+// In unix we use kill to terminate the application, that makes gdb
+// keep it alive which makes debugging easier.
+// (thanks go to an unknown author)
+#ifdef WIN32
+#define DIE() exit(1)
+#else
+#include &lt;csignal&gt;
+#define DIE() kill(0, SIGTERM)
+#endif
+
+#define BUFLEN 2048
+
+#define STD_ASSERT_MESSAGE(expr) \
+		char msg[BUFLEN]; \
+        sprintf( msg , "Assertion failed in %s at %s:%d.\n\n%s\0" , __PRETTY_FUNCTION__ , __FILE__ , __LINE__ , #expr );
+
+// non-fatal assertion
+#define STD_ASSERT_NONFATAL(expr) \
+        if (!(expr)) \
+        { \
+            STD_ASSERT_MESSAGE(expr); \
+            std::cerr &lt;&lt; "Assertion error " &lt;&lt; msg &lt;&lt; std::endl; \
+        }
+
+// fatal assertion
+#define STD_ASSERT(expr) \
+        if (!(expr)) \
+        { \
+            STD_ASSERT_MESSAGE(expr); \
+            std::cerr &lt;&lt; "Assertion error " &lt;&lt; msg &lt;&lt; std::endl; \
+            DIE(); \
+        }
+#endif
+#endif
+		</header>
+		<source>
+/**
+*   @file stdException.cpp
+*   @brief stdExecption is the basic class for std's error handling unit.
+*
+*   Two macros are defined to help error handling in std:
+*   STD_THROW() and STD_ASSERT().
+*
+*   @note STD_ASSERT() does nothing in release mode. For debug mode, compile with -D__WXDEBUG__
+*
+*	@author Nicolas Macherey (nm@graymat.fr)
+*	@version 0.0.1
+*	@date 03-Jan-2009
+*/
+#include &lt;libxml/xmlreader.h&gt;
+#include &lt;libxml/xpath.h&gt;
+
+#include &lt;iostream&gt;
+#include &lt;sstream&gt;
+#include &lt;map&gt;
+
+#include "stdDefines.h"
+#include "stdException.h"
+
+stdException::stdException(const std::string&amp; msg, const std::string&amp; file, int line)
+  : m_message(msg),
+    m_file(file),
+    m_line(line)
+{}
+
+stdException::~stdException()
+{}
+
+
+void stdException::ShowErrorMessage()
+{
+    std::cerr &lt;&lt; "Exception : " &lt;&lt; "An exception has been raised!" &lt;&lt; std::endl &lt;&lt; std::endl;
+	std::cerr &lt;&lt; "The library encountered an error in file : " &lt;&lt; m_file &lt;&lt; ", on line : " &lt;&lt; m_line &lt;&lt; "." &lt;&lt; std::endl;
+	std::cerr &lt;&lt; "The error message is : " &lt;&lt; std::endl &lt;&lt; std::endl;
+	std::cerr &lt;&lt; m_message &lt;&lt; std::endl;
+	std::cerr &lt;&lt; "Library build is : " &lt;&lt; __DATE__ &lt;&lt; " " &lt;&lt; __TIME__ &lt;&lt; std::endl;
+}
+
+std::string stdException::GetErrorMessage()
+{
+	std::stringstream strm;
+	
+	strm &lt;&lt; "Exception : " &lt;&lt; "An exception has been raised!" &lt;&lt; std::endl &lt;&lt; std::endl;
+	strm &lt;&lt; "The library encountered an error in file : " &lt;&lt; m_file &lt;&lt; ", on line : " &lt;&lt; m_line &lt;&lt; "." &lt;&lt; std::endl;
+	strm &lt;&lt; "The error message is : " &lt;&lt; std::endl &lt;&lt; std::endl;
+	strm &lt;&lt; m_message &lt;&lt; std::endl;
+	strm &lt;&lt; "Library build is : " &lt;&lt; __DATE__ &lt;&lt; " " &lt;&lt; __TIME__ &lt;&lt; std::endl;
+	std::string ret;
+	strm &gt;&gt; ret;
+	
+	return ret;
+}		
+		</source>
+	</addin>
+	<addin name="stdObject">
+		<header>
+/**
+*	@file stdObject.h
+
+*	@author Nicolas Macherey (nm@graymat.fr)
+*	@date 31-Janv-2009
+*	@version 0.0.1
+*
+*/
+
+#ifndef STD_OBJECT_H
+#define STD_OBJECT_H
+
+#include &lt;iostream&gt;
+#include &lt;ctype.h&gt;
+#include &lt;limits&gt;
+#include &lt;vector&gt;
+
+/*******************************************************************************
+   DEFINES / TYPDEFS / ENUMS
+*******************************************************************************/
+#ifndef MIN
+/*! Computes the minimum of \a a and \a b */
+#define MIN(a, b)       ((a) &lt; (b) ? (a) : (b))
+#endif
+#ifndef MAX
+/*! Computes the maximum of \a a and \a b */
+#define MAX(a, b)       ((a) &lt; (b) ? (b) : (a))
+#endif
+/*! Defines UNDEF */
+const double UNDEF = std::numeric_limits&lt;double&gt;::quiet_NaN();
+
+/* class definitions for stdObject */
+class stdClassInfo;
+class stdHashTable;
+class stdObjectRefData;
+class stdObject;
+
+typedef stdObject *(*stdObjectConstructorFn)(void);
+
+/*******************************************************************************
+   CLASS stdClassInfo DECLARATION
+*******************************************************************************/
+/**
+*	@class stdClassInfo
+*	@brief This class is the basic class for getting information about an element in a Std data file
+*	@author Nicolas Macherey (nm@graymat.fr)
+*	@date 08-Feb-2009
+*	@version 0.0.1
+*/
+
+class stdClassInfo {
+public:
+	stdClassInfo( const char *className,
+	              const stdClassInfo *baseInfo1,
+	              const stdClassInfo *baseInfo2,
+	              const stdClassInfo *baseInfo3,
+	              int size,
+	              stdObjectConstructorFn ctor )
+		: m_className(className)
+		, m_objectSize(size)
+		, m_objectConstructor(ctor)
+		, m_baseInfo1(baseInfo1)
+		, m_baseInfo2(baseInfo2)
+		, m_baseInfo3(baseInfo3)
+		, m_next(sm_first) {
+		sm_first = this;
+		Register();
+	}
+
+	~stdClassInfo();
+
+	stdObject *CreateObject() const {
+		return m_objectConstructor ? (*m_objectConstructor)() : 0;
+	}
+
+	bool IsDynamic() const {
+		return (NULL != m_objectConstructor);
+	}
+
+	const char *GetClassName() const {
+		return m_className;
+	}
+
+	const char* GetBaseClassName1() const {
+		return m_baseInfo1 ? m_baseInfo1-&gt;GetClassName() : NULL;
+	}
+
+	const char *GetBaseClassName2() const {
+		return m_baseInfo2 ? m_baseInfo2-&gt;GetClassName() : NULL;
+	}
+
+	const char *GetBaseClassName3() const {
+		return m_baseInfo3 ? m_baseInfo3-&gt;GetClassName() : NULL;
+	}
+
+	const stdClassInfo  *GetBaseClass1() const {
+		return m_baseInfo1;
+	}
+
+	const stdClassInfo  *GetBaseClass2() const {
+		return m_baseInfo2;
+	}
+
+	const stdClassInfo  *GetBaseClass3() const {
+		return m_baseInfo3;
+	}
+
+	int                 GetSize() const {
+		return m_objectSize;
+	}
+
+	stdObjectConstructorFn      GetConstructor() const {
+		return m_objectConstructor;
+	}
+
+	static const stdClassInfo  *GetFirst() {
+		return sm_first;
+	}
+
+	const stdClassInfo *GetNext() const {
+		return m_next;
+	}
+
+	static stdClassInfo *FindClass(const char* className);
+
+	bool IsKindOf(const stdClassInfo *info) const {
+		return info != 0 &amp;&amp;
+		       ( info == this ||
+		         ( m_baseInfo1 &amp;&amp; m_baseInfo1-&gt;IsKindOf(info) ) ||
+		         ( m_baseInfo2 &amp;&amp; m_baseInfo2-&gt;IsKindOf(info) ) ||
+		         ( m_baseInfo3 &amp;&amp; m_baseInfo3-&gt;IsKindOf(info) ) );
+	}
+
+
+public :
+
+	const char *m_className;
+	int m_objectSize;
+	stdObjectConstructorFn m_objectConstructor;
+
+	// Pointers to base stdClassInfo : set in InitializeClasses
+	const stdClassInfo *m_baseInfo1;
+	const stdClassInfo *m_baseInfo2;
+	const stdClassInfo *m_baseInfo3;
+
+	// class info object live in a linked list:
+	// pointers to its head and the next element in it
+
+	static stdClassInfo *sm_first;
+	stdClassInfo *m_next;
+
+private:
+	// InitializeClasses() helper
+	static stdClassInfo *GetBaseByName(const char *name);
+
+	static stdHashTable *sm_classTable;
+
+protected:
+	// registers the class
+	void Register();
+	void Unregister();
+
+};
+
+// ----------------------------------------------------------------------------
+// Dynamic class macros
+// ----------------------------------------------------------------------------
+#define DECLARE_NO_COPY_CLASS_STD(classname)        \
+	private:                                    \
+	classname(const classname&amp;);            \
+	classname&amp; operator=(const classname&amp;);
+
+#define DECLARE_NO_ASSIGN_CLASS_STD(classname)      \
+	private:                                    \
+	classname&amp; operator=(const classname&amp;);
+
+#define DECLARE_ABSTRACT_CLASS_STD(name)                                           \
+	public:                                                                    \
+	static stdClassInfo ms_classInfo;                                      \
+	virtual stdClassInfo *GetClassInfo() const;
+
+#define DECLARE_DYNAMIC_CLASS_STD_NO_ASSIGN_STD(name)                                  \
+	DECLARE_NO_ASSIGN_CLASS_STD(name)                                              \
+	DECLARE_DYNAMIC_CLASS_STD(name)
+
+#define DECLARE_DYNAMIC_CLASS_STD_NO_COPY_STD(name)                                    \
+	DECLARE_NO_COPY_CLASS_STD(name)                                                \
+	DECLARE_DYNAMIC_CLASS_STD(name)
+
+#define DECLARE_DYNAMIC_CLASS_STD(name)                                            \
+	DECLARE_ABSTRACT_CLASS_STD(name)                                               \
+	static stdObject* StdCreateObject();
+
+#define DECLARE_CLASS_STD(name) DECLARE_DYNAMIC_CLASS_STD(name)
+
+// common part of the macros below
+#define IMPLEMENT_CLASS_STD_COMMON_STD(name, basename, baseclsinfo2, baseclsinfo3 , func) \
+	stdClassInfo name::ms_classInfo( #name,                                    \
+	                                 &amp;basename::ms_classInfo,                                           \
+	                                 baseclsinfo2,                                                      \
+	                                 baseclsinfo3,                                                      \
+	                                 (int) sizeof(name),                                                \
+	                                 (stdObjectConstructorFn) func);                                    \
+	\
+	stdClassInfo *name::GetClassInfo() const                                   \
+	{ return &amp;name::ms_classInfo; }
+
+#define IMPLEMENT_CLASS_STD_COMMON_STD1(name, basename, func)                          \
+	IMPLEMENT_CLASS_STD_COMMON_STD(name, basename, NULL, NULL, func)
+
+#define IMPLEMENT_CLASS_STD_COMMON_STD2(name, basename1, basename2, func)              \
+	IMPLEMENT_CLASS_STD_COMMON_STD(name, basename1, &amp;basename2::ms_classInfo, NULL, func)
+
+#define IMPLEMENT_CLASS_STD_COMMON_STD3(name, basename1, basename2,basename3, func)    \
+	IMPLEMENT_CLASS_STD_COMMON_STD(name, basename1, &amp;basename2::ms_classInfo, &amp;basename3::ms_classInfo, func)
+
+// -----------------------------------
+// for template classes
+// -----------------------------------
+#define DECLARE_ABSTRACT_TEMPLATE_CLASS_STD(EXPORT_MACRO, name)                    \
+	public:                                                                    \
+	EXPORT_MACRO static stdClassInfo ms_classInfo;                                      \
+	EXPORT_MACRO virtual stdClassInfo *GetClassInfo() const;
+
+#define DECLARE_DYNAMIC_TEMPLATE_CLASS_STD(EXPORT_MACRO, name)                     \
+	DECLARE_ABSTRACT_TEMPLATE_CLASS_STD(EXPORT_MACRO, name)                         \
+	EXPORT_MACRO static stdObject* StdCreateObject();
+
+#define DECLARE_TEMPLATE_CLASS_STD(EXPORT_MACRO, name )                            \
+	DECLARE_DYNAMIC_TEMPLATE_CLASS_STD(EXPORT_MACRO, name )
+
+#define IMPLEMENT_TEMPLATE_CLASS_STD( name , basename )                            \
+	template&lt;&gt; stdObject* name::StdCreateObject()                      \
+	{ return new name; }                                               \
+	template&lt;&gt; stdClassInfo name::ms_classInfo( #name,                 \
+	        &amp;basename::ms_classInfo,                                           \
+	        NULL,                                                              \
+	        NULL,                                                              \
+	        (int) sizeof(name),                                                \
+	        (stdObjectConstructorFn) name::StdCreateObject );                  \
+	\
+	template&lt;&gt; stdClassInfo *name::GetClassInfo() const                \
+	{ return &amp;name::ms_classInfo; }
+
+#define IMPLEMENT_TEMPLATE_CLASS_STD2( name , basename1, basename2)                \
+	template&lt;&gt; name::stdObject* name::StdCreateObject()                \
+	{ return new name; }                                               \
+	template&lt;&gt; stdClassInfo name::ms_classInfo( #name,                 \
+	        &amp;basename1::ms_classInfo,                                          \
+	        &amp;basename2::ms_classInfo,                                          \
+	        NULL,                                                              \
+	        (int) sizeof(name),                                                \
+	        (stdObjectConstructorFn) name::StdCreateObject );                  \
+	\
+	template&lt;&gt; stdClassInfo *name::GetClassInfo() const                \
+	{ return &amp;name::ms_classInfo; }
+
+#define IMPLEMENT_TEMPLATE_CLASS_STD3( name , basename1, basename2, basename3)     \
+	template&lt;&gt; stdObject* name::StdCreateObject()                      \
+	{ return new name; } \
+	template&lt;&gt; stdClassInfo name::ms_classInfo( #name,                 \
+	        &amp;basename1::ms_classInfo,                                          \
+	        &amp;basename2::ms_classInfo,                                          \
+	        &amp;basename3::ms_classInfo,                                          \
+	        (int) sizeof(name),                                                \
+	        (stdObjectConstructorFn) name::StdCreateObject );                  \
+	\
+	template&lt;&gt; stdClassInfo *name::GetClassInfo() const                \
+	{ return &amp;name::ms_classInfo; }
+
+// -----------------------------------
+// for concrete classes
+// -----------------------------------
+
+// Single inheritance with one base class
+#define IMPLEMENT_DYNAMIC_CLASS_STD(name, basename)                                \
+	IMPLEMENT_CLASS_STD_COMMON_STD1(name, basename, name::StdCreateObject)             \
+	stdObject* name::StdCreateObject()                                         \
+	{ return new name; }
+
+// Multiple inheritance with two base classes
+#define IMPLEMENT_DYNAMIC_CLASS_STD2(name, basename1, basename2)                   \
+	IMPLEMENT_CLASS_STD_COMMON_STD2(name, basename1, basename2,                        \
+	                                name::StdCreateObject)                           \
+	stdObject* name::StdCreateObject()                                         \
+	{ return new name; }
+
+#define IMPLEMENT_DYNAMIC_CLASS_STD3(name, basename1, basename2, basename3)        \
+	IMPLEMENT_CLASS_STD_COMMON_STD3(name, basename1, basename2, basename2,             \
+	                                name::StdCreateObject)                           \
+	stdObject* name::StdCreateObject()                                         \
+	{ return new name; }
+
+// -----------------------------------
+// for abstract classes
+// -----------------------------------
+
+// Single inheritance with one base class
+
+#define IMPLEMENT_ABSTRACT_CLASS_STD(name, basename)                               \
+	IMPLEMENT_CLASS_STD_COMMON_STD1(name, basename, NULL)
+
+// Multiple inheritance with two base classes
+
+#define IMPLEMENT_ABSTRACT_CLASS_STD2(name, basename1, basename2)                  \
+	IMPLEMENT_CLASS_STD_COMMON_STD2(name, basename1, basename2, NULL)
+
+#define IMPLEMENT_ABSTRACT_CLASS_STD3(name, basename1, basename2, basename3)       \
+	IMPLEMENT_CLASS_STD_COMMON_STD3(name, basename1, basename2, basename3, NULL)
+
+#define IMPLEMENT_CLASS_STD IMPLEMENT_ABSTRACT_CLASS_STD
+#define IMPLEMENT_CLASS_STD2 IMPLEMENT_ABSTRACT_CLASS_STD2
+#define IMPLEMENT_CLASS_STD3 IMPLEMENT_ABSTRACT_CLASS_STD3
+
+
+#define STDCLASSINFO(name) (&amp;name::ms_classInfo)
+
+#define IS_OF_KIND(obj, className) obj-&gt;IsKindOf(&amp;className::ms_classInfo)
+
+/*******************************************************************************
+   CLASS stdObjectRefData DECLARATION
+*******************************************************************************/
+/*!
+@class stdObjectRefData
+@brief ref counted data meant to be stored in stdObject
+*/
+
+class stdObjectRefData {
+	friend class stdObject;
+
+public:
+	stdObjectRefData() : m_count(1) { }
+	virtual ~stdObjectRefData() { }
+
+	int GetRefCount() const {
+		return m_count;
+	}
+
+private:
+	int m_count;
+};
+
+/*******************************************************************************
+   CLASS stdObject DECLARATION
+*******************************************************************************/
+/**
+*	@class stdObject
+*	@brief This class is the basic class for reading/writing Std specific object from/to a file
+*	This class is used as a base class for defining STD Data read/wittrent from/to a file.
+*	Any returned information shall be based on this object. And any StdXmlHandler's must
+*	handle this type of object.
+*
+*	@author Nicolas Macherey (nm@graymat.fr)
+*	@date 08-Feb-2009
+*	@version 0.0.1
+*/
+class stdObject {
+	DECLARE_ABSTRACT_CLASS_STD(stdObject)
+
+public:
+	stdObject() {
+		m_refData = NULL;
+	}
+	virtual ~stdObject() {
+		UnRef();
+	}
+
+	stdObject(const stdObject&amp; other) {
+		m_refData = other.m_refData;
+		if (m_refData)
+			m_refData-&gt;m_count++;
+	}
+
+	stdObject&amp; operator=(const stdObject&amp; other) {
+		if ( this != &amp;other ) {
+			Ref(other);
+		}
+		return *this;
+	}
+
+	bool IsKindOf(stdClassInfo *info) const;
+
+	// get/set
+	stdObjectRefData *GetRefData() const {
+		return m_refData;
+	}
+	void SetRefData(stdObjectRefData *data) {
+		m_refData = data;
+	}
+
+	// make a 'clone' of the object
+	void Ref(const stdObject&amp; clone);
+
+	// destroy a reference
+	void UnRef();
+
+	// Make sure this object has only one reference
+	void UnShare() {
+		AllocExclusive();
+	}
+
+	// check if this object references the same data as the other one
+	bool IsSameAs(const stdObject&amp; o) const {
+		return m_refData == o.m_refData;
+	}
+
+protected:
+	// ensure that our data is not shared with anybody else: if we have no
+	// data, it is created using CreateRefData() below, if we have shared data
+	// it is copied using CloneRefData(), otherwise nothing is done
+	void AllocExclusive();
+
+	// both methods must be implemented if AllocExclusive() is used, not pure
+	// virtual only because of the backwards compatibility reasons
+
+	// create a new m_refData
+	virtual stdObjectRefData *CreateRefData() const;
+
+	// create a new m_refData initialized with the given one
+	virtual stdObjectRefData *CloneRefData(const stdObjectRefData *data) const;
+
+	stdObjectRefData *m_refData;
+};
+
+$(extended_enumeration_hdr)
+
+#endif
+		</header>
+		<source>
+/**
+*	@file stdObject.cpp
+*	@author Nicolas Macherey (nm@graymat.fr)
+*	@date 31-Janv-2009
+*	@version 0.0.1
+*/
+
+/*******************************************************************************
+   INCLUDES
+*******************************************************************************/
+#include &lt;string.h&gt;
+
+#include "stdHashTable.h"
+#include "stdObject.h"
+
+
+/*******************************************************************************
+   CLASS stdClassInfo DEFINITION
+*******************************************************************************/
+stdClassInfo stdObject::ms_classInfo( "stdObject", 0, 0,0,
+                                      (int) sizeof(stdObject),
+                                      (stdObjectConstructorFn) 0 );
+
+// restore optimizations
+#if defined __VISUALC__ &amp;&amp; __VISUALC__ &gt;= 1300
+#pragma optimize("", on)
+#endif
+
+stdClassInfo* stdClassInfo::sm_first = NULL;
+stdHashTable* stdClassInfo::sm_classTable = NULL;
+
+stdClassInfo::~stdClassInfo() {
+	// remove this object from the linked list of all class infos: if we don't
+	// do it, loading/unloading a DLL containing static wxClassInfo objects is
+	// not going to work
+	if ( this == sm_first ) {
+		sm_first = m_next;
+	} else {
+		stdClassInfo *info = sm_first;
+		while (info) {
+			if ( info-&gt;m_next == this ) {
+				info-&gt;m_next = m_next;
+				break;
+			}
+
+			info = info-&gt;m_next;
+		}
+	}
+	Unregister();
+}
+
+stdClassInfo *stdClassInfo::FindClass(const char* className) {
+	if ( sm_classTable ) {
+		return (stdClassInfo *)stdClassInfo::sm_classTable-&gt;Get(className);
+	} else {
+		for ( stdClassInfo *info = sm_first; info ; info = info-&gt;m_next ) {
+			if ( strcmp(info-&gt;GetClassName(), className) == 0 )
+				return info;
+		}
+
+		return NULL;
+	}
+}
+
+// This function wasn't written to be reentrant but there is a possiblity of
+// reentrance if something it does causes a shared lib to load and register
+// classes. On Solaris this happens when the wxHashTable is newed, so the first
+// part of the function has been modified to handle it, and a wxASSERT checks
+// against reentrance in the remainder of the function.
+
+void stdClassInfo::Register() {
+	if ( !sm_classTable ) {
+		stdHashTable *classTable = new stdHashTable(ktKEY_STRING);
+
+		// check for reentrance
+		if ( sm_classTable )
+			delete classTable;
+		else
+			sm_classTable = classTable;
+	}
+
+	sm_classTable-&gt;Put(m_className, (stdObject *)this);
+}
+
+void stdClassInfo::Unregister() {
+	if ( sm_classTable ) {
+		sm_classTable-&gt;Delete(m_className);
+		if ( sm_classTable-&gt;GetCount() == 0 ) {
+			delete sm_classTable;
+			sm_classTable = NULL;
+		}
+	}
+}
+
+/*******************************************************************************
+   CLASS stdObject DEFINITION
+*******************************************************************************/
+void stdObject::Ref(const stdObject&amp; clone) {
+	// nothing to be done
+	if (m_refData == clone.m_refData)
+		return;
+
+	// delete reference to old data
+	UnRef();
+
+	// reference new data
+	if ( clone.m_refData ) {
+		m_refData = clone.m_refData;
+		++(m_refData-&gt;m_count);
+	}
+}
+
+void stdObject::UnRef() {
+	if ( m_refData ) {
+		if ( --m_refData-&gt;m_count == 0 )
+			delete m_refData;
+		m_refData = NULL;
+	}
+}
+
+void stdObject::AllocExclusive() {
+	if ( !m_refData ) {
+		m_refData = CreateRefData();
+	} else if ( m_refData-&gt;GetRefCount() &gt; 1 ) {
+		// note that ref is not going to be destroyed in this case
+		const stdObjectRefData* ref = m_refData;
+		UnRef();
+
+		// ... so we can still access it
+		m_refData = CloneRefData(ref);
+	}
+	//else: ref count is 1, we are exclusive owners of m_refData anyhow
+}
+
+/*******************************************************************************
+   CLASS stdObjectRefData DEFINITION
+*******************************************************************************/
+stdObjectRefData *stdObject::CreateRefData() const {
+	return NULL;
+}
+
+stdObjectRefData *
+stdObject::CloneRefData(const stdObjectRefData * data) const {
+	// if you use AllocExclusive() you must override this method
+	return NULL;
+}
+
+stdClassInfo *stdObject::GetClassInfo() const {
+	return &amp;stdObject::ms_classInfo;
+}
+
+bool stdObject::IsKindOf(stdClassInfo *info) const {
+	stdClassInfo *thisInfo = GetClassInfo();
+	return (thisInfo) ? thisInfo-&gt;IsKindOf(info) : false ;
+}
+
+$(extended_enumeration_src)
+		</source>
+	</addin>
+	<addin name="stdHashTable">
+		<header>
+/**
+*	@file stdHashTableBase.h
+*	@author Nicolas Macherey (nm@graymat.fr)
+*	@date 31-Janv-2009
+*	@version 0.0.1
+*/
+#ifndef STD_HASHTABLE_H
+#define STD_HASHTABLE_H
+
+#include &lt;iostream&gt;
+
+/*******************************************************************************
+   DEFINES / TYPDEFS / ENUMS
+*******************************************************************************/
+/* std imports*/
+class stdObject;
+class stdHashTableBase;
+
+#if !defined(stdENUM_KEY_TYPE_DEFINED)
+#define stdENUM_KEY_TYPE_DEFINED
+
+/* Enumerate key types for the hash table */
+enum stdKeyType {
+	ktKEY_NONE,
+	ktKEY_INTEGER,
+	ktKEY_STRING
+};
+
+#endif
+
+/* key value is either a long either a string */
+union stdHashKeyValue {
+	long integer;
+	char* string;
+};
+
+/*******************************************************************************
+   CLASS stdHashTableBase_Node DECLARATION
+*******************************************************************************/
+/**
+*	@class stdHashTableBase_Node
+*	@brief This is the base class for handling hash table elements.
+*	@note 	Please note that the principle of Hash tables have been adapted
+*						from wxWidgets one for std, and for convenience, we keep the
+*						same organization.
+*	@author Nicolas Macherey (nm@graymat.fr)
+*	@date 10-Feb-2009
+*	@version 0.0.1
+*/
+class stdHashTableBase_Node {
+	/*********************************************************************************************
+	* FRIENDS AND DEFINITIONS
+	*********************************************************************************************/
+	/** Give our private members access to the stdHashTableBase */
+	friend class stdHashTableBase;
+
+	/** Define _Node as me */
+	typedef class stdHashTableBase_Node _Node;
+
+public:
+
+	/*********************************************************************************************
+	* CONSTRUCTORS
+	*********************************************************************************************/
+	/**
+	*	Constructor with a key as Integer (long)
+	*	@param key the Node's key as long
+	*	@param value the value or data in the node
+	*	@param table the parent's table
+	*/
+	stdHashTableBase_Node( long key, void* value,
+	                       stdHashTableBase* table );
+
+	/**
+	* 	Constructor with a key as string
+	* 	@param key the Node's key as char*
+	* 	@param value the value or data in the node
+	* 	@param table the parent's table
+	*/
+	stdHashTableBase_Node( const char* key, void* value,
+	                       stdHashTableBase* table );
+
+	/** Default destructor */
+	~stdHashTableBase_Node();
+
+	/*********************************************************************************************
+	* METHODS
+	*********************************************************************************************/
+	/** Gets the key as integer */
+	long GetKeyInteger() const {
+		return m_key.integer;
+	}
+
+	/** Gets the key as string */
+	const char* GetKeyString() const {
+		return m_key.string;
+	}
+
+	/** Gets the data pointer */
+	void* GetData() const {
+		return m_value;
+	}
+
+	/** Sets the data pointer
+	* @param data Data pointer cast in void for managing multiple objects types
+	*/
+	void SetData( void* data ) {
+		m_value = data;
+	}
+
+protected:
+	/*********************************************************************************************
+	* PROTECTED METHODS (INTERN)
+	*********************************************************************************************/
+	/** Forward to the next element in the list */
+	_Node* GetNext() const {
+		return m_next;
+	}
+
+protected:
+	/*********************************************************************************************
+	* PROTECTED VARIABLES
+	*********************************************************************************************/
+	/** Just stock the next node in the table */
+	stdHashTableBase_Node* m_next;
+
+	/** key value of the node */
+	stdHashKeyValue m_key;
+
+	/** Data pointer contained in the node */
+	void* m_value;
+
+	/** Pointer to the parent hash table */
+	stdHashTableBase* m_hashPtr;
+};
+
+/*******************************************************************************
+   CLASS stdHashTableBase DECLARATION
+*******************************************************************************/
+/**
+*	@class stdHashTableBase
+*	@brief This is the base class for defining a HashTable
+*	@note 	Please note that the principle of Hash tables have been adapted
+*						from wxWidgets one for std, and for convenience, we keep the
+*						same organization.
+*	@author Nicolas Macherey (nm@graymat.fr)
+*	@date 10-Feb-2009
+*	@version 0.0.1
+*/
+class stdHashTableBase {
+
+	/*********************************************************************************************
+	* FRIENDS AND DEFINITIONS
+	*********************************************************************************************/
+	/** Give our private memeber access to stdHashTableBase_Node */
+	friend class stdHashTableBase_Node;
+
+	/** Define Node as a stdHashTableBase_Node */
+	typedef stdHashTableBase_Node Node;
+
+public:
+
+	/*********************************************************************************************
+	* CONSTRUCTORS AND DESTRUCTORS
+	*********************************************************************************************/
+	/** Default constrcutor */
+	stdHashTableBase();
+
+	/** Default destructor, make virtual as the class has to be derived */
+	virtual ~stdHashTableBase() { }
+
+	/** Create the table with a key type and a given size
+	* @param keyType the key types of the HashTable
+	* @param size the hash table's size
+	*/
+	void Create( stdKeyType keyType = ktKEY_INTEGER,
+	             size_t size = 10 );
+
+	/**
+	* Clear the table but do not delete childrens
+	*/
+	void Clear();
+
+	/**
+	*	Destroy the table and all its childrens nodes
+	*/
+	void Destroy();
+
+	/*********************************************************************************************
+	* METHODS
+	*********************************************************************************************/
+	/** Gets the table size (allocated size must be greather or equal to number of elements ) */
+	size_t GetSize() const {
+		return m_size;
+	}
+
+	/** Gets the table number of elements */
+	size_t GetCount() const {
+		return m_count;
+	}
+
+	/** Specifies if the content shall be deleted on destroy
+	* @param falg set to true if we have to destroy all elements
+	*/
+	void DeleteContents( bool flag ) {
+		m_deleteContents = flag;
+	}
+
+	/** Change a string key in an integer key
+	* @param string the string to make as long;
+	*/
+	static long MakeKey(const char *string);
+
+protected:
+	/*********************************************************************************************
+	* PROTECTED METHODS
+	*********************************************************************************************/
+	/**
+	*	@brief This method is for adding a node in the table
+	*	@param key the elements key as integer
+	*	@param hash the index in the table where to insert the element
+	*	@param data the data pointer associated to the element
+	*/
+	void DoPut( long key, long hash, void* data );
+
+	/**
+	*	@brief This method is for adding a node in the table
+	*	@param key the elements key as string
+	*	@param hash the index in the table where to insert the element
+	*	@param data the data pointer associated to the element
+	*/
+	void DoPut( const char* key, long hash, void* data );
+
+	/**
+	*	@brief This method is for getting a node data
+	*	@param key the elements key as integer
+	*	@param hash the index in the table where to get the element
+	*	@return this will return the data pointer contained in the node
+	*/
+	void* DoGet( long key, long hash ) const;
+
+	/**
+	*	@brief This method is for getting a node data
+	*	@param key the elements key as string
+	*	@param hash the index in the table where to get the element
+	*	@return this will return the data pointer contained in the node
+	*/
+	void* DoGet( const char* key, long hash ) const;
+
+	/**
+	*   @brief This method is for deleting a node
+	*   @param key the elements key as integer
+	*   @param hash the index in the table where to delete the element
+	*   @return this will return the data pointer contained in the deleted node
+	*/
+	void* DoDelete( long key, long hash );
+
+	/**
+	* 	@brief This method is for deleting a node
+	* 	@param key the elements key as string
+	* 	@param hash the index in the table where to delete the element
+	* 	@return this will return the data pointer contained in the deleted node
+	*/
+	void* DoDelete( const char* key, long hash );
+
+private:
+
+	/*********************************************************************************************
+	* PRIVATE METHODS
+	*********************************************************************************************/
+	/**
+	* 	@brief Remove the node from the hash, *only called from
+	* 						~wxHashTable*_Node destructor
+	*	@param node the node to remove
+	*/
+	void DoRemoveNode( stdHashTableBase_Node* node );
+
+	/**
+	* 	@brief 	destroys data contained in the node if appropriate:
+	* 						deletes the key if it is a string and destroys
+	*							the value if m_deleteContents is true.
+	*	@param node the node to remove
+	*/
+	void DoDestroyNode( stdHashTableBase_Node* node );
+
+	/**
+	* 	inserts a node in the table (at the given position)
+	* 	@param bucket the index where the insertion has to be done
+	* 	@param node the node to insert
+	*/
+	void DoInsertNode( size_t bucket, stdHashTableBase_Node* node );
+
+	/**
+	*	Removes a node from the table (given a pointer to the previous
+	*	but does not delete it (only deletes its contents)
+	*	@param bucket the position of the node in the table
+	*	@param node the node to delete
+	*	@param prev the previous node of the node to delete
+	*/
+	void DoUnlinkNode( size_t bucket, stdHashTableBase_Node* node,
+	                   stdHashTableBase_Node* prev );
+
+	/**
+	*	unconditionally deletes node value (invoking the correct destructor)
+	*	@param node the node to delete the content
+	*/
+	virtual void DoDeleteContents( stdHashTableBase_Node* node ) = 0;
+
+protected:
+	/*********************************************************************************************
+	* PRIVATE VARIABLES
+	*********************************************************************************************/
+	/** number of buckets */
+	size_t m_size;
+
+	/** number of nodes (key/value pairs) */
+	size_t m_count;
+
+	/** table */
+	Node** m_table;
+
+	/** key typ (INTEGER/STRING) */
+	stdKeyType m_keyType;
+
+	/** delete contents when hash is cleared */
+	bool m_deleteContents;
+};
+
+/*******************************************************************************
+   CLASS stdHashTable_Node DECLARATION
+*******************************************************************************/
+/**
+*	@class stdHashTable_Node
+*	@brief This is the base class for handling hash table of stdObjects
+*	@note 	Please note that the principle of Hash tables have been adapted
+*						from wxWidgets one for std, and for convenience, we keep the
+*						same organization.
+*	@author Nicolas Macherey (nm@graymat.fr)
+*	@date 10-Feb-2009
+*	@version 0.0.1
+*/
+class stdHashTable_Node : public stdHashTableBase_Node {
+
+	/*********************************************************************************************
+	* FRIENDS AND DEFINITIONS
+	*********************************************************************************************/
+	/** Give our private member access to stdHasTable */
+	friend class stdHashTable;
+
+public:
+	/*********************************************************************************************
+	* CONSTRUCTORS AND DESTRUCTORS
+	*********************************************************************************************/
+	/**
+	*	Constructor with a key as Integer (long)
+	*	@param key the Node's key as long
+	*	@param value the value or data in the node
+	*	@param table the parent's table
+	*/
+	stdHashTable_Node( long key, void* value,
+	                   stdHashTableBase* table )
+		: stdHashTableBase_Node( key, value, table ) { };
+
+	/**
+	* 	Constructor with a key as string (char *)
+	* 	@param key the Node's key as long
+	* 	@param value the value or data in the node
+	* 	@param table the parent's table
+	*/
+	stdHashTable_Node( const char* key, void* value,
+	                   stdHashTableBase* table )
+		: stdHashTableBase_Node( key, value, table ) { };
+
+	/**
+	* 	Overload of the wright GetData method for casting the Data as
+	* 	std Objects
+	* 	@return Returns the stdObject contained in the node
+	*/
+	stdObject* GetData() const {
+		return (stdObject*)stdHashTableBase_Node::GetData();
+	}
+
+	/**
+	*	Overload of the wright GetData method for casting the Data as
+	*	std Objects
+	*	@param data the stdObject to set in the node
+	*/
+	void SetData( stdObject* data ) {
+		stdHashTableBase_Node::SetData( data );
+	}
+
+	/**
+	*	Overload of the wright GetNext method for getting the next node
+	*	as a stdHashTable_Node
+	*	@return The next stdHashTable_Node in the hash table
+	*/
+	stdHashTable_Node* GetNext() const {
+		return (stdHashTable_Node*)stdHashTableBase_Node::GetNext();
+	}
+};
+
+/*******************************************************************************
+   CLASS stdHashTable DECLARATION
+*******************************************************************************/
+/**
+*	@class stdHashTable
+*	@brief This is the base class for handling hash table of stdObjects
+*	@note 	Please note that the principle of Hash tables have been adapted
+*						from wxWidgets one for std, and for convenience, we keep the
+*						same organization.
+*	@author Nicolas Macherey (nm@graymat.fr)
+*	@date 10-Feb-2009
+*	@version 0.0.1
+*/
+class stdHashTable : public stdHashTableBase {
+	/*********************************************************************************************
+		* FRIENDS AND DEFINITIONS
+		*********************************************************************************************/
+	/** define the hash as a stdHashTableBase */
+	typedef stdHashTableBase hash;
+public:
+
+	/** define Node as a stdHashTable_Node */
+	typedef stdHashTable_Node Node;
+
+	/** define a compatibility_iterator for iterating nodes */
+	typedef stdHashTable_Node* compatibility_iterator;
+
+public:
+
+	/*********************************************************************************************
+	* CONSTRUCTORS AND DESTRUCTORS
+	*********************************************************************************************/
+	/** Create the table with a key type and a given size
+	*	@param keyType the key types of the HashTable
+	*	@param size the hash table's size
+	*/
+	stdHashTable( stdKeyType keyType = ktKEY_INTEGER,
+	              size_t size = 10 )
+		: stdHashTableBase() {
+		Create( keyType, size );
+		BeginFind();
+	}
+
+	/** Copy constructor */
+	stdHashTable( const stdHashTable&amp; table );
+
+	/** Default destructor */
+	virtual ~stdHashTable() {
+		Destroy();
+	}
+
+	/** Copy constructor by overloading = operator */
+	const stdHashTable&amp; operator=( const stdHashTable&amp; );
+
+	/*********************************************************************************************
+	* METHODS
+	*********************************************************************************************/
+	/**
+	*	@brief This method is for adding a stdObject in the table
+	*	@param value the elements key as integer (same as the index in the table)
+	*	@param object the stdObject pointer associated to the element
+	*/
+	void Put(long value, stdObject *object) {
+		DoPut( value, value, object );
+	}
+
+	/**
+	*	@brief This method is for adding a stdObject in the table
+	*	@param lhash the index of the object where to insert
+	*	@param value the elements key as integer
+	*	@param object the stdObject pointer associated to the element
+	*/
+	void Put(long lhash, long value, stdObject *object) {
+		DoPut( value, lhash, object );
+	}
+
+	/**
+	*	@brief This method is for adding a stdObject in the table
+	*	@param value the elements key as string (same as the index in the table)
+	*	@param object the stdObject pointer associated to the element
+	*/
+	void Put(const char *value, stdObject *object) {
+		DoPut( value, MakeKey( value ), object );
+	}
+
+	/**
+	*	@brief This method is for adding a stdObject in the table
+	*	@param lhash the index of the object where to insert
+	*	@param value the elements key as string
+	*	@param object the stdObject pointer associated to the element
+	*/
+	void Put(long lhash, const char *value, stdObject *object) {
+		DoPut( value, lhash, object );
+	}
+
+	/**
+	*	@brief This method is for getting a node data
+	*	@param value the elements key as integer (same as index )
+	*	@return this will return the stdObject pointer contained in the node if found
+	*/
+	stdObject *Get(long value) const {
+		return (stdObject*)DoGet( value, value );
+	}
+
+	/**
+	*	@brief This method is for getting a node data
+	*	@param lhash index where to insert
+	*	@return this will return the stdObject pointer contained in the node if found
+	*/
+	stdObject *Get(long lhash, long value) const {
+		return (stdObject*)DoGet( value, lhash );
+	}
+
+	/**
+	*	@brief This method is for getting a node data
+	*	@param value the elements key as string (same as index )
+	*	@return this will return the stdObject pointer contained in the node if found
+	*/
+	stdObject *Get(const char *value) const {
+		return (stdObject*)DoGet( value, MakeKey( value ) );
+	}
+
+	/**
+	*	@brief This method is for getting a node data
+	*	@param lhash index where to insert
+	*	@param value the elements key as string
+	*	@return this will return the stdObject pointer contained in the node if found
+	*/
+	stdObject *Get(long lhash, const char *value) const {
+		return (stdObject*)DoGet( value, lhash );
+	}
+
+	/**
+	*	@brief This method is for deleting a node
+	*	@param key the elements key as integer (same as index )
+	*	@return this will return the stdObject pointer contained in the node if found
+	*/
+	stdObject *Delete(long key) {
+		return (stdObject*)DoDelete( key, key );
+	}
+
+	/**
+	*	@brief This method is for deleting a node
+	*	@param lhash index where to delete
+	*	@param key the elements key as integer
+	*	@return this will return the stdObject pointer contained in the node if found
+	*/
+	stdObject *Delete(long lhash, long key) {
+		return (stdObject*)DoDelete( key, lhash );
+	}
+
+	/**
+	*	@brief This method is for deleting a node
+	*	@param key the elements key as string (same as index )
+	*	@return this will return the stdObject pointer contained in the node if found
+	*/
+	stdObject *Delete(const char *key) {
+		return (stdObject*)DoDelete( key, MakeKey( key ) );
+	}
+
+	/**
+	*	@brief This method is for deleting a node
+	*	@param lhash index where to delete
+	*	@param key the elements key as string
+	*	@return this will return the stdObject pointer contained in the node if found
+	*/
+	stdObject *Delete(long lhash, const char *key) {
+		return (stdObject*)DoDelete( key, lhash );
+	}
+
+	/** Construct your own integer key from a string, e.g. in case
+	*	you need to combine it with something
+	*	@param string the string to transform
+	*/
+	long MakeKey(const char *string) const {
+		return stdHashTableBase::MakeKey(string);
+	}
+
+	/** Way of iterating through whole hash table (e.g. to delete everything)
+	*	Not necessary, of course, if you're only storing pointers to
+	*	objects maintained separately
+	*/
+	void BeginFind() {
+		m_curr = NULL;
+		m_currBucket = 0;
+	}
+
+	/** Get the next node */
+	Node* Next();
+
+	/** Clear the table but do not delete its content */
+	void Clear() {
+		stdHashTableBase::Clear();
+	}
+
+	/** Get the table number of elements */
+	size_t GetCount() const {
+		return stdHashTableBase::GetCount();
+	}
+
+protected:
+	/*********************************************************************************************
+	* PROTECTED METHODS
+	*********************************************************************************************/
+	/** copy helper
+	*	@param copy the stdHasTable to copy
+	*/
+	void DoCopy( const stdHashTable&amp; copy );
+
+	/** searches the next node starting from bucket bucketStart and sets
+	*	m_curr to it and m_currBucket to its bucket
+	*	@param bucketStart the index from which to start
+	*/
+	void GetNextNode( size_t bucketStart );
+
+private :
+	/*********************************************************************************************
+	* PRIVATE METHODS OVERLOADED
+	*********************************************************************************************/
+	/** Delete the content of a node
+	*	@param node the node to delete the content
+	*/
+	virtual void DoDeleteContents( stdHashTableBase_Node* node );
+
+	/** current node */
+	Node* m_curr;
+
+	/** bucket the current node belongs to */
+	size_t m_currBucket;
+};
+
+#endif		
+		</header>
+		<source>
+/*!
+* @file stdHashTable.cpp
+* @author Nicolas Macherey (nm@graymat.fr)
+* @date February 2009
+* @brief File containing classes definitions for a HashTable
+*/
+
+/*******************************************************************************
+   INCLUDES
+*******************************************************************************/
+#include &lt;ctype.h&gt;
+#include &lt;stdio.h&gt;
+#include &lt;string.h&gt;
+
+#include "stdHashTable.h"
+#include "stdObject.h"
+
+
+/*******************************************************************************
+   CLASS stdHashTableBase_Node DEFINITION
+*******************************************************************************/
+stdHashTableBase_Node::stdHashTableBase_Node( long key, void* value,
+        stdHashTableBase* table )
+	: m_value( value ), m_hashPtr( table ) {
+	m_key.integer = key;
+}
+
+stdHashTableBase_Node::stdHashTableBase_Node( const char* key, void* value,
+        stdHashTableBase* table )
+	: m_value( value ), m_hashPtr( table ) {
+	m_key.string = strcpy( new char[strlen( key ) + 1], key );
+}
+
+stdHashTableBase_Node::~stdHashTableBase_Node() {
+	if( m_hashPtr ) m_hashPtr-&gt;DoRemoveNode( this );
+}
+
+/*******************************************************************************
+   CLASS stdHashTableBase DEFINITION
+*******************************************************************************/
+stdHashTableBase::stdHashTableBase()
+	: m_size( 0 ), m_count( 0 ), m_table( NULL ), m_keyType( ktKEY_NONE ),
+	  m_deleteContents( false ) {
+}
+
+void stdHashTableBase::Create( stdKeyType keyType, size_t size ) {
+	m_keyType = keyType;
+	m_size = size;
+	m_table = new stdHashTableBase_Node*[ m_size ];
+
+	for( size_t i = 0; i &lt; m_size; ++i )
+		m_table[i] = NULL;
+}
+
+void stdHashTableBase::Clear() {
+	for( size_t i = 0; i &lt; m_size; ++i ) {
+		Node* end = m_table[i];
+
+		if( end == NULL )
+			continue;
+
+		Node *curr, *next = end-&gt;GetNext();
+
+		do {
+			curr = next;
+			next = curr-&gt;GetNext();
+
+			DoDestroyNode( curr );
+
+			delete curr;
+		} while( curr != end );
+
+		m_table[i] = NULL;
+	}
+
+	m_count = 0;
+}
+
+void stdHashTableBase::DoRemoveNode( stdHashTableBase_Node* node ) {
+	size_t bucket = ( m_keyType == ktKEY_INTEGER ?
+	                  node-&gt;m_key.integer        :
+	                  MakeKey( node-&gt;m_key.string ) ) % m_size;
+
+	if( node-&gt;GetNext() == node ) {
+		// single-node chain (common case)
+		m_table[bucket] = NULL;
+	} else {
+		Node *start = m_table[bucket], *curr;
+		Node* prev = start;
+
+		for( curr = prev-&gt;GetNext(); curr != node;
+		        prev = curr, curr = curr-&gt;GetNext() ) ;
+
+		DoUnlinkNode( bucket, node, prev );
+	}
+
+	DoDestroyNode( node );
+}
+
+void stdHashTableBase::DoDestroyNode( stdHashTableBase_Node* node ) {
+	// if it is called from DoRemoveNode, node has already been
+	// removed, from other places it does not matter
+	node-&gt;m_hashPtr = NULL;
+
+	if( m_keyType == ktKEY_STRING )
+		delete[] node-&gt;m_key.string;
+	if( m_deleteContents )
+		DoDeleteContents( node );
+}
+
+void stdHashTableBase::Destroy() {
+	Clear();
+
+	delete[] m_table;
+
+	m_table = NULL;
+	m_size = 0;
+}
+
+void stdHashTableBase::DoInsertNode( size_t bucket, stdHashTableBase_Node* node ) {
+	if( m_table[bucket] == NULL ) {
+		m_table[bucket] = node-&gt;m_next = node;
+	} else {
+		Node *prev = m_table[bucket];
+		Node *next = prev-&gt;m_next;
+
+		prev-&gt;m_next = node;
+		node-&gt;m_next = next;
+		m_table[bucket] = node;
+	}
+
+	++m_count;
+}
+
+void stdHashTableBase::DoPut( long key, long hash, void* data ) {
+	size_t bucket = size_t(hash) % m_size;
+	Node* node = new stdHashTableBase_Node( key, data, this );
+
+	DoInsertNode( bucket, node );
+}
+
+void stdHashTableBase::DoPut( const char* key, long hash, void* data ) {
+	size_t bucket = size_t(hash) % m_size;
+	Node* node = new stdHashTableBase_Node( key, data, this );
+
+	DoInsertNode( bucket, node );
+}
+
+void* stdHashTableBase::DoGet( long key, long hash ) const {
+
+	size_t bucket = size_t(hash) % m_size;
+
+	if( m_table[bucket] == NULL )
+		return NULL;
+
+	Node *first = m_table[bucket]-&gt;GetNext(),
+	      *curr = first;
+
+	do {
+		if( curr-&gt;m_key.integer == key )
+			return curr-&gt;m_value;
+
+		curr = curr-&gt;GetNext();
+	} while( curr != first );
+
+	return NULL;
+}
+
+void* stdHashTableBase::DoGet( const char* key, long hash ) const {
+
+	size_t bucket = size_t(hash) % m_size;
+
+	if( m_table[bucket] == NULL )
+		return NULL;
+
+	Node *first = m_table[bucket]-&gt;GetNext(),
+	      *curr = first;
+
+	do {
+		if( strcmp( curr-&gt;m_key.string, key ) == 0 )
+			return curr-&gt;m_value;
+
+		curr = curr-&gt;GetNext();
+	} while( curr != first );
+
+	return NULL;
+}
+
+void stdHashTableBase::DoUnlinkNode( size_t bucket, stdHashTableBase_Node* node,
+                                     stdHashTableBase_Node* prev ) {
+	if( node == m_table[bucket] )
+		m_table[bucket] = prev;
+
+	if( prev == node &amp;&amp; prev == node-&gt;GetNext() )
+		m_table[bucket] = NULL;
+	else
+		prev-&gt;m_next = node-&gt;m_next;
+
+	DoDestroyNode( node );
+	--m_count;
+}
+
+void* stdHashTableBase::DoDelete( long key, long hash ) {
+
+	size_t bucket = size_t(hash) % m_size;
+
+	if( m_table[bucket] == NULL )
+		return NULL;
+
+	Node *first = m_table[bucket]-&gt;GetNext(),
+	      *curr = first,
+	       *prev = m_table[bucket];
+
+	do {
+		if( curr-&gt;m_key.integer == key ) {
+			void* retval = curr-&gt;m_value;
+			curr-&gt;m_value = NULL;
+
+			DoUnlinkNode( bucket, curr, prev );
+			delete curr;
+
+			return retval;
+		}
+
+		prev = curr;
+		curr = curr-&gt;GetNext();
+	} while( curr != first );
+
+	return NULL;
+}
+
+void* stdHashTableBase::DoDelete( const char* key, long hash ) {
+
+	size_t bucket = size_t(hash) % m_size;
+
+	if( m_table[bucket] == NULL )
+		return NULL;
+
+	Node *first = m_table[bucket]-&gt;GetNext(),
+	      *curr = first,
+	       *prev = m_table[bucket];
+
+	do {
+		if( strcmp( curr-&gt;m_key.string, key ) == 0 ) {
+			void* retval = curr-&gt;m_value;
+			curr-&gt;m_value = NULL;
+
+			DoUnlinkNode( bucket, curr, prev );
+			delete curr;
+
+			return retval;
+		}
+
+		prev = curr;
+		curr = curr-&gt;GetNext();
+	} while( curr != first );
+
+	return NULL;
+}
+
+long stdHashTableBase::MakeKey( const char *str ) {
+	long int_key = 0;
+
+	while( *str )
+		int_key += (char)*str++;
+
+	return int_key;
+}
+
+/*******************************************************************************
+   CLASS stdHashTable DEFINITION
+*******************************************************************************/
+stdHashTable::stdHashTable( const stdHashTable&amp; table )
+	: stdHashTableBase() {
+	DoCopy( table );
+}
+
+const stdHashTable&amp; stdHashTable::operator=( const stdHashTable&amp; table ) {
+	Destroy();
+	DoCopy( table );
+
+	return *this;
+}
+
+void stdHashTable::DoCopy( const stdHashTable&amp; table ) {
+	Create( m_keyType, m_size );
+}
+
+void stdHashTable::DoDeleteContents( stdHashTableBase_Node* node ) {
+	delete ((stdHashTable_Node*)node)-&gt;GetData();
+}
+
+void stdHashTable::GetNextNode( size_t bucketStart ) {
+	for( size_t i = bucketStart; i &lt; m_size; ++i ) {
+		if( m_table[i] != NULL ) {
+			m_curr = ((Node*)m_table[i])-&gt;GetNext();
+			m_currBucket = i;
+			return;
+		}
+	}
+
+	m_curr = NULL;
+	m_currBucket = 0;
+}
+
+stdHashTable::Node* stdHashTable::Next() {
+	if( m_curr == NULL )
+		GetNextNode( 0 );
+	else {
+		m_curr = m_curr-&gt;GetNext();
+
+		if( m_curr == ( (Node*)m_table[m_currBucket] )-&gt;GetNext() )
+			GetNextNode( m_currBucket + 1 );
+	}
+
+	return m_curr;
+}
+		</source>
+	</addin>
+	<addin name="stdObjectFactory">
+		<header>
+/**
+ * @file stdObjectFactory.h
+ * @brief main file for managing extended objects, 
+ * registering them and accessing their information
+ * @author Nicolas Macherey (nm@graymat.fr)
+ * @version 10.4
+ */
+#ifndef STDOBJECTFACTORY_H
+#define STDOBJECTFACTORY_H
+
+#include "stdSingleton.h"
+
+/* imports */
+class stdObject;
+class stdObjectFactory;
+
+/** define Generator constructor methods for building generically any kind of generators */
+typedef stdObject* (*stdObjectConstructor)();
+
+/** define Generator destructor methods for freeing any created generator */
+typedef void (*stdObjectDestructor)(stdObject*);
+
+
+
+/** @struct stdObjectRegistration
+  * @brief main strcuture for storing registration information about the
+  * construction and destrcution of a stdObject.
+  * @author Nicolas Macherey (nm@graymat.fr)
+  * @date 8-May-2010
+  */
+struct stdObjectRegistration
+{
+	/****************************************************************
+	  * STRUCTURE ACCESSORS
+	  **************************************************************/
+	/** default constructor */
+	stdObjectRegistration( ) : 
+		ctor(0),dtor(0)
+	{};
+
+	/** copy constructor */
+	stdObjectRegistration( const stdObjectRegistration&amp; rhs ):
+		name(rhs.name),
+		description(rhs.description),
+		ctor(rhs.ctor),
+		dtor(rhs.dtor)
+	{};
+
+	/** operator= overload */
+	stdObjectRegistration&amp; operator=(const stdObjectRegistration&amp; rhs)
+	{
+		name = rhs.name;
+		description = rhs.description;
+		ctor = rhs.ctor;
+		dtor = rhs.dtor;
+		return (*this);
+	}
+
+
+	/****************************************************************
+	  * PROPERTIES
+	  **************************************************************/
+	std::string name;
+	std::string description;
+	stdObjectConstructor ctor;
+	stdObjectDestructor dtor;
+};
+
+/** now we just have to define a map of stdObjectRegistration in order to manage them in
+  * the stdObjectFactory.
+  */
+typedef std::map&lt; std::string , stdObjectRegistration &gt; stdObjectRegistrationMap;
+
+/** @class stdObjectFactory
+  * @brief Main class for handling all available generator in wxGrammar
+  *
+  * @author Nicolas Macherey (nm@graymat.fr)
+  * @date 8-May-2010
+  */
+class stdObjectFactory : public stdSingleton&lt;stdObjectFactory&gt;
+{
+	friend class stdSingleton&lt;stdObjectFactory&gt;;
+
+public :
+	/*******************************************************************************
+    	*   ACCESSORS
+    	*******************************************************************************/
+
+    	/** Get the list of registered objects in this manager
+    	  * This will provide you with an array string of registered object names
+    	  * but not with their description, if you need to get the list of objects
+	  * descriptions you should call stdObjectFactory::GetDescriptions.Please
+	  * note that this list might change at run time as this factory is made
+	  * for adding and removing objects dynamically.
+    	  */
+	std::vector&lt; std::string &gt; GetList();
+
+	/** Get all descriptions associated to each registered object. Please
+	  * note that this list might change at run time as this factory is made
+	  * for adding and removing objects dynamically.
+	  */
+	std::vector&lt; std::string &gt; GetDescriptions();
+
+	/** Register an object in the factory.
+	  * Each object can only be registered once.
+	  * Please see the stdObjectRegistrant object in order
+	  * to know how to register a new object in this factory.
+	  * @param name object name
+	  * @param description object's description
+	  * @param ctor object constructor function pointer
+	  * @param dtor object destructor function pointer
+	  * @return false if the object already exists in this factory !
+	  */
+	bool RegisterObject( const std::string&amp; name,
+			const std::string&amp; description,
+			stdObjectConstructor ctor,
+			stdObjectDestructor dtor );
+
+	/** Unregister object from that factory,
+	  * Once you have call this method the object will not be available
+	  * in this factory.
+	  */
+	bool UnregisterObject( const std::string&amp; name );
+
+	/** Creates an object accordingly to it's name
+	  * You can call this method at any time if you want to create an object
+	  * from it's name only.
+	  * @param name object's name
+	  * @return the requested object instance if exists NULL if it is not existing
+	  */
+	stdObject* CreateObject( const std::string&amp; name );
+
+	/** Check the existence of an object by it's name
+	  * @param name object name to check the existance for
+	  * @return false if the object is not registered in the factory
+	  */
+	bool Exists( const std::string&amp; name );
+	
+	/** Find the description associated to the object name
+	  * @param name object's name to find the description for
+	  * @return a stdEmptyString if the object does not exists in the factory
+	  */
+	std::string GetDescription( const std::string&amp; name );
+
+private :
+	/***********************************************************************************
+	  * CONSTRUCTOR AND DESTRUCTOR
+	  *********************************************************************************/
+	/** Default constructor,
+	  * You cannot build directly this class, this class is a global singleton 
+	  * you have to use stdObjectFactory::Get() to access the global instance 
+	  * of this class.
+	  */
+	stdObjectFactory();
+
+	/** Default destructor
+	  * You shall never have to destroy this class by your own unless you are an
+	  * application developper. Anyway if you want to free the global instance of this manager
+	  * properly, you have to call stdObjectFactory::Free() to free it's global instance
+	  */
+	~stdObjectFactory();
+
+	/** container of all registered objects */
+	stdObjectRegistrationMap m_objects;
+};
+
+/**
+  * @class stdObjectRegistrant
+  * @brief this main template allows you to register easily your stdObject in the stdObjectFactory
+  * 
+  * Assuming that your object has the following name : MyObject , an example could be :
+  * @code 
+  *	namespace {
+  *		stdObjectRegistrant&lt;MyObject&gt; registrant( "MyObject" , "Description of my object");
+  *	};
+  * @endcode
+  * This shall be done in the top of MyObject.cpp file.
+  * I also wrote a helper in order to write it faster :
+  * @code
+  * stdREGISTER_OBJECT( MyObject , "Description of my object");
+  * @endcode
+  *
+  * @author Nicolas Macherey (nm@graymat.fr)
+  * @date 8-May-2010
+  */
+template&lt;class T&gt; class stdObjectRegistrant
+{
+
+public :
+	stdObjectRegistrant( const std::string&amp; name , const std::string&amp; description ):
+		m_name(name)
+	{
+		/* The main task is to call the wxGrammargeneratorFactory and to register the object in 
+		 * using our two satic method that will be used to register in the factory */
+		stdObjectFactory::Get()-&gt;RegisterObject( name , description , &amp;Create , &amp;Free );
+	}
+	
+	~stdObjectRegistrant()
+	{
+		/* if the factory is down this means that the instance has already been removed from it */
+		if(!stdObjectFactory::IsDown()) 
+			stdObjectFactory::Get()-&gt;UnregisterObject( m_name );
+	};
+	
+	/** The create method is made static, so that the program knows the adress of that method without the
+	  * need of making a functor or something complicated.
+	  * this method will correspond to the stdObjectConstructor pointer 
+	  */
+	static stdObject* Create( )
+	{
+		return new T( );
+	}
+
+	/** The free method is made static so that the program knows its adress. It corresponds to the 
+	  * stdObjectDestructor function pointer
+	  */
+	static void Free( stdObject* object )
+	{
+		delete object;
+	}
+
+private :
+	std::string m_name;
+};
+
+#define stdREGISTER_OBJECT( object , description ) \
+	namespace ns##object { \
+		stdObjectRegistrant&lt;object&gt; registrant( #object , description ); \
+	};
+
+#endif		
+		</header>
+		<source>
+/**
+ * @file stdObjectFactory.cpp
+ * @brief main file for managing extended objects
+ * @author Nicolas Macherey (nm@graymat.fr)
+ * @version 10.4
+ */
+#include &lt;libxml/xmlreader.h&gt;
+#include &lt;libxml/xpath.h&gt;
+
+#include &lt;stdio.h&gt;
+#include &lt;iostream&gt;
+#include &lt;string&gt;
+#include &lt;vector&gt;
+#include &lt;map&gt;
+#include &lt;stack&gt;
+
+#include "stdSingleton.h"
+#include "stdDefines.h"
+#include "stdObject.h"
+#include "stdObjectFactory.h"
+
+/** Global instance for the stdObjectFactory */
+template&lt;&gt; stdObjectFactory* stdSingleton&lt;stdObjectFactory&gt;::instance = 0;
+
+/** Global isShutdown initialization for the stdObjectFactory */
+template&lt;&gt; bool  stdSingleton&lt;stdObjectFactory&gt;::isShutdown = false;
+
+stdObjectFactory::stdObjectFactory()
+{
+
+}
+
+stdObjectFactory::~stdObjectFactory()
+{
+	m_objects.clear();
+}
+
+std::vector&lt; std::string &gt; stdObjectFactory::GetList()
+{
+	std::vector&lt; std::string &gt; ret;
+
+	stdObjectRegistrationMap::iterator it = m_objects.begin();
+	for( ; it != m_objects.end() ; ++it )
+		ret.push_back(it-&gt;first);
+
+	return ret;
+}
+
+std::vector&lt; std::string &gt; stdObjectFactory::GetDescriptions()
+{
+	std::vector&lt; std::string &gt; ret;
+
+	stdObjectRegistrationMap::iterator it = m_objects.begin();
+	for( ; it != m_objects.end() ; ++it )
+		ret.push_back(it-&gt;second.description);
+
+	return ret;
+}
+
+bool stdObjectFactory::RegisterObject( const std::string&amp; name,
+		const std::string&amp; description,
+		stdObjectConstructor ctor,
+		stdObjectDestructor dtor )
+{
+	stdObjectRegistrationMap::iterator it = m_objects.find(name);
+
+	if( it != m_objects.end() )
+		return false;
+
+	stdObjectRegistration info;
+	info.name = name;
+	info.description = description;
+	info.ctor = ctor;
+	info.dtor = dtor;
+
+	m_objects[name] = info;
+
+	return true;
+}
+
+bool stdObjectFactory::UnregisterObject( const std::string&amp; name )
+{
+	stdObjectRegistrationMap::iterator it = m_objects.find(name);
+
+	if( it == m_objects.end() )
+		return false;
+
+	m_objects.erase(it);
+	return true;
+}
+
+stdObject* stdObjectFactory::CreateObject( const std::string&amp; name )
+{
+	stdObjectRegistrationMap::iterator it = m_objects.find(name);
+
+	if( it == m_objects.end() )
+		return NULL;
+
+	stdObject* object = it-&gt;second.ctor( );
+	return object;
+}
+
+bool stdObjectFactory::Exists( const std::string&amp; name )
+{
+	stdObjectRegistrationMap::iterator it = m_objects.find(name);
+
+	if( it == m_objects.end() )
+		return false;
+
+	return true;
+}
+
+std::string stdObjectFactory::GetDescription( const std::string&amp; name )
+{
+	stdObjectRegistrationMap::iterator it = m_objects.find(name);
+
+	if( it == m_objects.end() )
+		return stdEmptyString;
+
+	return it-&gt;second.description;
+}			
+		</source>
+	</addin>
+	<addin name="stdSingleton">
+		<header>
+/**
+ * @file stdSingleton.h
+ * @author Nicolas Macherey (nm@graymat.fr)
+ * @version 10.4
+ */
+#ifndef STD_SINGLETON_H
+#define STD_SINGLETON_H
+
+#include &lt;cassert&gt;
+
+/* @class stdSingleton
+ *
+ * @brief stdSingleton is the class used for simulating static manager.
+ *
+ * To use this class simply inherit your object from stdSingleton&lt;YourModule&gt; and instanciate
+ * instance and isShutdown static variables for the stdSingleton&lt;YourModule&gt; then you will
+ * have access to your object global instance.
+ * YourModule::Get().
+ *
+ * @note this class has been taken from the Code::Blocks IDE
+ *
+ * @author Nicolas Macherey ( nm@graymat.fr )
+ * @date 02-Dec-2008
+ * @version 0.0.1
+ */
+template &lt;class MgrT&gt; class stdSingleton
+{
+    static MgrT *instance;										/*!&lt; global instance for the module */
+    static bool isShutdown;										/*!&lt; is the module shutting down */
+
+    explicit stdSingleton(const stdSingleton&lt;MgrT&gt;&amp;){};							/*!&lt; copy constructor */
+    stdSingleton&lt;MgrT&gt;&amp; operator=(stdSingleton&lt;MgrT&gt; const&amp;){return *this;};		/*!&lt; operator = overload */
+
+protected:
+
+    stdSingleton(){assert(stdSingleton&lt;MgrT&gt;::instance == 0);}					/*!&lt; Default constructor */
+    virtual ~stdSingleton(){stdSingleton&lt;MgrT&gt;::instance = 0;}					/*!&lt; Default destructor */
+
+public:
+
+	/*! Specifies is the manager is valid or not */
+	static inline bool Valid(){return (instance!=0) ? true : false;}
+
+	/*! Use this function to have access to the managers global instance */
+    static inline MgrT* Get()
+    {
+        if(instance == 0 &amp;&amp; isShutdown == false)
+            instance = new MgrT();
+
+        return instance;
+    }
+
+	/*! NEVER call this function, it called by the application when closing */
+    static void Free()
+    {
+        isShutdown = true;
+        delete instance;
+        instance = 0;
+    }
+
+    static inline bool IsDown() {return isShutdown;};
+};
+
+#endif
+		</header>
+	</addin>
+	<addin name="stdDefines">
+		<header>
+/**
+ * @file stdDefines.h
+ * @author Nicolas Macherey (nm@graymat.fr)
+ * @version 10.4
+ */
+#ifndef STD_DEFINES_H
+#define STD_DEFINES_H
+
+#include &lt;string&gt;
+#include &lt;set&gt;
+
+const std::string stdEmptyString = "";
+#define stdNOT_FOUND -1
+
+#define stdx2C( str ) reinterpret_cast&lt;const xmlChar*&gt;( str.c_str() )
+#define stdc2C( str ) str.c_str()
+
+/** Get the attribute content in the given node
+  * @param node node to get the named attribute in
+  * @param name attribute name to get
+  * @return a stdEmptyString if the attribute does not exists
+  */
+inline std::string GetXmlAttr( xmlNode* node , const std::string&amp; name )
+{
+	xmlChar* attr = xmlGetProp( node , stdx2C(name) );
+
+	if( attr == NULL )
+		return stdEmptyString;
+
+	std::string ret = (char*) attr;
+	xmlFree(attr);
+
+	return ret;
+}
+
+/** Get the content of the node as a std::string 
+  * @param node node to get the content for
+  */
+inline std::string GetXmlContent( xmlNode* node )
+{
+	xmlChar* content = xmlNodeGetContent( node );
+
+	if( content == NULL )
+		return stdEmptyString;
+
+	std::string ret = (char*) content;
+	xmlFree(content);
+
+	return ret;
+}
+	
+#endif		
+		</header>
+	</addin>
+</wxgrammar_generator_file>

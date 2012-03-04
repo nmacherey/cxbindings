@@ -1,0 +1,1863 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wxgrammar_generator_file lang="cpp">
+	<var name="header_doc">
+/** @file $(filename).h
+ * @author Nicolas Macherey (nm@graymat.fr) http://www.rheia-framework.com
+ * This file is the handler for reading and writing $(object)'s into xml files.
+ * @date $(date)
+ */
+	</var>
+	<var name="src_doc">
+/** @file $(filename).cpp
+  * @author Nicolas Macherey (nm@graymat.fr) http://www.rheia-framework.com
+  * This file is the handler for reading and writing $(object)'s into xml files.
+  * @date $(date)
+  */
+	</var>
+	<var name="namespace_start">
+namespace $(ns) {
+	</var>
+	<var name="namespace_end">
+};
+	</var>
+	<var name="object_defines">
+#ifndef $(OBJECT)XMLHANDLER_H
+#define $(OBJECT)XMLHANDLER_H
+	</var>
+	<var name="object_defines_end">
+#endif // $(OBJECT)XMLHANDER_H
+	</var>
+	<template name="object">
+		<objectpart file="header">
+$(header_doc)
+
+$(object_defines)
+
+/** @class $(object)XmlHandler
+  * @brief Main class for reading and writing $(object) nodes information in xml files
+  * @author Nicolas Macherey (nm@graymat.fr) http://www.rheia-framework.com
+  * @date $(date)
+  */
+class $(exportmacro) $(object)XmlHandler : public wxgXmlHandler
+{
+	DECLARE_DYNAMIC_CLASS( $(object)XmlHandler )
+public :
+	/**********************************************************************
+  	 * CONSTRUCTORS
+	 *********************************************************************/
+
+	/** Default Constructor */
+	$(object)XmlHandler(): 
+		wxgXmlHandler()
+	{};
+
+
+	/**********************************************************************
+  	 * METHODS
+	 *********************************************************************/
+	/** This one is called from CreateResource after variables
+	  * were filled.
+	  * Any handlers shall overload this metohd in order to complete the 
+	  * child stuff.
+	  */
+	virtual wxExtendedObject *DoCreateResource();
+
+	/** This is the method you have to overload to write a resource
+	  * to anode simply create a new node and write info in
+	  */
+	virtual xmlNode* DoWriteResource();	
+
+	/** @return Returns true if it understands this node and can create
+	  * a resource from it, false otherwise.
+	  */
+	virtual bool CanHandle(xmlNode *node);
+	
+	/** @return Returns true if it understands this node and can create
+	  * a resource from it, false otherwise.
+	  */
+	virtual bool CanHandle(const wxString&amp; className);
+
+	/** @return Returns true if it understands the given resource and
+	  * can write it into an xmlNode 
+	  */
+	virtual bool CanHandle( wxExtendedObject* resource );
+};
+
+$(object_defines_end)
+		</objectpart>
+		<objectpart file="src">
+$(src_doc)
+
+#include &lt;iostream&gt;
+#include &lt;stdio.h&gt;
+#include &lt;cstdio&gt;
+#include &lt;iostream&gt;
+#include &lt;vector&gt;
+#include &lt;map&gt;
+#include &lt;stack&gt;
+
+#include &lt;libxml/xmlreader.h&gt;
+#include &lt;libxml/xpath.h&gt;
+
+#include &lt;wx/wx.h&gt;
+#include &lt;wx/log.h&gt;
+#include &lt;wx/any.h&gt;
+
+#include "wxgXmlReader.h"
+
+#include "$(ns)_globals.h"
+
+$(local_includes)
+
+#include "$(object).h"
+#include "handlers/$(object)XmlHandler.h"
+
+IMPLEMENT_DYNAMIC_CLASS( $(object)XmlHandler , wxgXmlHandler )
+wxgREGISTER_XMLHANDLER( $(object)XmlHandler , wxT("Handler for reading and writing $(object) nodes from an XML file") );
+
+bool $(object)XmlHandler::CanHandle(xmlNode *node)
+{
+	if( node == NULL )
+		return false;
+
+	wxString nodeName = wxC2U( (char*) node-&gt;name );
+	
+	if( nodeName.IsSameAs( wxT("$(object_node_name)") ) )
+		return true;
+
+	return false;
+}
+
+bool $(object)XmlHandler::CanHandle(const wxString&amp; className)
+{	
+	if( className.IsSameAs( wxT("$(object)") ) )
+		return true;
+
+	return false;
+}
+
+wxExtendedObject *$(object)XmlHandler::DoCreateResource()
+{
+	wxgMAKE_INSTANCE( $(object)Instance , $(object) );
+
+$(objects_attribute_readers)
+	
+	xmlNode* childnode = m_node-&gt;children;	
+
+	while( childnode != NULL )
+	{
+		wxString cname = wxC2U( (char*) childnode->name );
+		
+$(objects_property_readers)
+
+		childnode = childnode-&gt;next;
+	}
+
+	return $(object)Instance;
+}
+
+xmlNode* $(object)XmlHandler::DoWriteResource()
+{
+	$(object)* $(object)Instance = dynamic_cast&lt;$(object)*&gt;(m_instance);
+
+	xmlNode* node = xmlNewNode( NULL , (const xmlChar*) "$(object_node_name)" );
+	xmlNode* childnode;
+	
+$(objects_attribute_writers)
+	
+$(objects_property_writers)
+
+	return node;
+}
+
+bool $(object)XmlHandler::CanHandle(wxExtendedObject *resource)
+{
+	if( resource == NULL )
+		return false;
+
+	wxString className = resource->GetClassInfo()->GetClassName();
+	
+	if( className.IsSameAs( wxT("$(object)") ) )
+		return true;
+
+	return false;
+}
+		</objectpart>
+	</template>
+	
+	
+	<!-- ATTRIBUTES READER AND WRITER TEMPLATES -->
+	<template name="attribute_reader_string">
+		<objectpart file="src">
+	wxString $(name) = GetXmlAttr( m_node , wxT("$(name)") );
+	$(object)Instance->Set$(name_extension)($(name));
+		</objectpart>
+	</template>
+	<template name="attribute_reader_int">
+		<objectpart file="src">
+	wxString $(name)str = GetXmlAttr( m_node , wxT("$(name)") );
+	
+	long val_$(name);
+	$(name)str.ToLong(&amp;val_$(name));
+	int $(name) = val_$(name);
+	$(object)Instance->Set$(name_extension)($(name));
+		</objectpart>
+	</template>
+	<template name="attribute_reader_enum">
+		<objectpart file="src">
+	wxString $(name)str = GetXmlAttr( m_node , wxT("$(name)") );
+	$(object)Instance->Get$(name_extension)().SetValue($(name)str);
+		</objectpart>
+	</template>
+	<template name="attribute_reader_uint">
+		<objectpart file="src">
+	wxString $(name)str = GetXmlAttr( m_node , wxT("$(name)") );
+	
+	long val_$(name);
+	$(name)str.ToLong(&amp;val_$(name));
+	unsigned int $(name) = (unsigned int)val_$(name);
+	$(object)Instance->Set$(name_extension)($(name));
+		</objectpart>
+	</template>
+	<template name="attribute_reader_long">
+		<objectpart file="src">
+	wxString $(name)str = GetXmlAttr( m_node , wxT("$(name)") );
+	
+	long $(name);
+	$(name)str.ToLong(&amp;$(name));
+	$(object)Instance->Set$(name_extension)($(name));
+		</objectpart>
+	</template>
+	<template name="attribute_reader_ulong">
+		<objectpart file="src">
+	wxString $(name)str = GetXmlAttr( m_node , wxT("$(name)") );
+	
+	long $(name);
+	$(name)str.ToLong(&amp;$(name));
+	$(object)Instance->Set$(name_extension)((unsigned long)$(name));
+		</objectpart>
+	</template>
+	<template name="attribute_reader_bool">
+		<objectpart file="src">
+	wxString $(name)str = GetXmlAttr( m_node , wxT("$(name)") );
+	
+	bool $(name) = $(name)str.IsSameAs(wxT("true"));
+	$(object)Instance->Set$(name_extension)($(name));
+		</objectpart>
+	</template>
+	<template name="attribute_reader_double">
+		<objectpart file="src">
+	wxString $(name)str = GetXmlAttr( m_node , wxT("$(name)") );
+	
+	double $(name);
+	$(name)str.ToDouble(&amp;$(name));
+	$(object)Instance->Set$(name_extension)($(name));
+		</objectpart>
+	</template>
+	<template name="attribute_reader_float">
+		<objectpart file="src">
+	wxString $(name)str = GetXmlAttr( m_node , wxT("$(name)") );
+	
+	double val_$(name);
+	$(name)str.ToDouble(&amp;val_$(name));
+	$(object)Instance->Set$(name_extension)((float)$(name));
+		</objectpart>
+	</template>
+	<template name="attribute_writer_string">
+		<objectpart file="src">
+	if( $(object)Instance->Has$(name_extension)() ) {
+		wxString $(name) = $(object)Instance->Get$(name_extension)();
+		xmlNewProp( node , (const xmlChar*) "$(name)" , wxxU2C($(name)) ); 
+	}
+		</objectpart>
+	</template>
+	<template name="attribute_writer_int">
+		<objectpart file="src">
+	if( $(object)Instance->Has$(name_extension)() ) {
+		wxString $(name)str = wxString::Format(wxT("%d"),$(object)Instance->Get$(name_extension)());
+		xmlNewProp( node , (const xmlChar*) "$(name)" , wxxU2C($(name)str) );
+	}
+		</objectpart>
+	</template>
+	<template name="attribute_writer_enum">
+		<objectpart file="src">
+	if( $(object)Instance->Has$(name_extension)() ) {
+		wxString $(name)str = $(object)Instance->Get$(name_extension)().GetValue();
+		xmlNewProp( node , (const xmlChar*) "$(name)" , wxxU2C($(name)str) );
+	}
+		</objectpart>
+	</template>
+	<template name="attribute_writer_uint">
+		<objectpart file="src">
+	if( $(object)Instance->Has$(name_extension)() ) {
+		wxString $(name)str = wxString::Format(wxT("%d"),(int)$(object)Instance->Get$(name_extension)());
+		xmlNewProp( node , (const xmlChar*) "$(name)" , wxxU2C($(name)str) );
+	}
+		</objectpart>
+	</template>
+	<template name="attribute_writer_long">
+		<objectpart file="src">
+	if( $(object)Instance->Has$(name_extension)() ) {
+		wxString $(name)str = wxString::Format(wxT("%d"),(int)$(object)Instance->Get$(name_extension)());
+		xmlNewProp( node , (const xmlChar*) "$(name)" , wxxU2C($(name)str) );
+	}
+		</objectpart>
+	</template>
+	<template name="attribute_writer_ulong">
+		<objectpart file="src">
+	if( $(object)Instance->Has$(name_extension)() ) {
+		wxString $(name)str = wxString::Format(wxT("%d"),(int)$(object)Instance->Get$(name_extension)());
+		xmlNewProp( node , (const xmlChar*) "$(name)" , wxxU2C($(name)str) );
+	}
+		</objectpart>
+	</template>
+	<template name="attribute_writer_bool">
+		<objectpart file="src">
+	if( $(object)Instance->Has$(name_extension)() ) {
+		wxString $(name)str = $(object)Instance->Get$(name_extension)() ? wxT("true") : wxT("false");
+		xmlNewProp( node , (const xmlChar*) "$(name)" , wxxU2C($(name)str) );
+	}
+		</objectpart>
+	</template>
+	<template name="attribute_writer_double">
+		<objectpart file="src">
+	if( $(object)Instance->Has$(name_extension)() ) {
+		wxString $(name)str = wxString::Format(wxT("%f"),$(object)Instance->Get$(name_extension)());
+		xmlNewProp( node , (const xmlChar*) "$(name)" , wxxU2C($(name)str) );
+	}
+		</objectpart>
+	</template>
+	<template name="attribute_writer_float">
+		<objectpart file="src">
+	if( $(object)Instance->Has$(name_extension)() ) {
+		wxString $(name)str = wxString::Format(wxT("%f"),$(object)Instance->Get$(name_extension)());
+		xmlNewProp( node , (const xmlChar*) "$(name)" , wxxU2C($(name)str) );
+	}
+		</objectpart>
+	</template>
+	
+	<!-- PROPERTIES READER AND WRITER TEMPLATES -->
+	<template name="property_reader_string">
+		<objectpart file="src">
+		if( cname.IsSameAs(wxT("$(name)")) ) {
+			wxString $(name) = GetXmlContent( childnode );
+			$(object)Instance->Set$(name_extension)($(name));
+		}
+		</objectpart>
+	</template>
+	<template name="property_reader_arraystring">
+		<objectpart file="src">
+		if( cname.IsSameAs(wxT("$(name)")) ) {
+			wxString $(name) = GetXmlContent( childnode );
+			$(object)Instance->Add$(name_extension)($(name));
+		}
+		</objectpart>
+	</template>
+	<template name="property_reader_int">
+		<objectpart file="src">
+		if( cname.IsSameAs(wxT("$(name)")) ) {
+			wxString $(name)str = GetXmlContent( childnode );
+			
+			long val_$(name);
+			$(name)str.ToLong(&amp;val_$(name));
+			int $(name) = val_$(name);
+			$(object)Instance->Set$(name_extension)($(name));
+		}
+		</objectpart>
+	</template>
+	<template name="property_reader_arrayint">
+		<objectpart file="src">
+		if( cname.IsSameAs(wxT("$(name)")) ) {
+			wxString $(name)str = GetXmlContent( childnode );
+			
+			long val_$(name);
+			$(name)str.ToLong(&amp;val_$(name));
+			int $(name) = val_$(name);
+			$(object)Instance->Add$(name_extension)($(name));
+		}
+		</objectpart>
+	</template>
+	<template name="property_reader_enum">
+		<objectpart file="src">
+		if( cname.IsSameAs(wxT("$(name)")) ) {
+			wxString $(name)str = GetXmlContent( childnode );
+			$(object)Instance->Get$(name_extension)().SetValue($(name)str);
+		}
+		</objectpart>
+	</template>
+	<template name="property_reader_uint">
+		<objectpart file="src">
+		if( cname.IsSameAs(wxT("$(name)")) ) {
+			wxString $(name)str = GetXmlContent( childnode );
+			
+			long val_$(name);
+			$(name)str.ToLong(&amp;val_$(name));
+			unsigned int $(name) = (unsigned int)val_$(name);
+			$(object)Instance->Set$(name_extension)($(name));
+		}
+		</objectpart>
+	</template>
+	<template name="property_reader_long">
+		<objectpart file="src">
+		if( cname.IsSameAs(wxT("$(name)")) ) {
+			wxString $(name)str = GetXmlContent( childnode );
+			
+			long $(name);
+			$(name)str.ToLong(&amp;$(name));
+			$(object)Instance->Set$(name_extension)($(name));
+		}
+		</objectpart>
+	</template>
+	<template name="property_reader_arraylong">
+		<objectpart file="src">
+		if( cname.IsSameAs(wxT("$(name)")) ) {
+			wxString $(name)str = GetXmlContent( childnode );
+			
+			long $(name);
+			$(name)str.ToLong(&amp;$(name));
+			$(object)Instance->Add$(name_extension)($(name));
+		}
+		</objectpart>
+	</template>
+	<template name="property_reader_ulong">
+		<objectpart file="src">
+		if( cname.IsSameAs(wxT("$(name)")) ) {
+			wxString $(name)str = GetXmlContent( childnode );
+			
+			long $(name);
+			$(name)str.ToLong(&amp;$(name));
+			$(object)Instance->Set$(name_extension)((unsigned long)$(name));
+		}
+		</objectpart>
+	</template>
+	<template name="property_reader_arrayulong">
+		<objectpart file="src">
+		if( cname.IsSameAs(wxT("$(name)")) ) {
+			wxString $(name)str = GetXmlContent( childnode );
+			
+			long $(name);
+			$(name)str.ToLong(&amp;$(name));
+			$(object)Instance->Add$(name_extension)((unsigned long)$(name));
+		}
+		</objectpart>
+	</template>
+	<template name="property_reader_bool">
+		<objectpart file="src">
+		if( cname.IsSameAs(wxT("$(name)")) ) {
+			wxString $(name)str = GetXmlContent( childnode );
+			
+			bool $(name) = $(name)str.IsSameAs(wxT("true"));
+			$(object)Instance->Set$(name_extension)($(name));
+		}
+		</objectpart>
+	</template>
+	<template name="property_reader_arraybool">
+		<objectpart file="src">
+		if( cname.IsSameAs(wxT("$(name)")) ) {
+			wxString $(name)str = GetXmlContent( childnode );
+			
+			bool $(name) = $(name)str.IsSameAs(wxT("true"));
+			$(object)Instance->Add$(name_extension)($(name));
+		}
+		</objectpart>
+	</template>
+	<template name="property_reader_double">
+		<objectpart file="src">
+		if( cname.IsSameAs(wxT("$(name)")) ) {
+			wxString $(name)str = GetXmlContent( childnode );
+			
+			double $(name);
+			$(name)str.ToDouble(&amp;$(name));
+			$(object)Instance->Set$(name_extension)($(name));
+		}
+		</objectpart>
+	</template>
+	<template name="property_reader_arraydouble">
+		<objectpart file="src">
+		if( cname.IsSameAs(wxT("$(name)")) ) {
+			wxString $(name)str = GetXmlContent( childnode );
+			
+			double $(name);
+			$(name)str.ToDouble(&amp;$(name));
+			$(object)Instance->Add$(name_extension)($(name));
+		}
+		</objectpart>
+	</template>
+	<template name="property_reader_float">
+		<objectpart file="src">
+		if( cname.IsSameAs(wxT("$(name)")) ) {
+			wxString $(name)str = GetXmlContent( childnode );
+			
+			double val_$(name);
+			$(name)str.ToDouble(&amp;val_$(name));
+			$(object)Instance->Set$(name_extension)((float)$(name));
+		}
+		</objectpart>
+	</template>
+	<template name="property_reader_arrayfloat">
+		<objectpart file="src">
+		if( cname.IsSameAs(wxT("$(name)")) ) {
+			wxString $(name)str = GetXmlContent( childnode );
+			
+			double val_$(name);
+			$(name)str.ToDouble(&amp;val_$(name));
+			$(object)Instance->Add$(name_extension)((float)$(name));
+		}
+		</objectpart>
+	</template>
+	<template name="property_writer_string">
+		<objectpart file="src">
+	if( $(object)Instance->Has$(name_extension)() ) {
+		wxString $(name) = $(object)Instance->Get$(name_extension)();
+		xmlNewChild( node , NULL , (const xmlChar*) "$(name)" , wxxU2C($(name)) ); 
+	}
+		</objectpart>
+	</template>
+	<template name="property_writer_arraystring">
+		<objectpart file="src">
+	if( $(object)Instance->Has$(name_extension)() ) {
+		std::vector&lt;wxString&gt;&amp; $(name) = $(object)Instance->Get$(name_extension)();
+		for( unsigned int i = 0; i &lt; $(name).size() ; ++ i )
+			xmlNewChild( node , NULL , (const xmlChar*) "$(name)" , wxxU2C($(name)[i]) ); 
+	}
+		</objectpart>
+	</template>
+	<template name="property_writer_int">
+		<objectpart file="src">
+	if( $(object)Instance->Has$(name_extension)() ) {
+		wxString $(name)str = wxString::Format(wxT("%d"),$(object)Instance->Get$(name_extension)());
+		xmlNewChild( node , NULL , (const xmlChar*) "$(name)" , wxxU2C($(name)str) );
+	}
+		</objectpart>
+	</template>
+	<template name="property_writer_arrayint">
+		<objectpart file="src">
+	if( $(object)Instance->Has$(name_extension)() ) {
+		std::vector&lt;int&gt;&amp; $(name) = $(object)Instance->Get$(name_extension)();
+		for( unsigned int i = 0; i &lt; $(name).size() ; ++ i ) {
+			wxString $(name)str = wxString::Format(wxT("%d"),$(name)[i]);
+			xmlNewChild( node , NULL , (const xmlChar*) "$(name)" , wxxU2C($(name)str) );
+		}
+	}
+		</objectpart>
+	</template>
+	<template name="property_writer_enum">
+		<objectpart file="src">
+	if( $(object)Instance->Has$(name_extension)() ) {
+		wxString $(name)str = $(object)Instance->Get$(name_extension)().GetValue();
+		xmlNewChild( node , NULL , (const xmlChar*) "$(name)" , wxxU2C($(name)str) );
+	}
+		</objectpart>
+	</template>
+	<template name="property_writer_uint">
+		<objectpart file="src">
+	if( $(object)Instance->Has$(name_extension)() ) {
+		wxString $(name)str = wxString::Format(wxT("%d"),(int)$(object)Instance->Get$(name_extension)());
+		xmlNewChild( node , NULL , (const xmlChar*) "$(name)" , wxxU2C($(name)str) );
+	}
+		</objectpart>
+	</template>
+	<template name="property_writer_arrayuint">
+		<objectpart file="src">
+	if( $(object)Instance->Has$(name_extension)() ) {
+		std::vector&lt;unsigned int&gt;&amp; $(name) = $(object)Instance->Get$(name_extension)();
+		for( unsigned int i = 0; i &lt; $(name).size() ; ++ i ) {
+			wxString $(name)str = wxString::Format(wxT("%d"),(int)$(name)[i]);
+			xmlNewChild( node , NULL , (const xmlChar*) "$(name)" , wxxU2C($(name)str) );
+		}
+	}
+		</objectpart>
+	</template>
+	<template name="property_writer_long">
+		<objectpart file="src">
+	if( $(object)Instance->Has$(name_extension)() ) {
+		wxString $(name)str = wxString::Format(wxT("%d"),(int)$(object)Instance->Get$(name_extension)());
+		xmlNewChild( node , NULL , (const xmlChar*) "$(name)" , wxxU2C($(name)str) );
+	}
+		</objectpart>
+	</template>
+	<template name="property_writer_arraylong">
+		<objectpart file="src">
+	if( $(object)Instance->Has$(name_extension)() ) {
+		std::vector&lt;long&gt;&amp; $(name) = $(object)Instance->Get$(name_extension)();
+		for( unsigned int i = 0; i &lt; $(name).size() ; ++ i ) {
+			wxString $(name)str = wxString::Format(wxT("%d"),(int)$(name)[i]);
+			xmlNewChild( node , NULL , (const xmlChar*) "$(name)" , wxxU2C($(name)str) );
+		}
+	}
+		</objectpart>
+	</template>
+	<template name="property_writer_ulong">
+		<objectpart file="src">
+	if( $(object)Instance->Has$(name_extension)() ) {
+		wxString $(name)str = wxString::Format(wxT("%d"),(int)$(object)Instance->Get$(name_extension)());
+		xmlNewChild( node , NULL , (const xmlChar*) "$(name)" , wxxU2C($(name)str) );
+	}
+		</objectpart>
+	</template>
+	<template name="property_writer_arrayulong">
+		<objectpart file="src">
+	if( $(object)Instance->Has$(name_extension)() ) {
+		std::vector&lt;unsigned long&gt;&amp; $(name) = $(object)Instance->Get$(name_extension)();
+		for( unsigned int i = 0; i &lt; $(name).size() ; ++ i ) {
+			wxString $(name)str = wxString::Format(wxT("%d"),(int)$(name)[i]);
+			xmlNewChild( node , NULL , (const xmlChar*) "$(name)" , wxxU2C($(name)str) );
+		}
+	}
+		</objectpart>
+	</template>
+	<template name="property_writer_bool">
+		<objectpart file="src">
+	if( $(object)Instance->Has$(name_extension)() ) {
+		wxString $(name)str = $(object)Instance->Get$(name_extension)() ? wxT("true") : wxT("false");
+		xmlNewChild( node , NULL , (const xmlChar*) "$(name)" , wxxU2C($(name)str) );
+	}
+		</objectpart>
+	</template>
+	<template name="property_writer_arraybool">
+		<objectpart file="src">
+	if( $(object)Instance->Has$(name_extension)() ) {
+		std::vector&lt;bool&gt;&amp; $(name) = $(object)Instance->Get$(name_extension)();
+		for( unsigned int i = 0; i &lt; $(name).size() ; ++ i ) {
+			wxString $(name)str = $(name)[i] ? wxT("true") : wxT("false");
+			xmlNewChild( node , NULL , (const xmlChar*) "$(name)" , wxxU2C($(name)str) );
+		}
+	}
+		</objectpart>
+	</template>
+	<template name="property_writer_double">
+		<objectpart file="src">
+	if( $(object)Instance->Has$(name_extension)() ) {
+		wxString $(name)str = wxString::Format(wxT("%f"),$(object)Instance->Get$(name_extension)());
+		xmlNewChild( node , NULL , (const xmlChar*) "$(name)" , wxxU2C($(name)str) );
+	}
+		</objectpart>
+	</template>
+	<template name="property_writer_arraydouble">
+		<objectpart file="src">
+	if( $(object)Instance->Has$(name_extension)() ) {
+		std::vector&lt;double&gt;&amp; $(name) = $(object)Instance->Get$(name_extension)();
+		for( unsigned int i = 0; i &lt; $(name).size() ; ++ i ) {
+			wxString $(name)str = wxString::Format(wxT("%f"),$(name)[i]);
+			xmlNewChild( node , NULL , (const xmlChar*) "$(name)" , wxxU2C($(name)str) );
+		}
+	}
+		</objectpart>
+	</template>
+	<template name="property_writer_float">
+		<objectpart file="src">
+	if( $(object)Instance->Has$(name_extension)() ) {
+		wxString $(name)str = wxString::Format(wxT("%f"),$(object)Instance->Get$(name_extension)());
+		xmlNewChild( node , NULL , (const xmlChar*) "$(name)" , wxxU2C($(name)str) );
+	}
+		</objectpart>
+	</template>
+	<template name="property_writer_arrayfloat">
+		<objectpart file="src">
+	if( $(object)Instance->Has$(name_extension)() ) {
+		std::vector&lt;float&gt;&amp; $(name) = $(object)Instance->Get$(name_extension)();
+		for( unsigned int i = 0; i &lt; $(name).size() ; ++ i ) {
+			wxString $(name)str = wxString::Format(wxT("%f"),$(name)[i]);
+			xmlNewChild( node , NULL , (const xmlChar*) "$(name)" , wxxU2C($(name)str) );
+		}
+	}
+		</objectpart>
+	</template>
+	
+	<!-- OBJECT TEMPLATES -->
+	
+	<template name="property_reader_object">
+		<objectpart file="src">
+		if( cname.IsSameAs(wxT("$(name)")) ) {
+			$(type)* $(name) = ($(type)*) CreateResFromNode(childnode,wxT("$(type)"),NULL);
+			if( $(name) != NULL ) {
+				$(object)Instance->Set$(name_extension)(*$(name));
+				delete $(name);
+			}
+		}
+		</objectpart>
+	</template>
+	<template name="property_reader_arrayobject">
+		<objectpart file="src">
+		if( cname.IsSameAs(wxT("$(name)")) ) {
+			$(type)* $(name) = ($(type)*) CreateResFromNode(childnode,wxT("$(type)"),NULL);
+			if( $(name) != NULL ) {
+				$(object)Instance->Add$(name_extension)(*$(name));
+				delete $(name);
+			}
+		}
+		</objectpart>
+	</template>
+	<template name="property_writer_object">
+		<objectpart file="src">
+	if( $(object)Instance->Has$(name_extension)() ) {
+		childnode = wxgXmlReader::Get()->WriteResource( &amp;($(object)Instance->Get$(name_extension)()) );
+		if( childnode != NULL ) {
+			xmlNodeSetName( childnode , (const xmlChar*) "$(name)" );
+			xmlAddChild( node , childnode );
+		}
+	}
+		</objectpart>
+	</template>
+	<template name="property_writer_arrayobject">
+		<objectpart file="src">
+	if( $(object)Instance->Has$(name_extension)() ) {
+		for( unsigned int i = 0; i &lt; $(object)Instance-&gt;Get$(name_extension)().size() ; ++i )
+		{
+			childnode = wxgXmlReader::Get()->WriteResource( &amp;( $(object)Instance-&gt;Get$(name_extension)()[i] ) );
+			if( childnode != NULL ) {
+				xmlNodeSetName( childnode , (const xmlChar*) "$(name)" );
+				xmlAddChild( node , childnode );
+			}
+		}
+	}
+		</objectpart>
+	</template>
+	
+	<!-- ANY TEMPLATES -->
+	
+	<template name="property_reader_any">
+		<objectpart file="src">
+		else if( !cname.IsEmpty() ) {
+			wxExtendedObject* $(name) = CreateResFromNode(childnode,wxEmptyString,NULL);
+			if( $(name) != NULL ) {
+				wxAny anyObject = $(name);
+				$(object)Instance->Set$(name_extension)(anyObject);
+			}
+		}
+		</objectpart>
+	</template>
+	<template name="property_reader_arrayany">
+		<objectpart file="src">
+		else if( !cname.IsEmpty() ) {
+			wxExtendedObject* $(name) = CreateResFromNode(childnode,wxEmptyString,NULL);
+			if( $(name) != NULL ) {
+				$(object)Instance->Add$(name_extension)($(name));
+			}
+		}
+		</objectpart>
+	</template>
+	<template name="property_writer_any">
+		<objectpart file="src">
+	if( $(object)Instance->Has$(name_extension)() ) {
+		childnode = wxgXmlReader::Get()->WriteResource( $(object)Instance->Get$(name_extension)().As&lt;wxExtendedObject*&gt;() );
+		if( childnode != NULL )
+			xmlAddChild( node , childnode );
+	}
+		</objectpart>
+	</template>
+	<template name="property_writer_arrayany">
+		<objectpart file="src">
+	if( $(object)Instance->Has$(name_extension)() ) {
+		for( unsigned int i = 0; i &lt; $(object)Instance-&gt;Get$(name_extension)().size() ; ++i )
+		{
+			childnode = wxgXmlReader::Get()->WriteResource( $(object)Instance-&gt;Get$(name_extension)()[i].As&lt;wxExtendedObject*&gt;() );
+			if( childnode != NULL )
+				xmlAddChild( node , childnode );
+		}
+	}
+		</objectpart>
+	</template>
+	
+	<!-- DATE TIME TEMPLATES -->
+	
+	<template name="property_reader_datetime">
+		<objectpart file="src">
+		if( cname.IsSameAs(wxT("$(name)")) ) {
+			wxString content = GetXmlContent(childnode);
+			wxDateTime $(name);
+			$(name).ParseISOCombined(content);
+			$(object)Instance->Set$(name_extension)($(name));
+		}
+		</objectpart>
+	</template>
+	<template name="property_reader_arraydatetime">
+		<objectpart file="src">
+		if( cname.IsSameAs(wxT("$(name)")) ) {
+			wxString content = GetXmlContent(childnode);
+			wxDateTime $(name);
+			$(name).ParseISOCombined(content);
+			$(object)Instance->Add$(name_extension)($(name));
+		}
+		</objectpart>
+	</template>
+	<template name="property_writer_datetime">
+		<objectpart file="src">
+	if( $(object)Instance->Has$(name_extension)() ) {
+		wxString $(name)str = $(object)Instance->Get$(name_extension)().FormatISOCombined();
+		xmlNewChild( node , NULL , (const xmlChar*) "$(name)" , wxxU2C($(name)str) );
+	}
+		</objectpart>
+	</template>
+	<template name="property_writer_arraydatetime">
+		<objectpart file="src">
+	for( unsigned int i = 0; i &lt; $(object)Instance.Get$(name_extension)().size() ; ++i )
+	{
+		wxString $(name)str = $(object)Instance->Get$(name_extension)().FormatISOCombined();
+		xmlNewChild( node , NULL , (const xmlChar*) "$(name)" , wxxU2C($(name)str) );
+	}
+		</objectpart>
+	</template>
+	
+	<template name="property_reader_date">
+		<objectpart file="src">
+		if( cname.IsSameAs(wxT("$(name)")) ) {
+			wxString content = GetXmlContent(childnode);
+			wxDateTime $(name);
+			$(name).ParseISODate(content);
+			$(object)Instance->Set$(name_extension)($(name));
+		}
+		</objectpart>
+	</template>
+	<template name="property_reader_arraydate">
+		<objectpart file="src">
+		if( cname.IsSameAs(wxT("$(name)")) ) {
+			wxString content = GetXmlContent(childnode);
+			wxDateTime $(name);
+			$(name).ParseISODate(content);
+			$(object)Instance->Add$(name_extension)($(name));
+		}
+		</objectpart>
+	</template>
+	<template name="property_writer_date">
+		<objectpart file="src">
+	if( $(object)Instance->Has$(name_extension)() ) {
+		wxString $(name)str = $(object)Instance->Get$(name_extension)().FormatISODate();
+		xmlNewChild( node , NULL , (const xmlChar*) "$(name)" , wxxU2C($(name)str) );
+	}
+		</objectpart>
+	</template>
+	<template name="property_writer_arraydate">
+		<objectpart file="src">
+	for( unsigned int i = 0; i &lt; $(object)Instance.Get$(name_extension)().size() ; ++i )
+	{
+		wxString $(name)str = $(object)Instance->Get$(name_extension)().FormatISODate();
+		xmlNewChild( node , NULL , (const xmlChar*) "$(name)" , wxxU2C($(name)str) );
+	}
+		</objectpart>
+	</template>
+	
+	<template name="property_reader_time">
+		<objectpart file="src">
+		if( cname.IsSameAs(wxT("$(name)")) ) {
+			wxString content = GetXmlContent(childnode);
+			wxDateTime $(name);
+			$(name).ParseISODate(content);
+			$(object)Instance->Set$(name_extension)($(name));
+		}
+		</objectpart>
+	</template>
+	<template name="property_reader_arraytime">
+		<objectpart file="src">
+		if( cname.IsSameAs(wxT("$(name)")) ) {
+			wxString content = GetXmlContent(childnode);
+			wxDateTime $(name);
+			$(name).ParseISOTime(content);
+			$(object)Instance->Add$(name_extension)($(name));
+		}
+		</objectpart>
+	</template>
+	<template name="property_writer_time">
+		<objectpart file="src">
+	if( $(object)Instance->Has$(name_extension)() ) {
+		wxString $(name)str = $(object)Instance->Get$(name_extension)().FormatISOTime();
+		xmlNewChild( node , NULL , (const xmlChar*) "$(name)" , wxxU2C($(name)str) );
+	}
+		</objectpart>
+	</template>
+	<template name="property_writer_arraytime">
+		<objectpart file="src">
+	for( unsigned int i = 0; i &lt; $(object)Instance.Get$(name_extension)().size() ; ++i )
+	{
+		wxString $(name)str = $(object)Instance->Get$(name_extension)().FormatISOTime();
+		xmlNewChild( node , NULL , (const xmlChar*) "$(name)" , wxxU2C($(name)str) );
+	}
+		</objectpart>
+	</template>
+	
+	<template name="property_reader_day">
+		<objectpart file="src">
+		if( cname.IsSameAs(wxT("$(name)")) ) {
+			wxString content = GetXmlContent(childnode);
+			wxDateTime $(name);
+			wxString::const_iterator end;
+			$(name).ParseFormat(content, wxT("%d"), &amp;end);
+			$(object)Instance->Set$(name_extension)($(name));
+		}
+		</objectpart>
+	</template>
+	<template name="property_reader_arrayday">
+		<objectpart file="src">
+		if( cname.IsSameAs(wxT("$(name)")) ) {
+			wxString content = GetXmlContent(childnode);
+			wxDay $(name);
+			wxString::const_iterator end;
+			$(name).ParseFormat(content, wxT("%d"), &amp;end);
+			$(object)Instance->Add$(name_extension)($(name));
+		}
+		</objectpart>
+	</template>
+	<template name="property_writer_day">
+		<objectpart file="src">
+	if( $(object)Instance->Has$(name_extension)() ) {
+		wxString $(name)str = $(object)Instance->Get$(name_extension)().Format(wxT("%d"));
+		xmlNewChild( node , NULL , (const xmlChar*) "$(name)" , wxxU2C($(name)str) );
+	}
+		</objectpart>
+	</template>
+	<template name="property_writer_arrayday">
+		<objectpart file="src">
+	for( unsigned int i = 0; i &lt; $(object)Instance.Get$(name_extension)().size() ; ++i )
+	{
+		wxString $(name)str = $(object)Instance->Get$(name_extension)().Format(wxT("%d"));
+		xmlNewChild( node , NULL , (const xmlChar*) "$(name)" , wxxU2C($(name)str) );
+	}
+		</objectpart>
+	</template>
+	
+	<template name="property_reader_month">
+		<objectpart file="src">
+		if( cname.IsSameAs(wxT("$(name)")) ) {
+			wxString content = GetXmlContent(childnode);
+			wxDateTime $(name);
+			wxString::const_iterator end;
+			$(name).ParseFormat(content, wxT("%m"), &amp;end);
+			$(object)Instance->Set$(name_extension)($(name));
+		}
+		</objectpart>
+	</template>
+	<template name="property_reader_arraymonth">
+		<objectpart file="src">
+		if( cname.IsSameAs(wxT("$(name)")) ) {
+			wxString content = GetXmlContent(childnode);
+			wxMonth $(name);
+			wxString::const_iterator end;
+			$(name).ParseFormat(content, wxT("%m"), &amp;end);
+			$(object)Instance->Add$(name_extension)($(name));
+		}
+		</objectpart>
+	</template>
+	<template name="property_writer_month">
+		<objectpart file="src">
+	if( $(object)Instance->Has$(name_extension)() ) {
+		wxString $(name)str = $(object)Instance->Get$(name_extension)().Format(wxT("%m"));
+		xmlNewChild( node , NULL , (const xmlChar*) "$(name)" , wxxU2C($(name)str) );
+	}
+		</objectpart>
+	</template>
+	<template name="property_writer_arraymonth">
+		<objectpart file="src">
+	for( unsigned int i = 0; i &lt; $(object)Instance.Get$(name_extension)().size() ; ++i )
+	{
+		wxString $(name)str = $(object)Instance->Get$(name_extension)().Format(wxT("%m"));
+		xmlNewChild( node , NULL , (const xmlChar*) "$(name)" , wxxU2C($(name)str) );
+	}
+		</objectpart>
+	</template>
+	
+	<template name="property_reader_year">
+		<objectpart file="src">
+		if( cname.IsSameAs(wxT("$(name)")) ) {
+			wxString content = GetXmlContent(childnode);
+			wxDateTime $(name);
+			wxString::const_iterator end;
+			$(name).ParseFormat(content, wxT("%Y"), &amp;end);
+			$(object)Instance->Set$(name_extension)($(name));
+		}
+		</objectpart>
+	</template>
+	<template name="property_reader_arrayyear">
+		<objectpart file="src">
+		if( cname.IsSameAs(wxT("$(name)")) ) {
+			wxString content = GetXmlContent(childnode);
+			wxYear $(name);
+			wxString::const_iterator end;
+			$(name).ParseFormat(content, wxT("%Y"), &amp;end);
+			$(object)Instance->Add$(name_extension)($(name));
+		}
+		</objectpart>
+	</template>
+	<template name="property_writer_year">
+		<objectpart file="src">
+	if( $(object)Instance->Has$(name_extension)() ) {
+		wxString $(name)str = $(object)Instance->Get$(name_extension)().Format(wxT("%Y"));
+		xmlNewChild( node , NULL , (const xmlChar*) "$(name)" , wxxU2C($(name)str) );
+	}
+		</objectpart>
+	</template>
+	<template name="property_writer_arrayyear">
+		<objectpart file="src">
+	for( unsigned int i = 0; i &lt; $(object)Instance.Get$(name_extension)().size() ; ++i )
+	{
+		wxString $(name)str = $(object)Instance->Get$(name_extension)().Format(wxT("%Y"));
+		xmlNewChild( node , NULL , (const xmlChar*) "$(name)" , wxxU2C($(name)str) );
+	}
+		</objectpart>
+	</template>
+	
+	<template name="property_reader_yearmonth">
+		<objectpart file="src">
+		if( cname.IsSameAs(wxT("$(name)")) ) {
+			wxString content = GetXmlContent(childnode);
+			wxDateTime $(name);
+			wxString::const_iterator end;
+			$(name).ParseFormat(content, wxT("%Y-%m"), &amp;end);
+			$(object)Instance->Set$(name_extension)($(name));
+		}
+		</objectpart>
+	</template>
+	<template name="property_reader_arrayyearmonth">
+		<objectpart file="src">
+		if( cname.IsSameAs(wxT("$(name)")) ) {
+			wxString content = GetXmlContent(childnode);
+			wxMonth $(name);
+			wxString::const_iterator end;
+			$(name).ParseFormat(content, wxT("%Y-%m"), &amp;end);
+			$(object)Instance->Add$(name_extension)($(name));
+		}
+		</objectpart>
+	</template>
+	<template name="property_writer_yearmonth">
+		<objectpart file="src">
+	if( $(object)Instance->Has$(name_extension)() ) {
+		wxString $(name)str = $(object)Instance->Get$(name_extension)().Format(wxT("%Y-%m"));
+		xmlNewChild( node , NULL , (const xmlChar*) "$(name)" , wxxU2C($(name)str) );
+	}
+		</objectpart>
+	</template>
+	<template name="property_writer_arrayyearmonth">
+		<objectpart file="src">
+	for( unsigned int i = 0; i &lt; $(object)Instance.Get$(name_extension)().size() ; ++i )
+	{
+		wxString $(name)str = $(object)Instance->Get$(name_extension)().Format(wxT("%Y-%m"));
+		xmlNewChild( node , NULL , (const xmlChar*) "$(name)" , wxxU2C($(name)str) );
+	}
+		</objectpart>
+	</template>
+	
+	<template name="property_reader_monthday">
+		<objectpart file="src">
+		if( cname.IsSameAs(wxT("$(name)")) ) {
+			wxString content = GetXmlContent(childnode);
+			wxDateTime $(name);
+			wxString::const_iterator end;
+			$(name).ParseFormat(content, wxT("%m-%d"), &amp;end);
+			$(object)Instance->Set$(name_extension)($(name));
+		}
+		</objectpart>
+	</template>
+	<template name="property_reader_arraymonthday">
+		<objectpart file="src">
+		if( cname.IsSameAs(wxT("$(name)")) ) {
+			wxString content = GetXmlContent(childnode);
+			wxString::const_iterator end;
+			wxMonthDay $(name);
+			$(name).ParseFormat(content, wxT("%m-%d"), &amp;end);
+			$(object)Instance->Add$(name_extension)($(name));
+		}
+		</objectpart>
+	</template>
+	<template name="property_writer_monthday">
+		<objectpart file="src">
+	if( $(object)Instance->Has$(name_extension)() ) {
+		wxString $(name)str = $(object)Instance->Get$(name_extension)().Format(wxT("%m-%d"));
+		xmlNewChild( node , NULL , (const xmlChar*) "$(name)" , wxxU2C($(name)str) );
+	}
+		</objectpart>
+	</template>
+	<template name="property_writer_arraymonthday">
+		<objectpart file="src">
+	for( unsigned int i = 0; i &lt; $(object)Instance.Get$(name_extension)().size() ; ++i )
+	{
+		wxString $(name)str = $(object)Instance->Get$(name_extension)().Format(wxT("%m-%d"));
+		xmlNewChild( node , NULL , (const xmlChar*) "$(name)" , wxxU2C($(name)str) );
+	}
+		</objectpart>
+	</template>
+	
+	<template name="property_reader_duration">
+		<objectpart file="src">
+		if( cname.IsSameAs(wxT("$(name)")) ) {
+			wxString content = GetXmlContent(childnode);
+			wxDuration $(name);
+			wxString::const_iterator end;
+			$(name).FromISOString(content);
+			$(object)Instance->Set$(name_extension)($(name));
+		}
+		</objectpart>
+	</template>
+	<template name="property_reader_arrayduration">
+		<objectpart file="src">
+		if( cname.IsSameAs(wxT("$(name)")) ) {
+			wxString content = GetXmlContent(childnode);
+			$(name).FromISOString(content);
+			$(object)Instance->Add$(name_extension)($(name));
+		}
+		</objectpart>
+	</template>
+	<template name="property_writer_duration">
+		<objectpart file="src">
+	if( $(object)Instance->Has$(name_extension)() ) {
+		wxString $(name)str = $(object)Instance->Get$(name_extension)().ToISOString();
+		xmlNewChild( node , NULL , (const xmlChar*) "$(name)" , wxxU2C($(name)str) );
+	}
+		</objectpart>
+	</template>
+	<template name="property_writer_arrayduration">
+		<objectpart file="src">
+	for( unsigned int i = 0; i &lt; $(object)Instance.Get$(name_extension)().size() ; ++i )
+	{
+		wxString $(name)str = $(object)Instance->Get$(name_extension)().ToISOString();
+		xmlNewChild( node , NULL , (const xmlChar*) "$(name)" , wxxU2C($(name)str) );
+	}
+		</objectpart>
+	</template>
+	
+	<!-- OTHER TEMPLATES -->
+
+	<!-- 
+	 Type infos are used to notify the interpreter that the related types in the xml shall be
+	 translated to the one given there.
+	 It will consist into a map of elements specifying the source as a key and the destination
+	 as a value.
+	 If a type is not found it is assumed to be complex or to be generated in the file.
+	-->
+	<types_info>
+		<typeinfo source="positiveInteger" destination="unsigned int"/>
+		<typeinfo source="variant" destination="wxAny"/>
+		<typeinfo source="string" destination="wxString"/>
+		<typeinfo source="boolean" destination="bool"/>
+		<typeinfo source="float" destination="double"/>
+		<typeinfo source="integer" destination="int"/>
+		<typeinfo source="dateTime" destination="wxDateTime"/>
+		<typeinfo source="duration" destination="wxDuration"/>
+		<typeinfo source="datetime" destination="wxDateTime"/>
+		<typeinfo source="date" destination="wxDate"/>
+		<typeinfo source="time" destination="wxTime"/>
+		<typeinfo source="gYear" destination="wxYear"/>
+		<typeinfo source="gYearMonth" destination="wxYearMonth"/>
+		<typeinfo source="gMonth" destination="wxMonth"/>
+		<typeinfo source="gMonthDay" destination="wxMonthDay"/>
+		<typeinfo source="ID" destination="unsigned int"/>
+	</types_info>
+	
+	<addin name="wxgXmlReader">
+		<source>
+/**
+ * @file wxgXmlReader.h
+ * @brief main file for managing xml reading stuff for wxg
+ * @author Nicolas Macherey (nm@graymat.fr)
+ * @version 10.4
+ */
+#include &lt;libxml/xmlreader.h&gt;
+#include &lt;libxml/xpath.h&gt;
+
+#include &lt;stdio.h&gt;
+#include &lt;iostream&gt;
+#include &lt;vector&gt;
+#include &lt;map&gt;
+#include &lt;stack&gt;
+
+#include &lt;wx/wx.h&gt;
+#include &lt;wx/log.h&gt;
+#include &lt;wx/variant.h&gt;
+
+#include "wxgDefines.h"
+#include "wxgException.h"
+
+#include "wxgXmlReader.h"
+
+IMPLEMENT_ABSTRACT_CLASS( wxgXmlHandler , wxObject );
+
+/** Global instance for the wxgXmlReader */
+template&lt;&gt; wxgXmlReader* wxgSingleton&lt;wxgXmlReader&gt;::instance = 0;
+
+/** Global isShutdown initialization for the wxgXmlReader */
+template&lt;&gt; bool  wxgSingleton&lt;wxgXmlReader&gt;::isShutdown = false;
+
+wxgXmlReader::wxgXmlReader()
+{
+
+}
+
+wxgXmlReader::~wxgXmlReader()
+{
+	m_registeredHandlers.clear();
+
+	for( unsigned int i = 0; i &lt; m_handlers.size(); ++i )
+		delete m_handlers[i];
+
+	m_handlers.clear();
+}
+
+wxExtendedObject* wxgXmlReader::LoadFile( const wxString&amp; file )
+{	
+	m_doc = xmlParseFile( wxcU2C(file) );
+	
+	if( m_doc == NULL )
+		WXG_THROW(wxT("Error cannot open document!"));
+	
+	m_root = xmlDocGetRootElement( m_doc );
+	
+	if( m_root == NULL )
+		WXG_THROW(wxT("Error cannot get your document root !"));
+		
+	wxString n_root = wxC2U((char*) m_root-&gt;name);
+
+	if( n_root.IsEmpty() )
+		WXG_THROW( wxT("Error document root is empty") );
+
+	/* Once we have extracted the root from the document, we have to 
+   	 * find a handler which is able to return an object associated to
+	 * this root.
+	 */
+	wxExtendedObject* resource = CreateResFromNode( m_root , wxEmptyString , NULL , NULL );
+	
+	xmlFreeDoc(m_doc);
+
+	return resource;
+}
+
+void wxgXmlReader::SaveFile( const wxString&amp; file , wxExtendedObject* resource )
+{
+	m_doc = xmlNewDoc((const xmlChar*) "1.0");
+	
+	if( m_doc == NULL )
+		WXG_THROW(wxT("Error cannot open document!"));
+	
+	m_root = WriteResource( resource );
+	
+	if( m_root == NULL )
+		WXG_THROW(wxT("Error cannot get your document root !"));
+		
+	xmlDocSetRootElement(m_doc,m_root);
+	xmlSaveFormatFileEnc( wxcU2C(file) , m_doc , "UTF-8" , 1 );
+	
+	xmlFreeDoc(m_doc);
+}
+
+bool wxgXmlReader::HasHandlerFor( xmlNode* node )
+{
+	for( unsigned int i = 0 ; i &lt; m_handlers.size() ; ++i )
+		if( m_handlers[i]-&gt;CanHandle( node ) )
+			return true;
+
+	return false;
+}
+
+wxExtendedObject *wxgXmlReader::DoCreateResFromNode(xmlNode *node, const wxString&amp; className , wxExtendedObject *resource,wxgXmlHandler *handlerToUse)
+{
+	if( handlerToUse != NULL )
+		return handlerToUse-&gt;CreateResource( node , className , resource );
+
+	wxExtendedObject* result = NULL;
+	wxgXmlHandler *handler = NULL;
+
+	for( unsigned int i = 0; i &lt; m_handlers.size() ; ++i )
+		if( m_handlers[i]-&gt;CanHandle( className ) ) {
+			handler = m_handlers[i];
+			break;
+		}
+	
+	if( handler == NULL ) {
+		for( unsigned int i = 0; i &lt; m_handlers.size() ; ++i )
+			if( m_handlers[i]-&gt;CanHandle( node ) ) {
+				handler = m_handlers[i];
+				break;
+			}
+	}
+	
+	if( handler != NULL )
+		result = handler-&gt;CreateResource( node , className , resource );
+
+	return result;
+}
+
+xmlNode* wxgXmlReader::DoWriteResource( wxExtendedObject* resource , wxgXmlHandler* handlerToUse )
+{
+	if( handlerToUse != NULL )
+		return handlerToUse-&gt;WriteResource( resource );
+
+	xmlNode* node = NULL;
+
+	for( unsigned int i = 0; i &lt; m_handlers.size() ; ++i )
+		if( m_handlers[i]-&gt;CanHandle( resource ) ) {
+			node = m_handlers[i]-&gt;WriteResource( resource );
+			break;
+		}
+
+	return node;
+}
+
+wxArrayString wxgXmlReader::GetList()
+{
+	wxArrayString ret;
+
+	wxgXmlHandlerRegistrationMap::iterator it = m_registeredHandlers.begin();
+	for( ; it != m_registeredHandlers.end() ; ++it )
+		ret.Add(it-&gt;first);
+
+	return ret;
+}
+
+wxArrayString wxgXmlReader::GetDescriptions()
+{
+	wxArrayString ret;
+
+	wxgXmlHandlerRegistrationMap::iterator it = m_registeredHandlers.begin();
+	for( ; it != m_registeredHandlers.end() ; ++it )
+		ret.Add(it-&gt;second.description);
+
+	return ret;
+}
+
+bool wxgXmlReader::RegisterXmlHandler( const wxString&amp; name,
+		const wxString&amp; description,
+		wxgXmlHandlerConstructor ctor,
+		wxgXmlHandlerDestructor dtor )
+{
+	wxgXmlHandlerRegistrationMap::iterator it = m_registeredHandlers.find(name);
+
+	if( it != m_registeredHandlers.end() )
+		return false;
+
+	wxgXmlHandlerRegistration info;
+	info.name = name;
+	info.description = description;
+	info.ctor = ctor;
+	info.dtor = dtor;
+
+	m_registeredHandlers[name] = info;
+	
+	wxgXmlHandler* handler = CreateXmlHandler( name );
+	m_handlers.push_back( handler );
+
+	return true;
+}
+
+bool wxgXmlReader::UnregisterXmlHandler( const wxString&amp; name )
+{
+	wxgXmlHandlerRegistrationMap::iterator it = m_registeredHandlers.find(name);
+
+	if( it == m_registeredHandlers.end() )
+		return false;
+	
+	RemoveHandlersOfClass( name );
+	m_registeredHandlers.erase(it);
+	return true;
+}
+
+wxgXmlHandler* wxgXmlReader::CreateXmlHandler( const wxString&amp; name )
+{
+	wxgXmlHandlerRegistrationMap::iterator it = m_registeredHandlers.find(name);
+
+	if( it == m_registeredHandlers.end() )
+		return NULL;
+
+	wxgXmlHandler* handler = it-&gt;second.ctor( );
+	return handler;
+}
+
+bool wxgXmlReader::Exists( const wxString&amp; name )
+{
+	wxgXmlHandlerRegistrationMap::iterator it = m_registeredHandlers.find(name);
+
+	if( it == m_registeredHandlers.end() )
+		return false;
+
+	return true;
+}
+
+wxString wxgXmlReader::GetDescription( const wxString&amp; name )
+{
+	wxgXmlHandlerRegistrationMap::iterator it = m_registeredHandlers.find(name);
+
+	if( it == m_registeredHandlers.end() )
+		return wxEmptyString;
+
+	return it-&gt;second.description;
+}
+
+
+void wxgXmlReader::RemoveHandlersOfClass( const wxString&amp; classInfo )
+{
+	unsigned int i = 0;
+
+	while( i &lt; m_handlers.size() ) {
+		wxString className = m_handlers[i]-&gt;GetClassInfo()-&gt;GetClassName();
+
+		if( className.IsSameAs( classInfo ) ) {
+			delete m_handlers[i];
+			wxArraygXmlHandler::iterator it = m_handlers.begin() + i;
+			m_handlers.erase(it);
+		}
+		else {
+			++i;
+		}
+	}
+}
+
+wxgXmlHandler::wxgXmlHandler():
+	wxObject(),
+	m_node(NULL),
+	m_instance(NULL)
+{
+}
+
+wxExtendedObject *wxgXmlHandler::CreateResource(xmlNode *node, const wxString&amp; className , wxExtendedObject *instance)
+{
+    xmlNode *myNode = m_node;
+    wxString myClass = m_class;
+    wxExtendedObject *myInstance = m_instance;
+
+    m_instance = instance;
+
+    m_node = node;
+    m_class = wxC2U( (char*) node-&gt;name );
+
+    wxExtendedObject *returned = DoCreateResource();
+
+    m_node = myNode;
+    m_class = myClass;
+    m_instance = myInstance;
+
+    return returned;
+}
+
+xmlNode* wxgXmlHandler::WriteResource( wxExtendedObject* resource )
+{
+	wxExtendedObject* myInstance = m_instance;
+
+	m_instance = resource;
+
+	xmlNode* node = DoWriteResource( );
+
+	m_instance = myInstance;
+	return node;
+}
+
+void wxgXmlHandler::CreateChildren(bool this_hnd_only)
+{
+	xmlNode* child = m_node-&gt;children;
+	while( child != NULL ) {
+
+		if( wxgXmlReader::Get()-&gt;HasHandlerFor( child ) )	
+			wxgXmlReader::Get()-&gt;DoCreateResFromNode(child, wxEmptyString, NULL, this_hnd_only ? this : NULL);
+		
+		child = child-&gt;next;
+	}
+}
+
+
+void wxgXmlHandler::CreateChildrenPrivately(xmlNode *rootnode)
+{
+	xmlNode *root;
+	if (rootnode == NULL) root = m_node; else root = rootnode;
+	xmlNode *n = root-&gt;children;
+
+	while (n != NULL)
+	{
+		if (CanHandle(n))
+		{
+			CreateResource(n,wxEmptyString, NULL);
+		}
+		n = n-&gt;next;
+    }
+}
+		</source>
+		<header>
+/**
+ * @file wxgXmlReader.h
+ * @brief main file for reading an xml file
+ * @author Nicolas Macherey (nm@graymat.fr)
+ * @version 10.4
+ */
+#ifndef WXG_XMLREADER_H
+#define WXG_XMLREADER_H
+
+#include "wxgSingleton.h"
+
+/* imports */
+class wxgXmlHandler;
+class wxgXmlReader;
+class wxExtendedObject;
+
+/** define XmlHandler constructor methods for building generically any kind of handlers */
+typedef wxgXmlHandler* (*wxgXmlHandlerConstructor)();
+
+/** define XmlHandler destructor methods for freeing any created handler */
+typedef void (*wxgXmlHandlerDestructor)(wxgXmlHandler*);
+
+/** define an array of wxgXmlHandler */
+typedef std::vector&lt; wxgXmlHandler* &gt; wxArraygXmlHandler;
+
+/** @struct wxgXmlHandlerRegistration
+  * @brief main strcuture for storing registration information about the
+  * construction and destrcution of a wxgXmlHandler.
+  * @author Nicolas Macherey (nm@graymat.fr)
+  * @date 8-May-2010
+  */
+struct wxgXmlHandlerRegistration
+{
+	/****************************************************************
+	  * STRUCTURE ACCESSORS
+	  **************************************************************/
+	/** default constructor */
+	wxgXmlHandlerRegistration( ) : 
+		ctor(0),dtor(0)
+	{};
+
+	/** copy constructor */
+	wxgXmlHandlerRegistration( const wxgXmlHandlerRegistration&amp; rhs ):
+		name(rhs.name),
+		description(rhs.description),
+		ctor(rhs.ctor),
+		dtor(rhs.dtor)
+	{};
+
+	/** operator= overload */
+	wxgXmlHandlerRegistration&amp; operator=(const wxgXmlHandlerRegistration&amp; rhs)
+	{
+		name = rhs.name;
+		description = rhs.description;
+		ctor = rhs.ctor;
+		dtor = rhs.dtor;
+		return (*this);
+	}
+
+
+	/****************************************************************
+	  * PROPERTIES
+	  **************************************************************/
+	wxString name;
+	wxString description;
+	wxgXmlHandlerConstructor ctor;
+	wxgXmlHandlerDestructor dtor;
+};
+
+/** now we just have to define a map of wxgXmlHandlerRegistration in order to manage them in
+  * the wxgXmlReader.
+  */
+typedef std::map&lt; wxString , wxgXmlHandlerRegistration &gt; wxgXmlHandlerRegistrationMap;
+
+/** @class wxgXmlReader
+  * @brief Main class for reading an xml file in wxg and in generated files
+  * @author Nicolas Macherey (nm@graymat.fr)
+  * @date 8-May-2010
+  */
+class wxgXmlReader : public wxgSingleton&lt;wxgXmlReader&gt;
+{
+	friend class wxgSingleton&lt;wxgXmlReader&gt;;
+	friend class wxgXmlHandler;
+
+public :
+	/*******************************************************************************
+    	*   ACCESSORS
+    	*******************************************************************************/
+
+    	/** Get the list of registered handlers in this manager
+    	  * This will provide you with an array string of registered object names
+    	  * but not with their description, if you need to get the list of handlers
+	  * descriptions you should call wxgXmlReader::GetDescriptions. Please
+	  * note that this list might change at run time as this factory is made
+	  * for adding and removing handlers dynamically.
+    	  */
+	wxArrayString GetList();
+
+	/** Get all descriptions associated to each registered handler. Please
+	  * note that this list might change at run time as this factory is made
+	  * for adding and removing handlers dynamically.
+	  */
+	wxArrayString GetDescriptions();
+
+	/** Register a handler in the factory.
+	  * Each handler can only be registered once.
+	  * Please see the wxgXmlHandlerRegistrant object in order
+	  * to know how to register a new handler in this factory.
+	  * @param name handler name
+	  * @param description handler's description
+	  * @param ctor handler constructor function pointer
+	  * @param dtor handler destructor function pointer
+	  * @return false if the handler already exists in this factory !
+	  */
+	bool RegisterXmlHandler( const wxString&amp; name,
+			const wxString&amp; description,
+			wxgXmlHandlerConstructor ctor,
+			wxgXmlHandlerDestructor dtor );
+
+	/** Unregister indicator from that factory,
+	  * Once you have call this method the handler will not be available
+	  * in this factory.
+	  */
+	bool UnregisterXmlHandler( const wxString&amp; name );
+
+	/** Creates a handler accordingly to it's name
+	  * You can call this method at any time if you want to create a handler
+	  * from it's name only.
+	  * @param name handlers name
+	  * @param g wxg on which the handler will work
+	  * @param interpreter wxgInterpreter interpreter for generating the code
+	  * @return the requested handler instance if exists NULL if it is not existing
+	  */
+	wxgXmlHandler* CreateXmlHandler( const wxString&amp; name );
+
+	/** Check the existence of a handler by it's name
+	  * @param name handler name to check the existance for
+	  * @return false if the handler is not registered in the factory
+	  */
+	bool Exists( const wxString&amp; name );
+	
+	/** Find the description associated to the handler name
+	  * @param name handler's name to find the description for
+	  * @return a wxEmptyString if the handler does not exists in the factory
+	  */
+	wxString GetDescription( const wxString&amp; name );
+
+	/** Remove all handlers associated to the given class from
+	  * the global array
+	  * @param classInfo class info of the handlers to remove
+	  */
+	void RemoveHandlersOfClass( const wxString&amp; classInfo );
+
+	/** This is the main stuff of that manager. when you need to read an xml file
+	  * using wxgxmlReader, you shall always use this method.
+	  * It is taking in input the xml file path to read and returns a wxExtendedObject
+	  * in output.
+	  * The wxExtendedObject shall corresponds to your root node of your xml file.
+	  */
+	wxExtendedObject* LoadFile( const wxString&amp; file );
+	
+	/** Save the resource in the given file 
+	 * @param file file in which the resource shall be saved 
+	 * @param resource resrouce to save in the file 
+	 */
+	void SaveFile( const wxString&amp; file , wxExtendedObject* resource );
+
+	/** This is a convenience function made for helping wxgXmlHandler's to
+	  * load resource from children of theirs but which they cannot handle.
+	  */
+	wxExtendedObject *CreateResFromNode(xmlNode *node , const wxString&amp; className, wxExtendedObject *resource = NULL, wxgXmlHandler* handlerToUse = NULL)
+	{
+		return node ? DoCreateResFromNode(node , className , resource, handlerToUse)
+			: NULL;
+	}
+
+
+	/** Check if the given xmlNode can be handled or not */
+	bool HasHandlerFor( xmlNode* node );
+
+	/** This method is used to write resource to into a node */
+	xmlNode* WriteResource( wxExtendedObject* resource , wxgXmlHandler* handlerToUse = NULL )
+	{
+		return resource ? DoWriteResource(resource, handlerToUse)
+			: NULL;
+	}
+
+
+private :
+	/***********************************************************************************
+	  * CONSTRUCTOR AND DESTRUCTOR
+	  *********************************************************************************/
+	/** Default constructor,
+	  * You cannot build directly this class, this class is a global singleton 
+	  * you have to use wxgXmlReader::Get() to access the global instance 
+	  * of this class.
+	  */
+	wxgXmlReader();
+
+	/** Default destructor
+	  * You shall never have to destroy this class by your own unless you are an
+	  * application developper. Anyway if you want to free the global instance of this manager
+	  * properly, you have to call wxgXmlReader::Free() to free it's global instance
+	  */
+	~wxgXmlReader();
+
+	/** Creates a wxExtendedObject from a node */
+	wxExtendedObject *DoCreateResFromNode(xmlNode* node,
+				  const wxString&amp; className,
+                                  wxExtendedObject *resource,
+                                  wxgXmlHandler *handlerToUse = NULL);
+
+	/** This method is used to write resource to into a node */
+	xmlNode* DoWriteResource( wxExtendedObject* resource , wxgXmlHandler* handlerToUse = NULL );
+
+	/** container of all registered handlers */
+	wxgXmlHandlerRegistrationMap m_registeredHandlers;
+	
+	/** container of all allocated handlers */
+	wxArraygXmlHandler m_handlers;
+
+	/** XML document */
+	xmlDoc* m_doc;
+
+	/** XML root node */
+	xmlNode* m_root;
+};
+
+/**
+  * @class wxgXmlHandler
+  * @brief Abstract class for defining a wxg xml handler
+  * 
+  * @author Nicolas Macherey (nm@graymat.fr)
+  * @date 8-May-2010
+  */
+class wxgXmlHandler : public wxObject
+{
+	DECLARE_ABSTRACT_CLASS(wxgXmlHandler)
+	
+	/** give wxgXmlReader our private members access */
+	friend class wxgXmlReader;
+
+public :
+	/** Default constructor */
+	wxgXmlHandler();
+	
+	/** Destructor */
+	virtual ~wxgXmlHandler()
+	{};
+
+   	/** Creates an object any kind of wxExtendedObject that can be created using
+	  * a wxgXmlHandler.
+	  * Any handler provides wxgXmlReader with a set of methods to
+	  * notify if the given resource can be created from a node or not.
+	  * the system is quite similar to the wxWidgets XRC system excepts
+	  * that any kind of nodes can be handled and not necessarily objects
+	  * node from your xml file.
+	  * Any way from that information the handler shall be able to create
+	  * it's resource from a node. This is the place to do it !
+	  */
+    	wxExtendedObject *CreateResource(xmlNode *node, const wxString&amp; className, wxExtendedObject *instance);
+
+	/** Write the given resource in the given parent node
+	  * This method is used to write an xml document using the
+	  * wxgXmlReader system.
+	  * The system simply ask the handler to write the given object in
+	  * a new node, this node will then be added in the parent properly.
+	  * each handler which is handling child nodes will have to add the
+	  * returned node if not NULL to its xml tree.
+	  */
+	xmlNode* WriteResource( wxExtendedObject* resource );
+
+    	/** This one is called from CreateResource after variables
+    	  * were filled.
+	  * Any handlers shall overload this metohd in order to complete the 
+	  * generation stuff.
+	  */
+    	virtual wxExtendedObject *DoCreateResource() = 0;
+
+	/** This is the method you have to overload to write a resource
+	  * to anode simply create a new node and write info in
+	  */
+	virtual xmlNode* DoWriteResource() = 0;
+
+    	/** @return Returns true if it understands this node and can create
+    	  * a resource from it, false otherwise.
+	  */
+    	virtual bool CanHandle(xmlNode *node) = 0;
+
+	/** @return Returns true if it understands this node and can create
+    	  * a resource from it, false otherwise.
+	  */
+    	virtual bool CanHandle(const wxString&amp; className) = 0;
+
+	/** @return Returns true if it understands the given resource and
+	  * can write it into an xmlNode 
+	  */
+	virtual bool CanHandle( wxExtendedObject* resource ) = 0;
+
+protected:
+    	// Variables (filled by CreateResource)
+    	xmlNode *m_node;
+    	wxString m_class;
+    	wxExtendedObject *m_instance;
+
+protected:
+	/** Creates children. */
+	void CreateChildren(bool this_hnd_only = false);
+
+	/** Helper function. */
+	void CreateChildrenPrivately(xmlNode *rootnode = NULL);
+
+	/** Creates a resource from a node. */
+	wxExtendedObject *CreateResFromNode(xmlNode *node,
+			const wxString&amp; className,
+			wxExtendedObject *instance = NULL)
+	{ return wxgXmlReader::Get()-&gt;CreateResFromNode(node, className, instance); }		
+};
+
+/** define a macro for helping creating the instance inside a wxXmlHandler :D */
+#define wxgMAKE_INSTANCE(variable, classname) \
+   classname *variable = NULL; \
+   if (m_instance) \
+       variable = wxStaticCast(m_instance, classname); \
+   if (!variable) \
+       variable = new classname;
+
+/**
+  * @class wxgXmlHandlerRegistrant
+  * @brief this main template allows you to register easily your wxgXmlHandler in the wxgXmlReader
+  * 
+  * Assuming that your handler has the following name : MyXmlHandler , an example could be :
+  * @code 
+  *	namespace {
+  *		wxgXmlHandlerRegistrant&lt;MyXmlHandler&gt; registrant( wxT("MyXmlHandler") , wxT("Description of my handler");
+  *	};
+  * @endcode
+  * This shall be done in the top of MyXmlHandler.cpp file.
+  * I also wrote a helper in order to write it faster :
+  * @code
+  * wxgREGISTER_XMLHANDLER( MyXmlHandler , wxtT("Description of my XmlHandler") );
+  * @endcode
+  *
+  * @author Nicolas Macherey (nm@graymat.fr)
+  * @date 8-May-2010
+  */
+template&lt;class T&gt; class wxgXmlHandlerRegistrant
+{
+
+public :
+	wxgXmlHandlerRegistrant( const wxString&amp; name , const wxString&amp; description ):
+		m_name(name)
+	{
+		/* The main task is to call the wxgXmlReader and to register the handler in 
+		 * using our two satic method that will be used to register in the factory */
+		wxgXmlReader::Get()-&gt;RegisterXmlHandler( name , description , &amp;Create , &amp;Free );
+	}
+	
+	~wxgXmlHandlerRegistrant()
+	{
+		/* if the factory is down this means that the instance has already been removed from it */
+		if(!wxgXmlReader::IsDown()) 
+			wxgXmlReader::Get()-&gt;UnregisterXmlHandler( m_name );
+	};
+	
+	/** The create method is made static, so that the program knows the adress of that method without the
+	  * need of making a functor or something complicated.
+	  * this method will correspond to the wxgXmlHandlerConstructor pointer 
+	  */
+	static wxgXmlHandler* Create( )
+	{
+		return new T( );
+	}
+
+	/** The free method is made static so that the program knows its adress. It corresponds to the 
+	  * wxgXmlHandlerDestructor function pointer
+	  */
+	static void Free( wxgXmlHandler* handler )
+	{
+		delete handler;
+	}
+
+private :
+	wxString m_name;
+};
+
+#define wxgREGISTER_XMLHANDLER( object , description ) \
+	namespace ns##object { \
+		wxgXmlHandlerRegistrant&lt;object&gt; registrant( wxT(#object) , description ); \
+	};
+
+#endif
+		</header>
+	</addin>
+</wxgrammar_generator_file>

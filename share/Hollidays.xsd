@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.example.org/Hollidays" xmlns:wxg="http://www.example.org/Hollidays" elementFormDefault="qualified">
+
+    <complexType name="personType">
+    	<sequence>
+    		<element name="address" type="string" minOccurs="1"
+    			maxOccurs="1">
+    		</element>
+    		<element name="zipcode" type="string" minOccurs="1"
+    			maxOccurs="1">
+    		</element>
+    		<element name="city" type="string" minOccurs="1"
+    			maxOccurs="1">
+    		</element>
+    		<element name="country" type="string" minOccurs="1"
+    			maxOccurs="1">
+    		</element>
+    		<element name="email" type="string" minOccurs="1"
+    			maxOccurs="1">
+    		</element>
+    		<element name="phone" type="string" minOccurs="1" maxOccurs="1"></element>
+			<element name="age" type="positiveInteger" minOccurs="1" maxOccurs="1"></element>
+    	</sequence>
+    	<attribute name="firstname" type="string" use="required"></attribute>
+    	<attribute name="lastname" type="string"></attribute>
+    </complexType>
+
+    <complexType name="holidayType">
+    	<sequence>
+    		<element name="start" type="date" minOccurs="1" maxOccurs="1"></element>
+    		<element name="end" type="date" minOccurs="1" maxOccurs="1"></element>
+    	</sequence>
+    </complexType>
+
+    <complexType name="holidaysType">
+    	<sequence>
+    		<element name="personHolidays" type="wxg:personHolidaysType" minOccurs="0" maxOccurs="unbounded"></element>
+    	</sequence>
+    </complexType>
+
+    <element name="holidays" type="wxg:holidaysType"></element>
+
+    <complexType name="personHolidaysType">
+    	<sequence>
+    		<element name="person" type="wxg:personType" minOccurs="1"
+    			maxOccurs="1">
+    		</element>
+    		<element name="holiday" type="wxg:holidayType" minOccurs="0" maxOccurs="unbounded"></element>
+    	</sequence>
+    </complexType>
+</schema>
