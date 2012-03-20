@@ -54,4 +54,4 @@ echo done...
 echo
 fi
 #
-echo Done generating all project files for rheia.
+echo Done generating all project files for CXBindings.
