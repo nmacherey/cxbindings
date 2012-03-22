@@ -1,0 +1,10 @@
+prefix=@CMAKE_INSTALL_PREFIX@
+exec_prefix=${prefix}
+includedir=${prefix}/@INCLUDE_INSTALL_DIR@/cxbindings
+libdir=${exec_prefix}/@LIB_INSTALL_DIR@
+
+Name: cxbindings
+Description: cxbindings is an utility library for distributed applications
+Version: @CXBINDINGS_VERSION@
+Libs: -L${libdir} -lcxbindings
+Cflags: -I${includedir}
