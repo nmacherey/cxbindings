@@ -14,7 +14,7 @@
 #include <stack>
 
 
-
+#include <boost/filesystem.hpp>
 
 
 #include "CXBindingsGlobals.h"
@@ -22,34 +22,13 @@
 
 bool CXBindingsMakeDirRecursively(const std::string& full_path, int perms)
 {
-    if (wxDirExists(full_path)) // early out
-        return true;
-
-    CXBindingsArrayString dirs;
-    std::string currdir;
-
-    {
-        wxFileName tmp(full_path);
-        currdir = tmp.GetVolume() + tmp.GetVolumeSeparator() + wxFILE_SEP_PATH;
-        dirs = tmp.GetDirs();
-    }
-    for (size_t i = 0; i < dirs.size(); ++i)
-    {
-        currdir << dirs[i];
-        if (!wxDirExists(currdir) && !wxMkdir(currdir, perms))
-            return false;
-        currdir << wxFILE_SEP_PATH;
-    }
+    boost::filesystem::create_directories( full_path );
     return true;
 }
 
 bool CXBindingsMakeDir(const std::string& full_path, int perms )
 {
-    if (wxDirExists(full_path))
-        return true;
-
-    if (!wxMkdir(full_path, perms))
-        return false;
-
+   
+    boost::filesystem::create_directory( full_path );
     return true;
 }

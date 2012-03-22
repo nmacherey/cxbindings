@@ -55,8 +55,8 @@ namespace
 
 CXBindingsInterpreterInfo CXBindingsInterpreter::DoExtractObjectsInformation( const std::string& file , CXBindings& grammar , const CXBindingsGeneratorOptions& options )
 {
-	wxLogMessage( "Generating object code for your grammar : ") + grammar.GetName()  ;
-	wxLogMessage( "Generating object code for your file : ") + file  ;
+	////wxLogMessage( "Generating object code for your grammar : ") + grammar.GetName()  ;
+	////wxLogMessage( "Generating object code for your file : ") + file  ;
 
 	CXBindingsInterpreterInfo result;
 	result.grammar = grammar;
@@ -73,7 +73,7 @@ CXBindingsInterpreterInfo CXBindingsInterpreter::DoExtractObjectsInformation( co
 	/* Get the document root */
 	m_root = xmlDocGetRootElement(m_doc);
 
-	wxLogMessage( "Xml Document file as root : ") + cxC2U( (char*) m_root->name )  ;
+	////wxLogMessage( "Xml Document file as root : ") + cxC2U( (char*) m_root->name )  ;
 
 	/* for each element in the info object of the grammar */
 	CXBindingsInfo& info = grammar.GetInfo();
@@ -82,14 +82,14 @@ CXBindingsInterpreterInfo CXBindingsInterpreter::DoExtractObjectsInformation( co
 
 	for( unsigned int i = 0; i < genOrder.size() ; ++i )
 	{
-		wxLogMessage( "\t Begin generation for : ") + genOrder[i]  ;
+		////wxLogMessage( "\t Begin generation for : ") + genOrder[i]  ;
 
 		/* Get all nodes of the given type */
 		xmlNodeArray m_nodes;
 		GetNodeList( m_nodes , m_root , genOrder[i] , levels[i] );
 
 		/* Display the total number of nodes founded */
-		wxLogMessage( std::string::Format( "\t\t Founded %d node of type : ") , m_nodes.size() ) + genOrder[i]  ;
+		//wxLogMessage( std::string::Format( "\t\t Founded %d node of type : ") , m_nodes.size() ) + genOrder[i]  ;
 
 		/* Get the grammar object associated */
 		CXBindingsObject* obj = grammar.FindObject(genOrder[i]);
@@ -103,7 +103,7 @@ CXBindingsInterpreterInfo CXBindingsInterpreter::DoExtractObjectsInformation( co
 		CXBindingsArrayGrammarInherits& models = obj->GetModels();
 		for( unsigned int j = 0; j < models.size() ; ++j )
 		{
-			wxLogMessage( "\t\t\t Appending model : ") + models[j].GetName() + " properties to object ") + obj->GetName(   ;
+			//wxLogMessage( "\t\t\t Appending model : ") + models[j].GetName() + " properties to object ") + obj->GetName(   ;
 			AppendModelToObject( grammar , *obj , models[j].GetName() );
 		}
 
@@ -114,7 +114,7 @@ CXBindingsInterpreterInfo CXBindingsInterpreter::DoExtractObjectsInformation( co
 			objInfos.push_back( DoExtractNodeInformation(grammar,*obj,m_nodes[j],options) );
 
 		result.objects[genOrder[i]] = objInfos;
-		wxLogMessage( "\t End generation for : ") + genOrder[i]  ;
+		//wxLogMessage( "\t End generation for : ") + genOrder[i]  ;
 	}
 
 	/* Cleanup */
@@ -125,11 +125,11 @@ CXBindingsInterpreterInfo CXBindingsInterpreter::DoExtractObjectsInformation( co
 	return result;
 }
 
-CXBindingsObjectInfo CXBindingsInterpreter::DoExtractNodeInformation( CXBindings& grammar , CXBindingsObject& object , xmlNode* node , const CXBindingsGeneratorOptions& WXUNUSED(options) )
+CXBindingsObjectInfo CXBindingsInterpreter::DoExtractNodeInformation( CXBindings& grammar , CXBindingsObject& object , xmlNode* node , const CXBindingsGeneratorOptions&  )
 {
 	CXBindingsObjectInfo objectInfo;
 
-	wxLogMessage( "\t\t Generating Object generation informations for object : ") + object.GetName()  ;
+	//wxLogMessage( "\t\t Generating Object generation informations for object : ") + object.GetName()  ;
 
 	/* First check if the node has the corresponding properties
 	 * Assuming that each property is unique we can create a map of 
@@ -169,7 +169,7 @@ CXBindingsObjectInfo CXBindingsInterpreter::DoExtractNodeInformation( CXBindings
 	objectInfo.rules = rInfos;
 	objectInfo.childInfos = childinfos;
 
-	wxLogMessage( "\t\t End Object generation information for object : ") + object.GetName()  ;
+	//wxLogMessage( "\t\t End Object generation information for object : ") + object.GetName()  ;
 	return objectInfo;
 }
 
@@ -177,12 +177,12 @@ void CXBindingsInterpreter::AppendModelToObject( CXBindings& grammar , CXBinding
 {
 	CXBindingsModel* model = grammar.FindModel(modelname);
 	if( model == NULL )
-		CXB_THROW( "Error cannot find object model in model list : ") + modelname  ;
+		CXB_THROW( "Error cannot find object model in model list : " + modelname ) ;
 
 	CXBindingsArrayGrammarInherits& models = model->GetModels();
 	for( unsigned int i = 0; i < models.size() ; ++i )
 	{
-		wxLogMessage( "\t\t\t Appending model : ") + models[i].GetName() + " properties to object ") + object.GetName(   ;
+		//wxLogMessage( "\t\t\t Appending model : ") + models[i].GetName() + " properties to object ") + object.GetName(   ;
 		AppendModelToObject( grammar , object , models[i].GetName() );
 	}
 
@@ -200,27 +200,27 @@ void CXBindingsInterpreter::AppendModelToObject( CXBindings& grammar , CXBinding
 	CXBindingsArrayGrammarCategory& 		o_categories = object.GetCategories();
 	CXBindingsArrayGrammarChildContainer& 		o_childContainers = object.GetChildContainers();
 
-	wxLogMessage( "\t\t\t Appending model childs : ") + std::string::Format("%d"),m_childs.size()) + wxT(" to object ") + object.GetName(   ;
+	//wxLogMessage( "\t\t\t Appending model childs : ") + std::string::Format("%d"),m_childs.size()) + wxT(" to object ") + object.GetName(   ;
 	for( unsigned int i = 0; i < m_childs.size() ; ++i )
 		o_childs.push_back(m_childs[i]);
 
-	wxLogMessage( "\t\t\t Appending model properties : ") + std::string::Format("%d"),m_properties.size()) + wxT(" to object ") + object.GetName(   ;
+	//wxLogMessage( "\t\t\t Appending model properties : ") + std::string::Format("%d"),m_properties.size()) + wxT(" to object ") + object.GetName(   ;
 	for( unsigned int i = 0; i < m_properties.size() ; ++i )
 		o_properties.push_back(m_properties[i]);
 
-	wxLogMessage( "\t\t\t Appending model rules : ") + std::string::Format("%d"),m_rules.size()) + wxT(" to object ") + object.GetName(   ;
+	//wxLogMessage( "\t\t\t Appending model rules : ") + std::string::Format("%d"),m_rules.size()) + wxT(" to object ") + object.GetName(   ;
 	for( unsigned int i = 0; i < m_rules.size() ; ++i )
 		o_rules.push_back(m_rules[i]);
 
-	wxLogMessage( "\t\t\t Appending model childRules : ") + std::string::Format("%d"),m_childRules.size()) + wxT(" to object ") + object.GetName(   ;
+	//wxLogMessage( "\t\t\t Appending model childRules : ") + std::string::Format("%d"),m_childRules.size()) + wxT(" to object ") + object.GetName(   ;
 	for( unsigned int i = 0; i < m_childRules.size() ; ++i )
 		o_childRules.push_back(m_childRules[i]);
 
-	wxLogMessage( "\t\t\t Appending model categories : ") + std::string::Format("%d"),m_categories.size()) + wxT(" to object ") + object.GetName(   ;
+	//wxLogMessage( "\t\t\t Appending model categories : ") + std::string::Format("%d"),m_categories.size()) + wxT(" to object ") + object.GetName(   ;
 	for( unsigned int i = 0; i < m_categories.size() ; ++i )
 		o_categories.push_back(m_categories[i]);
 
-	wxLogMessage( "\t\t\t Appending model childContainers : ") + std::string::Format("%d"),m_childContainers.size()) + wxT(" to object ") + object.GetName(   ;
+	//wxLogMessage( "\t\t\t Appending model childContainers : ") + std::string::Format("%d"),m_childContainers.size()) + wxT(" to object ") + object.GetName(   ;
 	for( unsigned int i = 0; i < m_childContainers.size() ; ++i )
 		o_childContainers.push_back(m_childContainers[i]);
 }
@@ -228,12 +228,12 @@ void CXBindingsInterpreter::AppendModelToObject( CXBindings& grammar , CXBinding
 /* property extraction method */
 CXBindingsStringStringMap CXBindingsInterpreter::DoExtractPropertiesFrom( xmlNode* node , CXBindingsArrayGrammarProperty& properties , CXBindings& grammar )
 {
-	wxLogMessage( "\t\t Extracting properties")  ;
+	//wxLogMessage( "\t\t Extracting properties")  ;
 	CXBindingsStringStringMap pValues;
 
 	for( unsigned int i = 0; i < properties.size() ; ++i )
 	{
-		wxLogMessage( "\t\t\t Extracting property : ") + properties[i].GetName()  ;
+		//wxLogMessage( "\t\t\t Extracting property : ") + properties[i].GetName()  ;
 
 		CXBindingsArrayGrammarCondition& conditions = properties[i].GetConditions();
 		std::string conditionMatch;
@@ -250,13 +250,13 @@ CXBindingsStringStringMap CXBindingsInterpreter::DoExtractPropertiesFrom( xmlNod
 				matchfound = true;
 				match = conditions[j].GetMatch( node,grammar );
 
-				wxLogMessage( "\t\t\t Found condition match  : ") + match  ;
+				//wxLogMessage( "\t\t\t Found condition match  : ") + match  ;
 				break;
 			}
 		}
 
 		std::string value = GetXmlAttr( node , properties[i].GetName() );
-		wxLogMessage( "\t\t\t Default value is  : ") + properties[i].GetDefaultValue()  ;
+		//wxLogMessage( "\t\t\t Default value is  : ") + properties[i].GetDefaultValue()  ;
 		
 		/* One of the most important thing here is to fill the "missing" properties, missing in the
 		 * the sence of grammar usage required fields. If not the system will generate some exceptions
@@ -267,7 +267,7 @@ CXBindingsStringStringMap CXBindingsInterpreter::DoExtractPropertiesFrom( xmlNod
 					(value.empty() && properties[i].GetDefaultValue().empty() ) ) &&
 				match.empty()
 		  )
-			CXB_THROW( "Error cannot find required property : ") + properties[i].GetName()  ;
+			CXB_THROW( "Error cannot find required property : " + properties[i].GetName()  );
 		else if( value.empty() && match.empty() )
 		{
 			xmlNewProp( node , cxxU2C( properties[i].GetName() ) , cxxU2C( properties[i].GetDefaultValue() ) ); 
@@ -279,11 +279,11 @@ CXBindingsStringStringMap CXBindingsInterpreter::DoExtractPropertiesFrom( xmlNod
 			value = match;
 		}
 
-		wxLogMessage( "\t\t\t Found property : ") + properties[i].GetName() + " , it's value is : "  + value  ;
+		//wxLogMessage( "\t\t\t Found property : ") + properties[i].GetName() + " , it's value is : "  + value  ;
 		pValues[properties[i].GetName()] = value;
 	}
 
-	wxLogMessage( "\t\t End Extracting properties")  ;
+	//wxLogMessage( "\t\t End Extracting properties")  ;
 	return pValues;
 }
 
@@ -292,7 +292,7 @@ CXBindingsArrayGrammarCategoryInfo CXBindingsInterpreter::DoExtractCategoriesFro
 	CXBindingsArrayGrammarCategoryInfo result;
 
 	xmlNode* child = node->children;
-	wxLogMessage( "\t\t Checking if node has matching categories")  ;
+	//wxLogMessage( "\t\t Checking if node has matching categories")  ;
 
 	while( child != NULL )
 	{
@@ -312,7 +312,7 @@ CXBindingsArrayGrammarCategoryInfo CXBindingsInterpreter::DoExtractCategoriesFro
 		if( category_index != -1 )
 		{
 			CXBindingsCategory& category = categories[category_index];
-			wxLogMessage( "\t\t\t Found child category : ") + category.GetName()  ;
+			//wxLogMessage( "\t\t\t Found child category : ") + category.GetName()  ;
 
 			/* Once properties have been extracted from the child category, we have to extract 
 			 * childrens if they exists from the nodes child category !
@@ -340,7 +340,7 @@ CXBindingsArrayGrammarCategoryInfo CXBindingsInterpreter::DoExtractCategoriesFro
 
 		child = child->next;
 	}
-	wxLogMessage( "\t\t End Checking if node has matching child containers")  ;	
+	//wxLogMessage( "\t\t End Checking if node has matching child containers")  ;	
 	return result;
 }
 
@@ -349,7 +349,7 @@ CXBindingsArrayGrammarChildContainerInfo CXBindingsInterpreter::DoExtractChildCo
 	CXBindingsArrayGrammarChildContainerInfo result;
 
 	xmlNode* child = node->children;
-	wxLogMessage( "\t\t Checking if node has matching child containers")  ;
+	//wxLogMessage( "\t\t Checking if node has matching child containers")  ;
 
 	while( child != NULL )
 	{
@@ -369,9 +369,9 @@ CXBindingsArrayGrammarChildContainerInfo CXBindingsInterpreter::DoExtractChildCo
 		if( container_index != -1 )
 		{
 			CXBindingsChildContainer& container = containers[container_index];
-			wxLogMessage( "\t\t\t Found child container : ") + container.GetName()  ;
+			//wxLogMessage( "\t\t\t Found child container : ") + container.GetName()  ;
 
-			wxLogMessage( "\t\t\t Extracting properties for child container : ") + container.GetName()  ;
+			//wxLogMessage( "\t\t\t Extracting properties for child container : ") + container.GetName()  ;
 			CXBindingsArrayGrammarProperty&	properties = container.GetProperties();
 			CXBindingsArrayGrammarRule& rules = container.GetRules();
 			CXBindingsArrayGrammarForEachChild& childRules = container.GetChildRules();
@@ -408,7 +408,7 @@ CXBindingsArrayGrammarChildContainerInfo CXBindingsInterpreter::DoExtractChildCo
 
 		child = child->next;
 	}
-	wxLogMessage( "\t\t End Checking if node has matching child containers")  ;	
+	//wxLogMessage( "\t\t End Checking if node has matching child containers")  ;	
 	return result;
 }
 

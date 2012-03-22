@@ -15,6 +15,7 @@
 #include <libxml/xpath.h>
 
 #include <iostream>
+#include <sstream>
 #include <map>
 
 
@@ -36,45 +37,37 @@ CXBindingsException::~CXBindingsException()
 
 void CXBindingsException::ShowErrorMessage(bool safe)
 {
-    std::string gccvers;
+
+    std::stringstream gccvers;
 #ifdef __GNUC__
-    gccvers.Printf(_T("gcc %d.%d.%d"), __GNUC__, __GNUC_MINOR__, __GNUC_PATCHLEVEL__);
+    gccvers << "gcc " << __GNUC__ <<__GNUC_MINOR__ << __GNUC_PATCHLEVEL__;
 #endif
 
-    std::string title = _("Exception");
-    std::string err;
-    err.Printf(_("An exception has been raised!\n\n"
-                 "The application encountered an error at %s, on line %d.\n"
-                 "The error message is:\n\n%s\n\n"
-                 "CXBindings Version revision %d (%s, "
-                 "build: %s %s)"),
-               File.c_str(), Line, Message.c_str(),
-               1123, gccvers.c_str(),
-               __DATE__), __TIME__  ;
+    std::string title = "Exception";
+     std::stringstream err;
+    err << "An exception has been raised!\n\n" <<
+                 "The application encountered an error at " << File << ", on line " << Line << ".\n" <<
+                 "The error message is:\n\n" << Message << " \n\n" <<
+                 "CXBindings Version revision " << 1123 <<
+                 "build: " << gccvers.str() << " " << __DATE__ << " " <<  __TIME__;
 
-	if( safe )
-		std::cerr <<  cxcU2C( title )  << " : " << cxcU2C( err ) << std::endl;
-	else
-		wxMessageBox( err , "CXBindings exception catched !") , wxICON_ERROR  ;
+	std::cerr << err.str() << std::endl;
 }
 
 std::string CXBindingsException::GetErrorMessage()
 {
-	std::string gccvers;
+	std::stringstream gccvers;
 #ifdef __GNUC__
-    gccvers.Printf(_T("gcc %d.%d.%d"), __GNUC__, __GNUC_MINOR__, __GNUC_PATCHLEVEL__);
+    gccvers << "gcc " << __GNUC__ <<__GNUC_MINOR__ << __GNUC_PATCHLEVEL__;
 #endif
 
-    std::string title = _("Exception");
-    std::string err;
-    err.Printf(_("An exception has been raised!\n\n"
-                 "The application encountered an error at %s, on line %d.\n"
-                 "The error message is:\n\n%s\n\n"
-                 "CXBindings Version revision %d (%s, "
-                 "build: %s %s)"),
-               File.c_str(), Line, Message.c_str(),
-               1123, gccvers.c_str(),
-               __DATE__), __TIME__  ;
+    std::string title = "Exception";
+     std::stringstream err;
+    err << "An exception has been raised!\n\n" <<
+                 "The application encountered an error at " << File << ", on line " << Line << ".\n" <<
+                 "The error message is:\n\n" << Message << " \n\n" <<
+                 "CXBindings Version revision " << 1123 <<
+                 "build: " << gccvers.str() << " " << __DATE__ << " " <<  __TIME__;
 			   
-	return err;
+	return err.str();
 }

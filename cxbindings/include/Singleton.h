@@ -6,6 +6,8 @@
 #ifndef SINGLETON_H
 #define SINGLETON_H
 
+#include <cassert>
+
 /* @class Singleton
  *
  * @brief Singleton is the class used for simulating static manager.

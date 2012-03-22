@@ -80,8 +80,8 @@ CXBindingsOperator CXBindingsExpressionParser::GetToken(unsigned int& pos) {
 	for( unsigned int i = 0; i < (unsigned int)CXBindingsNoOperators ; ++i ) {
 		int opSize = CXBindingsOperators[i].size();
 		if( pos + opSize <= m_expr.size() ) {
-			std::string temp = m_expr(pos,opSize);
-			if( temp ==CXBindingsOperators[i]) && opSize > sizFound  {
+			std::string temp = m_expr.substr(pos,opSize);
+			if( temp ==CXBindingsOperators[i] && opSize > sizFound)  {
 				sizFound = opSize;
 				longest = temp;
 			}
@@ -94,7 +94,7 @@ CXBindingsOperator CXBindingsExpressionParser::GetToken(unsigned int& pos) {
 
 bool CXBindingsExpressionParser::DoParse() {
 	
-	m_buffer.Clear();
+	m_buffer.clear();
 	m_opStack.push(opEOS);
 	
 	GetNextToken();
@@ -171,15 +171,15 @@ void CXBindingsExpressionParser::GetNextToken()
 			{
 				m_buffer += m_expr[0];
 				pos++;
-				m_expr.Remove(0,1);
+				m_expr.erase(0,1);
 			}
 			else
-				m_expr.Remove(0,1);
+				m_expr.erase(0,1);
 		}
 		else if( newPos > 0 && pos == 0 )
 		{
 			pos = newPos;
-			m_expr.Remove(0,pos);
+			m_expr.erase(0,pos);
 			break;
 		}
 		else

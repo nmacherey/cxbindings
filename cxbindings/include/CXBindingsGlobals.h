@@ -13,6 +13,32 @@
 #include "CXBindingsDefinitions.h"
 #include "Singleton.h"
 
+
+	inline std::string after_first( const std::string& str, char c) {
+		std::string ret;
+		bool found = false;
+
+		for( unsigned int i = 0; i < str.size() ; ++i ) {
+			if( found )
+				ret += str[i];
+			else if( str[i] == c )
+				found = true;
+		}
+		return ret;
+	}
+
+	inline std::string before_first( const std::string& str, char c) {
+		std::string ret;
+
+		for( unsigned int i = 0; i < str.size() ; ++i ) {
+			if( str[i] == c )
+				break;
+			
+			ret += str[i];
+		}
+		return ret;
+	}
+
 /// Return @c str as a proper unicode-compatible string
 inline std::string cxC2U(const char* str)
 {

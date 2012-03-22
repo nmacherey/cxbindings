@@ -51,7 +51,7 @@ CXBindingsXmlReader::~CXBindingsXmlReader()
 
 CXBindingsObjectBase* CXBindingsXmlReader::LoadFile( const std::string& file )
 {
-	wxLogMessage( "Opening File : ") + file  ;
+	//wxLogMessage( "Opening File : ") + file  ;
 	
 	m_doc = xmlParseFile( cxcU2C(file) );
 	
@@ -64,7 +64,7 @@ CXBindingsObjectBase* CXBindingsXmlReader::LoadFile( const std::string& file )
 		CXB_THROW("Error cannot get your document root !") ;
 		
 	std::string n_root = cxC2U((char*) m_root->name);
-	wxLogMessage( "Root read, name is : ") + n_root  ;
+	//wxLogMessage( "Root read, name is : ") + n_root  ;
 
 	if( n_root.empty() )
 		CXB_THROW( "Error document root is empty")  ;
@@ -126,7 +126,7 @@ CXBindingsArrayString CXBindingsXmlReader::GetList()
 
 	CXBindingsXmlHandlerRegistrationMap::iterator it = m_registeredHandlers.begin();
 	for( ; it != m_registeredHandlers.end() ; ++it )
-		ret.Add(it->first);
+		ret.push_back(it->first);
 
 	return ret;
 }
@@ -137,7 +137,7 @@ CXBindingsArrayString CXBindingsXmlReader::GetDescriptions()
 
 	CXBindingsXmlHandlerRegistrationMap::iterator it = m_registeredHandlers.begin();
 	for( ; it != m_registeredHandlers.end() ; ++it )
-		ret.Add(it->second.description);
+		ret.push_back(it->second.description);
 
 	return ret;
 }

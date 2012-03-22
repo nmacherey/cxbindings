@@ -15,6 +15,8 @@
 #include <stack>
 
 #include <boost/algorithm/string/replace.hpp>
+#include <boost/lexical_cast.hpp>
+#include <boost/algorithm/string/predicate.hpp>
 
 
 
@@ -54,7 +56,6 @@ IMPLEMENT_DYNAMIC_CLASS_CXBINDINGS(CXBindingsInfo,CXBindingsObjectBase);
  * END OF DYNAMIC CLASS IMPLEMENTATIONS
  ***********************************************************************************/
 
-
 /************************************************************************************
  * CXBindings METHODS IMPLEMENTATIONS
  ***********************************************************************************/
@@ -90,7 +91,7 @@ CXBindingsSet* CXBindings::FindVariable( const std::string& name )
 
 bool CXBindingsCondition::Compile()
 {
-	//wxLogMessage("**** Compiling condition ") + m_condition + " ****"   ;
+	////wxLogMessage("**** Compiling condition ") + m_condition + " ****"   ;
 	
 	if( m_compiled )
 		return true;
@@ -109,7 +110,7 @@ CXBindingsAny CXBindingsCondition::EvaluateVar( CXBindingsTreeNode& item , xmlNo
 {
 	CXBindingsArrayGrammarTreeNode& childs = item.GetChilds();
 	CXBindingsAny returned;
-	//wxLogMessage( "Item is : ") + item.GetContent()  ;
+	////wxLogMessage( "Item is : ") + item.GetContent()  ;
 	
 	switch( item.GetType() )
 	{
@@ -229,7 +230,7 @@ CXBindingsAny CXBindingsCondition::EvaluateVar( CXBindingsTreeNode& item , xmlNo
 					matchfound = true;
 					match = conditions[j].GetMatch( node,grammar );
 					
-					//wxLogMessage( "\t\t\t Found condition match  : ") + match  ;
+					////wxLogMessage( "\t\t\t Found condition match  : ") + match  ;
 				}
 			}
 			
@@ -241,7 +242,7 @@ CXBindingsAny CXBindingsCondition::EvaluateVar( CXBindingsTreeNode& item , xmlNo
 			if( content.empty() )
 				CXB_THROW("Set is empty : " + pname );
 				
-			//wxLogMessage( "\t\t\t Global Variable content  : ") + content  ;
+			////wxLogMessage( "\t\t\t Global Variable content  : ") + content  ;
 				
 			CXB_THROW("$(VARIABLE) macros not supported yet") ;
 				
@@ -259,8 +260,8 @@ CXBindingsAny CXBindingsCondition::EvaluateVar( CXBindingsTreeNode& item , xmlNo
 			CXBindingsAny var1 =  EvaluateVar( childs[0] , node , grammar );
 			CXBindingsAny var2 =  EvaluateVar( childs[1] , node , grammar );
 			
-			//wxLogMessage( " Var 1 type : " ) + var1.GetType() + "-") + var1.GetString(   ;
-			//wxLogMessage( " Var 2 type : " ) + var2.GetType() + "-") + var2.GetString(   ;
+			////wxLogMessage( " Var 1 type : " ) + var1.GetType() + "-") + var1.GetString(   ;
+			////wxLogMessage( " Var 2 type : " ) + var2.GetType() + "-") + var2.GetString(   ;
 			
 				
 			if( var1.GetType() =="bool")  
@@ -366,8 +367,8 @@ CXBindingsAny CXBindingsCondition::EvaluateVar( CXBindingsTreeNode& item , xmlNo
 			CXBindingsAny var1 =  EvaluateVar( childs[1] , node , grammar );
 			CXBindingsAny var2 =  EvaluateVar( childs[0] , node , grammar );
 
-			//wxLogMessage( " Var 1 type : " ) + var1.GetType() + "-") + var1.GetString(   ;
-			//wxLogMessage( " Var 2 type : " ) + var2.GetType() + "-") + var2.GetString(   ;
+			////wxLogMessage( " Var 1 type : " ) + var1.GetType() + "-") + var1.GetString(   ;
+			////wxLogMessage( " Var 2 type : " ) + var2.GetType() + "-") + var2.GetString(   ;
 			
 				
 			if( var1.GetType() =="bool")  
@@ -380,7 +381,7 @@ CXBindingsAny CXBindingsCondition::EvaluateVar( CXBindingsTreeNode& item , xmlNo
 				CXB_THROW("Operator Less Than or Equal unsuported variable type !") ;
 			
 			std::string msg = "Condition is : " ;
-			//wxLogMessage( msg + (returned.GetBool() ? "true") : "false")    ;
+			////wxLogMessage( msg + (returned.GetBool() ? "true") : "false")    ;
 				
 			return returned;
 			break;
@@ -393,21 +394,30 @@ CXBindingsAny CXBindingsCondition::EvaluateVar( CXBindingsTreeNode& item , xmlNo
 			//value.replace("'","" );
 			
 			/** check if it is a number */
-			bool isInt = (value.Freq('.')) == 0 ;
-			bool nNumber = (value.Freq('.')) == 0) || (value.Freq('-')) == 0) || (value.Freq(wxT('.')) > 1) || (value.Freq(wxT('-')  > 1 ;
+			bool isInt = false;
+			bool number = false;
+
+			try
+			    {
+				boost::lexical_cast<double>(value);
+				number = true;
+			    }
+			    catch(boost::bad_lexical_cast &)
+			    {
+				// if it throws, it's not a number.
+			    }
+
+			try
+			    {
+				boost::lexical_cast<long>(value);
+				isInt = true;
+			    }
+			    catch(boost::bad_lexical_cast &)
+			    {
+				// if it throws, it's not a number.
+			    }
 			
-			std::string numbers = "0123456789-." ;
-			
-			for(unsigned int i = 0; i < value.size() ; ++i )
-			{
-				if( numbers.find_first_of(value[i]) == (unsigned int) -1 )
-				{
-					nNumber = true;
-					break;
-				}
-			}
-			
-			if( nNumber )
+			if( !number && !isInt )
 			{
 				// if the value is a string, we have to check if it is not a reference to an object property
 				// or to a global variable specific to the node
@@ -415,16 +425,16 @@ CXBindingsAny CXBindingsCondition::EvaluateVar( CXBindingsTreeNode& item , xmlNo
 				xmlNode* cursor = node;
 				std::string result;
 				std::string buffer;
-				
+
 				while( content.size() > 0 )
 				{
 					if( content[0] == '{')  
 					{
-						std::string temp = content.AfterFirst('{') ;
-						temp = temp.BeforeFirst('}') ;
-						content = content.AfterFirst('}') ;
+						std::string temp = after_first(content,'{') ;
+						temp = before_first(temp,'}') ;
+						content = after_first(content,'}') ;
 						
-						wxLogMessage( temp + " ") + content  ;
+						//wxLogMessage( temp + " ") + content  ;
 						
 						if( temp =="parent")  
 						{
@@ -432,7 +442,7 @@ CXBindingsAny CXBindingsCondition::EvaluateVar( CXBindingsTreeNode& item , xmlNo
 								CXB_THROW("Requested parent but node has no parent !") ;
 							
 							cursor = cursor->parent;
-							wxLogMessage("SWITCHED TO PARENT")  ;
+							//wxLogMessage("SWITCHED TO PARENT")  ;
 						}
 						else
 						{
@@ -446,41 +456,43 @@ CXBindingsAny CXBindingsCondition::EvaluateVar( CXBindingsTreeNode& item , xmlNo
 					}
 					else if( content[0] == '[')  
 					{
-						std::string temp = content.AfterFirst('[') ;
-						temp = temp.BeforeFirst(']') ;
-						content = content.AfterFirst(']') ;
+						std::string temp = after_first(content,'[') ;
+						temp = before_first(temp,']') ;
+						content = after_first(content,']') ;
 						
 						result += temp;
 					}
 					else
 					{
 						result += content[0];
-						content.Remove(0,1);
+						content.erase(0,1);
 					}
 				}
 
-				//wxLogMessage( "Result : ") + result  ;
+				////wxLogMessage( "Result : ") + result  ;
 				if( result =="unbounded")  
 					returned = (long) 100000;
-				else if( result.IsNumber() )
-				{
-					long val;
-					result.ToLong(&val);
-					returned = val;
-				}
 				else
-					returned = result;
+				{
+					try
+					    {
+						long val = boost::lexical_cast<long>(value);
+						returned = val;
+					    }
+					    catch(boost::bad_lexical_cast &)
+					    {
+						returned = result;
+					    }
+				}
 			}
 			else if( isInt )
 			{
-				long val;
-				value.ToLong( &val );
+				long val =boost::lexical_cast<long>(value);
 				returned = val; 
 			}
 			else
 			{
-				double val;
-				value.ToDouble(&val);
+				double val = boost::lexical_cast<double>(value);
 				returned = val;
 			}
 			
@@ -488,7 +500,7 @@ CXBindingsAny CXBindingsCondition::EvaluateVar( CXBindingsTreeNode& item , xmlNo
 			break;
 		}
 		default :
-			std::string op = std::string::Format(" Operator is : %d") , item.GetType()  ;
+			std::string op = " Operator is : %d" + item.GetType()  ;
 			CXB_THROW("Error unknown operator in condition cannot evaluate !" + op );
 	}
 	
@@ -507,9 +519,9 @@ bool CXBindingsCondition::Matches( xmlNode* node  , CXBindings& grammar )
 		CXB_THROW( "Error conditions are expected to be boolean !")  ;
 	
 	/*if( res.GetBool() )
-		wxLogMessage("**** Condition ") + m_condition + " MATCHES IN NODE ****"   ;
+		//wxLogMessage("**** Condition ") + m_condition + " MATCHES IN NODE ****"   ;
 	else
-		wxLogMessage("**** Condition ") + m_condition + " DOES NOT MATCH IN NODE ****"   ;*/
+		//wxLogMessage("**** Condition ") + m_condition + " DOES NOT MATCH IN NODE ****"   ;*/
 		
 	return res.GetBool();
 }
@@ -527,11 +539,11 @@ std::string CXBindingsCondition::GetMatch( xmlNode* node , CXBindings& grammar )
 		{
 			if( content[0] == '{')  
 			{
-				std::string temp = content.AfterFirst('{') ;
-				temp = temp.BeforeFirst('}') ;
-				content = content.AfterFirst('}') ;
+						std::string temp = after_first(content,'{') ;
+						temp = before_first(temp,'}') ;
+						content = after_first(content,'}') ;
 				
-				//wxLogMessage( temp + " ") + content  ;
+				////wxLogMessage( temp + " ") + content  ;
 				
 				if( temp =="parent")  
 				{
@@ -539,7 +551,7 @@ std::string CXBindingsCondition::GetMatch( xmlNode* node , CXBindings& grammar )
 						CXB_THROW("Requested parent but node has no parent !") ;
 					
 					cursor = cursor->parent;
-					//wxLogMessage("SWITCHED TO PARENT")  ;
+					////wxLogMessage("SWITCHED TO PARENT")  ;
 				}
 				else
 				{
@@ -553,16 +565,16 @@ std::string CXBindingsCondition::GetMatch( xmlNode* node , CXBindings& grammar )
 			}
 			else if( content[0] == '[')  
 			{
-				std::string temp = content.AfterFirst('[') ;
-				temp = temp.BeforeFirst(']') ;
-				content = content.AfterFirst(']') ;
+						std::string temp = after_first(content,'[') ;
+						temp = before_first(temp,']') ;
+						content = after_first(content,']') ;
 				
 				result += temp;
 			}
 			else
 			{
 				result += content[0];
-				content.Remove(0,1);
+				content.erase(0,1);
 			}
 			
 		}
@@ -575,14 +587,14 @@ std::string CXBindingsCondition::GetMatch( xmlNode* node , CXBindings& grammar )
 
 std::string CXBindingsType::GetTemplateMatch( xmlNode* node , CXBindings& grammar )
 {
-	if( !m_stemplate.StartsWith( "$(") )  
+	if( ! boost::algorithm::starts_with(m_stemplate,"$(") )  
 		return m_stemplate;
 	
 	std::string pname = m_stemplate;
 
-	pname.Replace( "$") , ""  , true  ;
-	pname.Replace( "(") , ""  , true  ;
-	pname.Replace( ")") , ""  , true  ;
+	boost::replace_all ( pname, "$", "" );
+	boost::replace_all ( pname, ")", "" );
+	boost::replace_all ( pname, "(", "" );
 
 	// Find in the grammar the CXBindingsSet that contains the information for the
 	// Containing variable
@@ -607,7 +619,7 @@ std::string CXBindingsType::GetTemplateMatch( xmlNode* node , CXBindings& gramma
 			matchfound = true;
 			match = conditions[j].GetMatch( node,grammar );
 
-			//wxLogMessage( "\t\t\t Found condition match  : ") + match  ;
+			////wxLogMessage( "\t\t\t Found condition match  : ") + match  ;
 			break;
 		}
 	}
@@ -620,7 +632,7 @@ std::string CXBindingsType::GetTemplateMatch( xmlNode* node , CXBindings& gramma
 	if( content.empty() )
 		CXB_THROW("Set is empty : " + pname );
 
-	//wxLogMessage( "\t\t\t Global Variable content  : ") + content  ;
+	////wxLogMessage( "\t\t\t Global Variable content  : ") + content  ;
 	return content;
 }
 
@@ -635,11 +647,11 @@ std::string CXBindingsType::GetContentMatch( xmlNode* node , CXBindings& )
 	{
 		if( content[0] == '{')  
 		{
-			std::string temp = content.AfterFirst('{') ;
-			temp = temp.BeforeFirst('}') ;
-			content = content.AfterFirst('}') ;
+						std::string temp = after_first(content,'{') ;
+						temp = before_first(temp,'}') ;
+						content = after_first(content,'}') ;
 
-			//wxLogMessage( temp + " " + content );
+			////wxLogMessage( temp + " " + content );
 
 			if( temp =="parent")  
 			{
@@ -647,7 +659,7 @@ std::string CXBindingsType::GetContentMatch( xmlNode* node , CXBindings& )
 					CXB_THROW("Requested parent but node has no parent !") ;
 
 				cursor = cursor->parent;
-				//wxLogMessage("SWITCHED TO PARENT")  ;
+				////wxLogMessage("SWITCHED TO PARENT")  ;
 			}
 			else
 			{
@@ -661,16 +673,16 @@ std::string CXBindingsType::GetContentMatch( xmlNode* node , CXBindings& )
 		}
 		else if( content[0] == '[')  
 		{
-			std::string temp = content.AfterFirst('[') ;
-			temp = temp.BeforeFirst(']') ;
-			content = content.AfterFirst(']') ;
+						std::string temp = after_first(content,'[') ;
+						temp = before_first(temp,']') ;
+						content = after_first(content,']') ;
 
 			result += temp;
 		}
 		else
 		{
 			result += content[0];
-			content.Remove(0,1);
+			content.erase(0,1);
 		}
 
 	}
@@ -680,14 +692,14 @@ std::string CXBindingsType::GetContentMatch( xmlNode* node , CXBindings& )
 
 std::string CXBindingsVariable::GetTemplateMatch( xmlNode* node , CXBindings& grammar )
 {
-	if( !m_stemplate.StartsWith( "$(") )  
+	if( !boost::algorithm::starts_with(m_stemplate,"$(") )  
 		return m_stemplate;
 	
 	std::string pname = m_stemplate;
 
-	pname.Replace( "$") , ""  , true  ;
-	pname.Replace( "(") , ""  , true  ;
-	pname.Replace( ")") , ""  , true  ;
+	boost::replace_all ( pname, "$", "" );
+	boost::replace_all ( pname, ")", "" );
+	boost::replace_all ( pname, "(", "" );
 
 	// Find in the grammar the CXBindingsSet that contains the information for the
 	// Containing variable
@@ -712,112 +724,7 @@ std::string CXBindingsVariable::GetTemplateMatch( xmlNode* node , CXBindings& gr
 			matchfound = true;
 			match = conditions[j].GetMatch( node,grammar );
 
-			//wxLogMessage( "\t\t\t Found condition match  : ") + match  ;
-			break;
-		}
-	}
-
-	if( matchfound )
-		content = match;
-	else
-		content = variable->GetContent();
-
-	if( content.empty() )
-		CXB_THROW("Set is empty : ") + pname  ;
-
-	//wxLogMessage( "\t\t\t Global Variable content  : ") + content  ;
-	return content;
-}
-
-std::string CXBindingsVariable::GetContentMatch( xmlNode* node , CXBindings& WXUNUSED(grammar) )
-{
-	std::string content = m_content;
-	xmlNode* cursor = node;
-	std::string result;
-	std::string buffer;
-
-	while( content.size() > 0 )
-	{
-		if( content[0] == '{')  
-		{
-			std::string temp = content.AfterFirst('{') ;
-			temp = temp.BeforeFirst('}') ;
-			content = content.AfterFirst('}') ;
-
-			//wxLogMessage( temp + " ") + content  ;
-
-			if( temp =="parent")  
-			{
-				if( cursor->parent == NULL )
-					CXB_THROW("Requested parent but node has no parent !") ;
-
-				cursor = cursor->parent;
-				//wxLogMessage("SWITCHED TO PARENT")  ;
-			}
-			else
-			{
-				std::string attr = GetXmlAttr(cursor,temp);
-				if( attr.empty() )
-					CXB_THROW("Attribute not found : " + temp );
-
-				result += attr;
-			}
-
-		}
-		else if( content[0] == '[')  
-		{
-			std::string temp = content.AfterFirst('[') ;
-			temp = temp.BeforeFirst(']') ;
-			content = content.AfterFirst(']') ;
-
-			result += temp;
-		}
-		else
-		{
-			result += content[0];
-			content.Remove(0,1);
-		}
-
-	}
-
-	return result;
-}
-
-std::string CXBindingsName::GetTemplateMatch( xmlNode* node , CXBindings& grammar )
-{
-	if( !m_stemplate.StartsWith( "$(") )  
-		return m_stemplate;
-	
-	std::string pname = m_stemplate;
-
-	pname.Replace( "$") , ""  , true  ;
-	pname.Replace( "(") , ""  , true  ;
-	pname.Replace( ")") , ""  , true  ;
-
-	// Find in the grammar the CXBindingsSet that contains the information for the
-	// Containing variable
-
-	CXBindingsSet* variable = grammar.FindVariable(pname);
-
-	if( variable == NULL )
-		CXB_THROW("Cannot find your global variable : " + pname );
-
-	CXBindingsArrayGrammarCondition& conditions = variable->GetConditions();
-
-	bool matchfound = false;
-	std::string match;
-	std::string content;
-
-	for( unsigned int j = 0; j < conditions.size() ; ++j )
-	{
-		conditions[j].Compile();
-
-		if( conditions[j].Matches(node,grammar) )
-		{
-			matchfound = true;
-			match = conditions[j].GetMatch( node,grammar );
-
-			//wxLogMessage( "\t\t\t Found condition match  : ") + match  ;
+			////wxLogMessage( "\t\t\t Found condition match  : ") + match  ;
 			break;
 		}
 	}
@@ -830,7 +737,112 @@ std::string CXBindingsName::GetTemplateMatch( xmlNode* node , CXBindings& gramma
 	if( content.empty() )
 		CXB_THROW("Set is empty : " + pname );
 
-	//wxLogMessage( "\t\t\t Global Variable content  : ") + content  ;
+	////wxLogMessage( "\t\t\t Global Variable content  : ") + content  ;
+	return content;
+}
+
+std::string CXBindingsVariable::GetContentMatch( xmlNode* node , CXBindings& )
+{
+	std::string content = m_content;
+	xmlNode* cursor = node;
+	std::string result;
+	std::string buffer;
+
+	while( content.size() > 0 )
+	{
+		if( content[0] == '{')  
+		{
+						std::string temp = after_first(content,'{') ;
+						temp = before_first(temp,'}') ;
+						content = after_first(content,'}') ;
+
+			////wxLogMessage( temp + " ") + content  ;
+
+			if( temp =="parent")  
+			{
+				if( cursor->parent == NULL )
+					CXB_THROW("Requested parent but node has no parent !") ;
+
+				cursor = cursor->parent;
+				////wxLogMessage("SWITCHED TO PARENT")  ;
+			}
+			else
+			{
+				std::string attr = GetXmlAttr(cursor,temp);
+				if( attr.empty() )
+					CXB_THROW("Attribute not found : " + temp );
+
+				result += attr;
+			}
+
+		}
+		else if( content[0] == '[')  
+		{
+						std::string temp = after_first(content,'[') ;
+						temp = before_first(temp,']') ;
+						content = after_first(content,']') ;
+
+			result += temp;
+		}
+		else
+		{
+			result += content[0];
+			content.erase(0,1);
+		}
+
+	}
+
+	return result;
+}
+
+std::string CXBindingsName::GetTemplateMatch( xmlNode* node , CXBindings& grammar )
+{
+	if( !boost::algorithm::starts_with(m_stemplate,"$(") )  
+		return m_stemplate;
+	
+	std::string pname = m_stemplate;
+
+	boost::replace_all ( pname, "$", "" );
+	boost::replace_all ( pname, ")", "" );
+	boost::replace_all ( pname, "(", "" );
+
+	// Find in the grammar the CXBindingsSet that contains the information for the
+	// Containing variable
+
+	CXBindingsSet* variable = grammar.FindVariable(pname);
+
+	if( variable == NULL )
+		CXB_THROW("Cannot find your global variable : " + pname );
+
+	CXBindingsArrayGrammarCondition& conditions = variable->GetConditions();
+
+	bool matchfound = false;
+	std::string match;
+	std::string content;
+
+	for( unsigned int j = 0; j < conditions.size() ; ++j )
+	{
+		conditions[j].Compile();
+
+		if( conditions[j].Matches(node,grammar) )
+		{
+			matchfound = true;
+			match = conditions[j].GetMatch( node,grammar );
+
+			////wxLogMessage( "\t\t\t Found condition match  : ") + match  ;
+			break;
+		}
+	}
+
+	if( matchfound )
+		content = match;
+	else
+		content = variable->GetContent();
+
+	if( content.empty() )
+		CXB_THROW("Set is empty : " + pname );
+
+	////wxLogMessage( "\t\t\t Global Variable content  : ") + content  ;
 	return content;
 }
 
@@ -845,11 +857,11 @@ std::string CXBindingsName::GetContentMatch( xmlNode* node , CXBindings& )
 	{
 		if( content[0] == '{')  
 		{
-			std::string temp = content.AfterFirst('{') ;
-			temp = temp.BeforeFirst('}') ;
-			content = content.AfterFirst('}') ;
+						std::string temp = after_first(content,'{') ;
+						temp = before_first(temp,'}') ;
+						content = after_first(content,'}') ;
 
-			//wxLogMessage( temp + " " + content  );
+			////wxLogMessage( temp + " " + content  );
 
 			if( temp =="parent")  
 			{
@@ -857,7 +869,7 @@ std::string CXBindingsName::GetContentMatch( xmlNode* node , CXBindings& )
 					CXB_THROW("Requested parent but node has no parent !") ;
 
 				cursor = cursor->parent;
-				//wxLogMessage("SWITCHED TO PARENT")  ;
+				////wxLogMessage("SWITCHED TO PARENT")  ;
 			}
 			else
 			{
@@ -871,16 +883,16 @@ std::string CXBindingsName::GetContentMatch( xmlNode* node , CXBindings& )
 		}
 		else if( content[0] == '[')  
 		{
-			std::string temp = content.AfterFirst('[') ;
-			temp = temp.BeforeFirst(']') ;
-			content = content.AfterFirst(']') ;
+						std::string temp = after_first(content,'[') ;
+						temp = before_first(temp,']') ;
+						content = after_first(content,']') ;
 
 			result += temp;
 		}
 		else
 		{
 			result += content[0];
-			content.Remove(0,1);
+			content.erase(0,1);
 		}
 
 	}
@@ -890,14 +902,14 @@ std::string CXBindingsName::GetContentMatch( xmlNode* node , CXBindings& )
 
 std::string CXBindingsRule::GetMakeMatch( xmlNode* node , CXBindings& grammar )
 {
-	if( !m_make.StartsWith( "$(") )  
+	if( !boost::algorithm::starts_with(m_make,"$(") )  
 		return m_make;
 	
 	std::string pname = m_make;
 
-	pname.Replace( "$") , ""  , true  ;
-	pname.Replace( "(") , ""  , true  ;
-	pname.Replace( ")") , ""  , true  ;
+	boost::replace_all ( pname, "$", "" );
+	boost::replace_all ( pname, ")", "" );
+	boost::replace_all ( pname, "(", "" );
 
 	// Find in the grammar the CXBindingsSet that contains the information for the
 	// Containing variable
@@ -922,7 +934,7 @@ std::string CXBindingsRule::GetMakeMatch( xmlNode* node , CXBindings& grammar )
 			matchfound = true;
 			match = conditions[j].GetMatch( node,grammar );
 
-			//wxLogMessage( "\t\t\t Found condition match  : ") + match  ;
+			////wxLogMessage( "\t\t\t Found condition match  : ") + match  ;
 			break;
 		}
 	}
@@ -935,6 +947,6 @@ std::string CXBindingsRule::GetMakeMatch( xmlNode* node , CXBindings& grammar )
 	if( content.empty() )
 		CXB_THROW("Set is empty : " + pname  );
 
-	//wxLogMessage( "\t\t\t Global Variable content  : ") + content  ;
+	////wxLogMessage( "\t\t\t Global Variable content  : ") + content  ;
 	return content;
 }

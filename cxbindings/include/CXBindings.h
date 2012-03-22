@@ -26,6 +26,7 @@ class CXBindingsGeneration;
 class CXBindings;
 class CXBindingsSet;
 class CXBindingsBaseCondition;
+class CXBindingsAny;
 
 /** CXBindingsArrays declarations */
 typedef std::vector<CXBindingsCondition> CXBindingsArrayGrammarCondition;

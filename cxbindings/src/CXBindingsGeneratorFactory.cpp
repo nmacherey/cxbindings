@@ -13,6 +13,9 @@
 #include <map>
 #include <stack>
 
+#include <boost/date_time/gregorian/gregorian.hpp>
+#include <boost/algorithm/string/replace.hpp>
+
 #include "CXBindingsDefinitions.h"
 #include "CXBindingsGlobals.h"
 #include "CXBindingsException.h"
@@ -208,8 +211,9 @@ void CXBindingsGenerator::SetDefaultMacros(CXBindingsGeneratorOptions& options)
 	m_macros["generationname" ] = options.genName;
 	m_macros["ns" ] = options.ns;
 	m_macros["exportmacro" ] = options.exportMacro;
-	wxDateTime date = wxDateTime::Now();
-    	std::string sDate =  date.Format( "%c") , wxDateTime::CET   ;
+
+	boost::gregorian::date date = boost::gregorian::day_clock::local_day();
+    	std::string sDate =  boost::gregorian::to_simple_string(date)   ;
 	m_macros["date" ] = sDate;
 }
 
@@ -254,15 +258,15 @@ int CXBindingsGenerator::DoReplaceMacros( std::string& str )
 			// if we have found something, get the macro name and replace it in the string
 			std::string macroName = text.Mid( beg , len );
 			
-			macroName.Replace( "$") , ""  , true  ;
-			macroName.Replace( "(") , ""  , true  ;
-			macroName.Replace( ")") , ""  , true  ;
+			boost::replace_all(macroName, "$" , "")  ;
+			boost::replace_all(macroName, "(" , "")  ;
+			boost::replace_all(macroName, ")" , "")  ;
 
 			std::string macroValue = GetMacro( macroName );
 			if( !MacroExists(macroName) )
-				CXB_THROW( "Error missing macro (preventing infinity loops): ") + macroName  ;
+				CXB_THROW( "Error missing macro (preventing infinity loops): "+ macroName );
 			else
-				text.Replace( "$(") + macroName + ")"  , macroValue , true  ; 
+				boost::replace_all(text,  "$(" + macroName + ")" , "")  ;
 
 		}//end if( pos != -1 && start != end )
 		else
@@ -287,10 +291,10 @@ void CXBindingsGenerator::DoCreateObjectDependencyList( CXBindingsArrayString& d
 	
 	CXBindingsStringStringMap& properties = objectInfo.properties;
 
-	if( properties["name")].empty()  
+	if( properties["name"].empty()  )
 		CXB_THROW( "Error object with no name cannot continue...")  ;
 
-	wxLogMessage( "\t Calculating object dependencies for object ") + properties["name" ]  ;
+	//wxLogMessage( "\t Calculating object dependencies for object ") + properties["name" ]  ;
 
 	std::string realName = properties["name" ];
 	realName = GetRealType( realName  , options );
@@ -299,23 +303,23 @@ void CXBindingsGenerator::DoCreateObjectDependencyList( CXBindingsArrayString& d
 		return;
 
 	// STEP 1 : CHECK CHILD CONTAINERS AND RULES
-	wxLogMessage( "\t STEP 1 : Checking for existing child containers dependencies ... ")  ;
+	//wxLogMessage( "\t STEP 1 : Checking for existing child containers dependencies ... ")  ;
         CXBindingsArrayGrammarChildContainerInfo& ccInfo = objectInfo.childs;
 	
 	std::string msg = std::string::Format( "\t\t Found %d childcontainers...") , ccInfo.size()  ;
-	wxLogMessage( msg );
+	//wxLogMessage( msg );
 	
 	for( unsigned int i = 0; i < ccInfo.size() ; ++i ) 
 		DoCreateContainerDependencyList( dependencyList , realName , ccInfo[i] , grammar , options );
 		
-	wxLogMessage( "\t END STEP 1")  ;
+	//wxLogMessage( "\t END STEP 1")  ;
 	
 	// STEP 2 : CHECK CATEGORIES AND RULES
-	wxLogMessage( "\t STEP 2 : Checking for existing dependencies in the child categories ... ")  ;
+	//wxLogMessage( "\t STEP 2 : Checking for existing dependencies in the child categories ... ")  ;
         CXBindingsArrayGrammarCategoryInfo& catInfo = objectInfo.categories;
 	
 	msg = std::string::Format( "\t\t Found %d categories...") , catInfo.size()  ;
-	wxLogMessage( msg );
+	//wxLogMessage( msg );
 	
 	for( unsigned int i = 0; i < catInfo.size() ; ++i ) 
 		DoCreateCategoryDependencyList( dependencyList , realName , catInfo[i] , grammar , options );
@@ -325,7 +329,7 @@ void CXBindingsGenerator::DoCreateObjectDependencyList( CXBindingsArrayString& d
 		DoCreateChildDependencyList( dependencyList , realName , childs[j] , grammar , options );
 	}
 		
-	wxLogMessage( "\t END STEP 2")  ;
+	//wxLogMessage( "\t END STEP 2")  ;
 
 	// Add me in the dependencyList
 
@@ -374,7 +378,7 @@ void CXBindingsGenerator::DoCreateChildDependencyList(CXBindingsArrayString& dep
 
 	std::string type = properties["type" ];
 
-	wxLogMessage( "\t Type is : ") + type  ;
+	//wxLogMessage( "\t Type is : ") + type  ;
 
 	if( type.empty() )
 		return;
@@ -391,7 +395,7 @@ void CXBindingsGenerator::DoCreateChildDependencyList(CXBindingsArrayString& dep
 //	if( it != types.end() )
 //		return;
 	
-	wxLogMessage( "\t Type (2) is : ") + type  ;
+	//wxLogMessage( "\t Type (2) is : ") + type  ;
 	
 	// else find the objectInfo related to this type in the CXBindingsInterpreterInfo */
 	CXBindingsInfo& info = grammar.GetInfo();
@@ -444,8 +448,7 @@ void CXBindingsGenerator::DoCreateContainerDependencyList( CXBindingsArrayString
 
 		type = GetRealType( type , options );
 
-		if( (make == "import") ) || make == "child_enumerator") ) || make.IsSameAs( wxT("typedef")    && dependencyList.Index( type  == wxNOT_FOUND   {
-
+		if( (make == "import"|| make == "child_enumerator" || make == "typedef" )    && dependencyList.Index( type )  == wxNOT_FOUND )   {
 			dependencyList.Add( type );
 		}
 	}
@@ -559,7 +562,7 @@ std::string CXBindingsGenerator::GetRealType( const std::string& type , CXBindin
 	CXBindingsStringStringMap& types = m_genfile->GetTypeInfo().GetTypes();
 	types[type] = realType;
 	
-	wxLogMessage( type + " - ") + realType  ;
+	//wxLogMessage( type + " - ") + realType  ;
 
 	return realType;
 }
