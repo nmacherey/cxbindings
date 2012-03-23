@@ -14,6 +14,10 @@
 #include <map>
 #include <stack>
 
+#include <algorithm>
+
+#include <boost/algorithm/string/predicate.hpp>
+#include <boost/algorithm/string/replace.hpp>
 
 
 
@@ -55,10 +59,10 @@ bool CXBindingsCppObjectsGenerator::DoGenerateCode( CXBindingsGeneratorOptions& 
 	 */
 	CXBindingsArrayString dependencies = DoCreateDependencyList( options );
 	
-	wxLogMessage( "Generation List is : ")  ;
+	//wxLogMessage( "Generation List is : ")  ;
 
 	for( unsigned int i = 0 ; i < dependencies.size() ; ++i )
-		wxLogMessage( std::string::Format( "object to begenrated in %d position is :") , i ) + dependencies[i]  ;
+		//wxLogMessage( std::string::Format( "object to begenrated in %d position is :") , i ) + dependencies[i]  ;
 
 	/** @todo here generate object in their dependencies order is this really usefull .??? */
 	for( unsigned int k = 0; k < dependencies.size() ; ++k ) {
@@ -91,14 +95,14 @@ bool CXBindingsCppObjectsGenerator::DoGenerateCode( CXBindingsGeneratorOptions& 
 	std::string global_file = GetMacro( "global_file")  ;
 	std::string global_file_src = GetMacro( "global_file_src")  ;
 	std::string filename = options.ns + "_globals" ;
-	SetMacro( "filename") , filename  ;
-	SetMacro( "globals_code") , m_globalInfo.headerPublicInfo  ;
-	SetMacro( "globals_code_src") , m_globalInfo.srcInfo  ;
+	SetMacro( "filename" , filename) ;
+	SetMacro( "globals_code" , m_globalInfo.headerPublicInfo) ;
+	SetMacro( "globals_code_src" , m_globalInfo.srcInfo) ;
 	
 	DoReplaceMacros( global_file );
 	DoReplaceMacros( global_file_src );
-	SaveFile( hdrDir + "/") + filename + ".h"  , global_file  ;
-	SaveFile( srcDir + "/") + filename + ".cpp"  , global_file_src  ;
+	SaveFile( hdrDir + "/" + filename + ".h"  , global_file );
+	SaveFile( srcDir + "/" + filename + ".cpp"  , global_file_src) ;
 	
 	// Generate additional files
 	CXBindingsArrayGrammarGeneratorFileAddin& addins = m_genfile->GetAddins();
@@ -109,11 +113,11 @@ bool CXBindingsCppObjectsGenerator::DoGenerateCode( CXBindingsGeneratorOptions& 
 		
 		if( !header.empty() ) {
 			DoReplaceMacros( header );
-			SaveFile( hdrDir + "/") + fname + ".h"  , header  ;
+			SaveFile( hdrDir + "/" + fname + ".h"  , header)  ;
 		}
 		if( !source.empty() ) {
 			DoReplaceMacros( source );
-			SaveFile( srcDir + "/") + fname + ".cpp"  , source  ;
+			SaveFile( srcDir + "/" + fname + ".cpp"  , source) ;
 		}
 	}
 	
@@ -121,10 +125,10 @@ bool CXBindingsCppObjectsGenerator::DoGenerateCode( CXBindingsGeneratorOptions& 
 	CXBindingsFileInfoMap::iterator it = m_objectInfos.begin();
 	for( ; it != m_objectInfos.end() ; ++it )
 	{
-		if( !m_objectFiles[it->first] ==filename) && !m_objectFiles[it->first].empty() 
+		if( m_objectFiles[it->first] !=filename && !m_objectFiles[it->first].empty() )
 		{
-			std::string srcFile = srcDir + "/") + m_objectFiles[it->first] + wxT(".cpp" ;
-			std::string hdrFile = hdrDir + "/") + m_objectFiles[it->first] + wxT(".h" ;
+			std::string srcFile = srcDir + "/" + m_objectFiles[it->first] + ".cpp" ;
+			std::string hdrFile = hdrDir + "/" + m_objectFiles[it->first] + ".h" ;
 		
 			if( !it->second.srcInfo.empty() ) {
 				SaveFile( srcFile , it->second.srcInfo );
@@ -146,11 +150,11 @@ void CXBindingsCppObjectsGenerator::DoGenerateCodeFor(
 	// STEP 0 : APPEND OBJECT PROPERTIES IN THE MACRO MAP
 	CXBindingsStringStringMap& properties = objectInfo.properties;
 	
-	wxLogMessage( "\t STEP O : Calculating Object preliminar informations : ") + properties["name" ]  ;
+	//wxLogMessage( "\t STEP O : Calculating Object preliminar informations : ") + properties["name" ]  ;
 	
-	wxLogMessage( "\t\t STEP O.1 : Appending Object macro : ") + properties["name" ]  ;
+	//wxLogMessage( "\t\t STEP O.1 : Appending Object macro : ") + properties["name" ]  ;
 	
-	if( properties["name")].empty()  
+	if( properties["name"].empty() ) 
 		CXB_THROW( "Error object with no name cannot continue...")  ;
 	
 	std::string objectName = properties["name" ];
@@ -160,21 +164,21 @@ void CXBindingsCppObjectsGenerator::DoGenerateCodeFor(
 	upName += objectName;
 	to_upper( upName );
 	
-	SetMacro( "object") , objectName  ;
-	SetMacro( "OBJECT") , upName  ;
+	SetMacro( "object" , objectName);
+	SetMacro( "OBJECT" , upName) ;
 
 	// @todo here the file is not preoprely set
 	/* First set up some macros for the given file */
 	// filename macros
 	std::string filename = m_objectFiles[objectName];
-	SetMacro( "filename") , filename  ;
+	SetMacro( "filename" , filename) ;
 
 	// STEP 1 : CHECK CHILD CONTAINERS AND RULES
-	wxLogMessage( "\t STEP 1 : Checking for existing rules in the child containers ... ")  ;
+	//wxLogMessage( "\t STEP 1 : Checking for existing rules in the child containers ... ")  ;
         CXBindingsArrayGrammarChildContainerInfo& ccInfo = objectInfo.childs;
 	
-	std::string msg = std::string::Format( "\t\t Found %d childcontainers...") , ccInfo.size()  ;
-	wxLogMessage( msg );
+	//std::string msg = std::string::Format( "\t\t Found %d childcontainers...") , ccInfo.size()  ;
+	//wxLogMessage( msg );
 
 	CXBindingsFileInfo objectFileInfo;
 	
@@ -182,20 +186,20 @@ void CXBindingsCppObjectsGenerator::DoGenerateCodeFor(
 		objectFileInfo += DoGenerateChildContainerCodeFor( ccInfo[i] , grammar , options ); 	
 	}
 		
-	wxLogMessage( "\t END STEP 1")  ;
+	//wxLogMessage( "\t END STEP 1")  ;
 
 	// STEP 2 : CHECK CATEGORIES AND RULES
-	wxLogMessage( "\t STEP 2 : Checking for existing rules in the child categories ... ")  ;
+	//wxLogMessage( "\t STEP 2 : Checking for existing rules in the child categories ... ")  ;
         CXBindingsArrayGrammarCategoryInfo& catInfo = objectInfo.categories;
 	
-	msg = std::string::Format( "\t\t Found %d categories...") , catInfo.size()  ;
-	wxLogMessage( msg );
+	//msg = std::string::Format( "\t\t Found %d categories...") , catInfo.size()  ;
+	//wxLogMessage( msg );
 	
 	for( unsigned int i = 0; i < catInfo.size() ; ++i ) {	 	
 		objectFileInfo += DoGenerateCategoryCodeFor( catInfo[i] , grammar , options );
 	}
 		
-	wxLogMessage( "\t END STEP 2")  ;
+	//wxLogMessage( "\t END STEP 2")  ;
 
 	CXBindingsArrayGrammarChildInfo& childs = objectInfo.childInfos;
 	for( unsigned int j = 0; j < childs.size() ; ++j ) {
@@ -204,22 +208,22 @@ void CXBindingsCppObjectsGenerator::DoGenerateCodeFor(
 		objectFileInfo += ruleContent;
 	}
 
-	wxLogMessage( "\t STEP 3 : create additional object macros for the given object if exists ... ")  ;
+	//wxLogMessage( "\t STEP 3 : create additional object macros for the given object if exists ... ")  ;
 
 	// Append codes in the childs_header_public_code
 	std::string childs_header_public_code = objectFileInfo.headerPublicInfo;
-	SetMacro( "childs_header_public_code") , childs_header_public_code  ;
+	SetMacro( "childs_header_public_code" , childs_header_public_code);
 
 	std::string childs_header_private_code;
 	childs_header_private_code = objectFileInfo.headerPrivateInfo;
-	SetMacro( "childs_header_private_code") , childs_header_private_code  ;
+	SetMacro( "childs_header_private_code" , childs_header_private_code) ;
 
 	std::string childs_header_protected_code;
 	childs_header_protected_code = objectFileInfo.headerProtectedInfo,
-	SetMacro( "childs_header_protected_code") , childs_header_protected_code  ;
+	SetMacro( "childs_header_protected_code" , childs_header_protected_code) ;
 
 	std::string childs_src_code = objectFileInfo.srcInfo;
-	SetMacro( "childs_src_code") , childs_src_code  ;
+	SetMacro( "childs_src_code" , childs_src_code) ;
 
 	// Finally build the missing macrods for doc comments and other parameters info
 	CXBindingsFileParametersMacros params;
@@ -249,21 +253,21 @@ void CXBindingsCppObjectsGenerator::DoGenerateCodeFor(
 		params.parameters_eqop_list += localp.parameters_eqop_list;
 		params.parameters_eqeqop_list = localp.parameters_eqeqop_list;
 
-		wxLogMessage( localp.parameters_doc_list );
+		//wxLogMessage( localp.parameters_doc_list );
 		
 		if( i != 0 ) {
 			object_bases += " , public "  + pName;
 			object_bases_list += " , "  + pName;
-			object_bases_default_ctor += ",\n\t\t") + pName + "( " ;
-			object_bases_copy_list += ",\n\t\t") + pName + "(rhs " ;
-			object_bases_init_list += ",\n\t\t") + pName + "(") + localp.parameters_ctor_list2 + wxT(" " ;
+			object_bases_default_ctor += ",\n\t\t" + pName + "( " ;
+			object_bases_copy_list += ",\n\t\t" + pName + "(rhs " ;
+			object_bases_init_list += ",\n\t\t" + pName + "(" + localp.parameters_ctor_list2 + " " ;
 		}
 		else {
 			object_bases += " public "  + pName;
 			object_bases_list += pName;
-			object_bases_default_ctor += "\t\t") + pName + "( " ;
-			object_bases_copy_list += "\t\t") + pName + "(rhs " ;
-			object_bases_init_list += " \t\t") + pName + "(") + localp.parameters_ctor_list2 + wxT(" " ;
+			object_bases_default_ctor += "\t\t" + pName + "( " ;
+			object_bases_copy_list += "\t\t" + pName + "(rhs " ;
+			object_bases_init_list += " \t\t" + pName + "(" + localp.parameters_ctor_list2 + " " ;
 		}
 	}
 
@@ -278,28 +282,28 @@ void CXBindingsCppObjectsGenerator::DoGenerateCodeFor(
 	if( !params.parameters_ctor_list.empty() )
 		params.parameters_ctor_list += " ," ;
 	
-	SetMacro( "object_bases") , object_bases  ;
-	SetMacro( "object_bases_list") , object_bases_list  ;
-	SetMacro( "object_bases_default_ctor") , object_bases_default_ctor  ;
-	SetMacro( "object_bases_init_list") , object_bases_init_list  ;
-	SetMacro( "object_bases_copy_list") , object_bases_copy_list  ;
+	SetMacro( "object_bases" , object_bases ) ;
+	SetMacro( "object_bases_list" , object_bases_list) ;
+	SetMacro( "object_bases_default_ctor" , object_bases_default_ctor) ;
+	SetMacro( "object_bases_init_list" , object_bases_init_list) ;
+	SetMacro( "object_bases_copy_list" , object_bases_copy_list) ;
 	
 	DoCreateParametersMacrosFor( objectFileInfo , params , options );
 
-	SetMacro( "parameters_doc_list") , params.parameters_doc_list  ;
-	SetMacro( "parameters_ctor_list") , params.parameters_ctor_list  ;
-	SetMacro( "parameters_dtor_list") , params.parameters_dtor_list  ;
-	SetMacro( "parameters_init_list") , params.parameters_init_list  ;
-	SetMacro( "parameters_default_init_list") , params.parameters_default_init_list  ;
-	SetMacro( "parameters_copy_list") , params.parameters_copy_list  ;
-	SetMacro( "parameters_eqop_list") , params.parameters_eqop_list  ;
-	SetMacro( "parameters_eqeqop_list") , params.parameters_eqeqop_list  ;
-	SetMacro( "parameters_property_table") , params.parameters_property_table  ;
+	SetMacro( "parameters_doc_list" , params.parameters_doc_list ) ;
+	SetMacro( "parameters_ctor_list" , params.parameters_ctor_list ) ;
+	SetMacro( "parameters_dtor_list" , params.parameters_dtor_list ) ;
+	SetMacro( "parameters_init_list" , params.parameters_init_list ) ;
+	SetMacro( "parameters_default_init_list" , params.parameters_default_init_list ) ;
+	SetMacro( "parameters_copy_list" , params.parameters_copy_list ) ;
+	SetMacro( "parameters_eqop_list" , params.parameters_eqop_list ) ;
+	SetMacro( "parameters_eqeqop_list" , params.parameters_eqeqop_list ) ;
+	SetMacro( "parameters_property_table" , params.parameters_property_table ) ;
 	
 	if( params.parameters_doc_list.empty() ){
-		SetMacro( "object_ctors") , "$(object_simple_ctor_header)"   ;
+		SetMacro( "object_ctors" , "$(object_simple_ctor_header)" )  ;
 	} else {
-		SetMacro( "object_ctors") , "$(object_complex_ctor_header)"   ;
+		SetMacro( "object_ctors" , "$(object_complex_ctor_header)" )  ;
 	}
 	/* The next step is very important ! 
 	 * First we have to establish all direct dependencies in the given property list
@@ -307,14 +311,14 @@ void CXBindingsCppObjectsGenerator::DoGenerateCodeFor(
 	 * Once this is done, we can get the dependency list and include list to put in the 
 	 * source file*/
 	
-	std::string local_includes = "#include \"") + options.ns + "_globals"  + wxT(".h\"\n" ;
+	std::string local_includes = "#include \"" + options.ns + "_globals"  + ".h\"\n" ;
 	std::string object_imports;
 	
 	CXBindingsArrayString lc;
 	CXBindingsArrayString oi;
 	
 	CXBindingsArrayString currObj;
-	currObj.Add(objectName);
+	currObj.push_back(objectName);
 	DoGetIncludesListFor(lc,oi,currObj,objectFileInfo,options);
 	
 	for( unsigned int i = 0; i < lc.size() ; ++i ) {
@@ -322,25 +326,25 @@ void CXBindingsCppObjectsGenerator::DoGenerateCodeFor(
 		object_imports += oi[i];
 	}
 	
-	if( !filename ==options.ns + "_globals") 
+	if( filename != options.ns + "_globals") 
 	{
-		object_imports += "class ") + objectName + wxT(";\n" ;
+		object_imports += "class " + objectName + ";\n" ;
 	}
 	
-	SetMacro( "local_includes") , local_includes  ;
-	SetMacro( "object_imports") , object_imports  ;
-	wxLogMessage( "\t\t\t local_includes is :") + local_includes  ;
-	wxLogMessage( "\t\t\t object_imports is :") + object_imports  ;
+	SetMacro( "local_includes" , local_includes) ;
+	SetMacro( "object_imports" , object_imports) ;
+	//wxLogMessage( "\t\t\t local_includes is :") + local_includes  ;
+	//wxLogMessage( "\t\t\t object_imports is :") + object_imports  ;
 
 		
-	wxLogMessage( "\t END STEP 3...")  ;
+	//wxLogMessage( "\t END STEP 3...")  ;
 
 	// STEP 4 : CHECK EXISTING RULES IN THE GIVEN OBJECT
-	wxLogMessage( "\t STEP 4 : Checking for existing rules in the object ... ")  ;
+	//wxLogMessage( "\t STEP 4 : Checking for existing rules in the object ... ")  ;
 	CXBindingsArrayGrammarRuleInfo& rules = objectInfo.rules;
 	
-	msg = std::string::Format( "\t\t Found %d rules...") , rules.size()  ;
-	wxLogMessage( msg );
+	//msg = std::string::Format( "\t\t Found %d rules...") , rules.size()  ;
+	//wxLogMessage( msg );
 
 	CXBindingsFileInfo FinalInfo;
 
@@ -361,7 +365,7 @@ void CXBindingsCppObjectsGenerator::DoGenerateCodeFor(
 	FinalInfo += objectFileInfo;
 	m_objectInfos[objectName] = FinalInfo;
 
-	wxLogMessage( "\t END STEP 4...")  ;
+	//wxLogMessage( "\t END STEP 4...")  ;
 }
 
 void CXBindingsCppObjectsGenerator::DoCreateParametersMacrosFor( CXBindingsFileInfo& file , CXBindingsFileParametersMacros& parameters , CXBindingsGeneratorOptions& options )
@@ -371,13 +375,13 @@ void CXBindingsCppObjectsGenerator::DoCreateParametersMacrosFor( CXBindingsFileI
 		std::string pName = file.properties[i].first;
 		std::string pType = file.properties[i].second;
 
-		wxLogMessage( pName + " - ") + pType  ;
+		//wxLogMessage( pName + " - ") + pType  ;
 
 		std::string nameExt = GetPropertyExtension( pName , options );
 		
-		SetMacro( "content_type") , pType  ;
-		SetMacro( "content") , pName  ;
-		SetMacro( "content_ext") , nameExt  ;
+		SetMacro( "content_type" , pType) ;
+		SetMacro( "content" , pName) ;
+		SetMacro( "content_ext" , nameExt) ;
 		std::string str,str2;
 		
 		str = GetMacro("ctor_var_composer") ;
@@ -439,9 +443,9 @@ CXBindingsFileInfo CXBindingsCppObjectsGenerator::DoGenerateRuleCodeFor( CXBindi
 {
 	CXBindingsFileInfo res;
 
-	wxLogMessage( "\t\t Rule make is : ") + ruleInfo.make  ;
-	wxLogMessage( "\t\t Rule name is : ") + ruleInfo.name.content  ;
-	wxLogMessage( "\t\t Rule type is : ") + ruleInfo.type.content  ;
+	//wxLogMessage( "\t\t Rule make is : ") + ruleInfo.make  ;
+	//wxLogMessage( "\t\t Rule name is : ") + ruleInfo.name.content  ;
+	//wxLogMessage( "\t\t Rule type is : ") + ruleInfo.type.content  ;
 
 	CXBindingsStringStringMap& types = m_genfile->GetTypeInfo().GetTypes();
 	std::string realType = ruleInfo.type.content;
@@ -464,17 +468,17 @@ CXBindingsFileInfo CXBindingsCppObjectsGenerator::DoGenerateRuleCodeFor( CXBindi
 	std::string savedType = typeExt;
 
 	if( typeTemplate == "array")    {
-		typeExt = "std::vector< ") + typeExt + wxT(" >" ; 
+		typeExt = "std::vector< " + typeExt + " >" ; 
 		 arrayTemplate = m_genfile->FindTemplate( "array_addons")  ;
 	}
 	
 	std::string nameExt = ruleInfo.name.content;
 	nameExt = GetPropertyExtension( nameExt , options );
-	SetMacro( "name_extension") , nameExt  ;
+	SetMacro( "name_extension" , nameExt) ;
 	
-	SetMacro( "name") , ruleInfo.name.content  ;
-	SetMacro( "type") , typeExt  ;
-	SetMacro( "real_type") , savedType  ;
+	SetMacro( "name" , ruleInfo.name.content ) ;
+	SetMacro( "type" , typeExt ) ;
+	SetMacro( "real_type" , savedType)  ;
 
 	if( ruleInfo.make == "import")    {
 		
@@ -521,26 +525,26 @@ CXBindingsFileInfo CXBindingsCppObjectsGenerator::DoGenerateRuleCodeFor( CXBindi
 	CXBindingsGeneratorFileTemplate* rTemplate = m_genfile->FindTemplate( ruleInfo.make );
 
 	if( rTemplate == NULL )
-		CXB_THROW( "Error cannot find template : ") + ruleInfo.make  ;
+		CXB_THROW( "Error cannot find template : " + ruleInfo.make) ;
 	
 	// manage the various teplates which can be found inside a child container
 	if( ruleInfo.make == "child_enumerator")    {
 		DoGenerateMacroForChildEnumerator( ruleInfo , childContainer.childs , grammar , options );
 		std::string nameExt = GetRealType( ruleInfo.name.content , options );
-		SetMacro( "name") , nameExt  ;
+		SetMacro( "name" , nameExt) ;
 	}
 	else if( ruleInfo.make == "typedef")    {
 		std::string nameExt = GetRealType( ruleInfo.name.content , options );
-		SetMacro( "name") , nameExt  ;
+		SetMacro( "name" , nameExt) ;
 	}
-	else if( ruleInfo.make == "property") ) || ruleInfo.make.IsSameAs( "attribute"     {
+	else if( ruleInfo.make == "property" || ruleInfo.make ==  "attribute" )     {
 		std::pair< std::string , std::string > mpair( ruleInfo.name.content , typeExt );
 		res.properties.push_back( mpair );
 	}
 	else
-		CXB_THROW( "Error unknown child container template : ") + ruleInfo.make  ;
+		CXB_THROW( "Error unknown child container template : " + ruleInfo.make ) ;
 		
-	if( ruleInfo.make == "property") ) || ruleInfo.make == "attribute") ) || ruleInfo.make.IsSameAs( wxT("variant_accessor")  || ruleInfo.make.IsSameAs( wxT("variant_array_accessor"     {
+	if( ruleInfo.make == "property" || ruleInfo.make == "attribute" || ruleInfo.make == "variant_accessor"  || ruleInfo.make ==  "variant_array_accessor")  {
 		std::pair< std::string , std::string > mpair( ruleInfo.name.content , savedType );
 		res.dependencies.push_back( mpair );
 	}
@@ -591,13 +595,13 @@ CXBindingsFileInfo CXBindingsCppObjectsGenerator::DoGenerateRuleCodeFor( CXBindi
 
 }
 
-CXBindingsFileInfo CXBindingsCppObjectsGenerator::DoGenerateRuleCodeFor( CXBindingsRuleInfo& ruleInfo , CXBindings& WXUNUSED(grammar) , CXBindingsGeneratorOptions& options )
+CXBindingsFileInfo CXBindingsCppObjectsGenerator::DoGenerateRuleCodeFor( CXBindingsRuleInfo& ruleInfo , CXBindings& , CXBindingsGeneratorOptions& options )
 {
 	CXBindingsFileInfo res;
 
-	wxLogMessage( "\t\t Rule make is : ") + ruleInfo.make  ;
-	wxLogMessage( "\t\t Rule name is : ") + ruleInfo.name.content  ;
-	wxLogMessage( "\t\t Rule type is : ") + ruleInfo.type.content  ;
+	//wxLogMessage( "\t\t Rule make is : ") + ruleInfo.make  ;
+	//wxLogMessage( "\t\t Rule name is : ") + ruleInfo.name.content  ;
+	//wxLogMessage( "\t\t Rule type is : ") + ruleInfo.type.content  ;
 	
 	
 		
@@ -623,7 +627,7 @@ CXBindingsFileInfo CXBindingsCppObjectsGenerator::DoGenerateRuleCodeFor( CXBindi
 	std::string savedType = typeExt;
 	
 	if( typeTemplate == "array")    {
-		typeExt = "std::vector< ") + typeExt + wxT(" >" ; 
+		typeExt = "std::vector< " + typeExt + " >" ; 
 		 arrayTemplate = m_genfile->FindTemplate( "array_addons")  ;
 	}
 	
@@ -672,24 +676,24 @@ CXBindingsFileInfo CXBindingsCppObjectsGenerator::DoGenerateRuleCodeFor( CXBindi
 
 	std::string nameExt = ruleInfo.name.content;
 	nameExt = GetPropertyExtension( nameExt , options );
-	SetMacro( "name_extension") , nameExt  ;
+	SetMacro( "name_extension" , nameExt)  ;
 	
-	SetMacro( "name") , ruleInfo.name.content  ;
-	SetMacro( "type") , typeExt  ;
-	SetMacro( "real_type") , savedType  ;
-	SetMacro( "variable") , ruleInfo.variable.content  ;
+	SetMacro( "name" , ruleInfo.name.content)  ;
+	SetMacro( "type" , typeExt)  ;
+	SetMacro( "real_type" , savedType)  ;
+	SetMacro( "variable" , ruleInfo.variable.content)  ;
 
 	CXBindingsGeneratorFileTemplate* rTemplate = m_genfile->FindTemplate( ruleInfo.make );
 
 	if( rTemplate == NULL )
-		CXB_THROW( "Error cannot find template : ") + ruleInfo.make  ;
+		CXB_THROW( "Error cannot find template : " + ruleInfo.make)  ;
 	
-	if( ruleInfo.make == "property") ) || ruleInfo.make.IsSameAs( "attribute"     {
+	if( ruleInfo.make == "property" || ruleInfo.make ==  "attribute" )    {
 		std::pair< std::string , std::string > mpair( ruleInfo.name.content , typeExt );
 		res.properties.push_back( mpair );
 	}
 	
-	if( ruleInfo.make == "property") ) || ruleInfo.make == "attribute") ) || ruleInfo.make.IsSameAs( wxT("variant_accessor")  || ruleInfo.make.IsSameAs( wxT("variant_array_accessor"     {
+	if( ruleInfo.make == "property" || ruleInfo.make == "attribute" || ruleInfo.make == "variant_accessor"  || ruleInfo.make == "variant_array_accessor")  {
 		std::pair< std::string , std::string > mpair( ruleInfo.name.content , savedType );
 		res.dependencies.push_back( mpair );
 	}
@@ -740,7 +744,7 @@ CXBindingsFileInfo CXBindingsCppObjectsGenerator::DoGenerateRuleCodeFor( CXBindi
 	
 }
 
-void CXBindingsCppObjectsGenerator::DoGenerateMacroForChildEnumerator( CXBindingsRuleInfo& ruleInfo , CXBindingsArrayGrammarChildInfo& childs , CXBindings& WXUNUSED(grammar) , CXBindingsGeneratorOptions& WXUNUSED(options) )
+void CXBindingsCppObjectsGenerator::DoGenerateMacroForChildEnumerator( CXBindingsRuleInfo& ruleInfo , CXBindingsArrayGrammarChildInfo& childs , CXBindings& , CXBindingsGeneratorOptions& )
 {
 	/** @todo manage here enumaration for types different from a string */
 	if( childs.size() > 0 ) {
@@ -749,23 +753,23 @@ void CXBindingsCppObjectsGenerator::DoGenerateMacroForChildEnumerator( CXBinding
 
 		for( unsigned int i = 0; i < childs.size() ; ++i ) {
 			if( i == 0 )
-				child_enum_list += "\t$(ns)") + childs[i].properties[ruleInfo.variable.content] + wxT(" = 0,\n" ;
+				child_enum_list += "\t$(ns)" + childs[i].properties[ruleInfo.variable.content] + " = 0,\n" ;
 			else
-				child_enum_list += "\t$(ns)") + childs[i].properties[ruleInfo.variable.content] + wxT(",\n" ;
+				child_enum_list += "\t$(ns)" + childs[i].properties[ruleInfo.variable.content] + ",\n" ;
 
 
 			std::string str = GetMacro("string_composer") ;
-			SetMacro("content"),childs[i].properties[ruleInfo.variable.content] ;
+			SetMacro("content",childs[i].properties[ruleInfo.variable.content]) ;
 			DoReplaceMacros( str );
 			
 			if( i < childs.size()-1 )
-				child_string_enum_list += "\t")  + str + wxT(",\n" ;
+				child_string_enum_list += "\t"  + str + ",\n" ;
 			else
 				child_string_enum_list += "\t"   + str;
 		}
 
-		SetMacro( "child_enum_list") , child_enum_list  ;
-		SetMacro( "child_string_enum_list") , child_string_enum_list  ;
+		SetMacro( "child_enum_list" , child_enum_list ) ;
+		SetMacro( "child_string_enum_list" , child_string_enum_list ) ;
 	}
 
 }
@@ -785,7 +789,7 @@ CXBindingsFileInfo CXBindingsCppObjectsGenerator::DoGenerateChildRuleCodeFor( CX
 	return ret;
 }
 
-CXBindingsFileInfo CXBindingsCppObjectsGenerator::DoGenerateForEachChildRuleCodeFor( CXBindingsChildContainerInfo& WXUNUSED(childContainer) , CXBindingsForEachChildInfo& ruleInfo , CXBindings& grammar , CXBindingsGeneratorOptions& options )
+CXBindingsFileInfo CXBindingsCppObjectsGenerator::DoGenerateForEachChildRuleCodeFor( CXBindingsChildContainerInfo& , CXBindingsForEachChildInfo& ruleInfo , CXBindings& grammar , CXBindingsGeneratorOptions& options )
 {
 	CXBindingsFileInfo ret;
 	
@@ -812,37 +816,39 @@ void CXBindingsCppObjectsGenerator::DoGetIncludesListFor( CXBindingsArrayString&
 	for( unsigned int i = 0; i < file.bases.size() ; ++i ) {
 		std::string pName = file.bases[i].first;
 		
-		if( currentObjects.Index(pName) == wxNOT_FOUND ) {
-			currentObjects.Add(pName);
-			DoGetIncludesListFor( local_includes , object_imports , currentObjects , file.bases[i].second , options );
-			currentObjects.Remove(pName);
+		CXBindingsArrayString::iterator it = std::find( currentObjects.begin(), currentObjects.end(), pName );
+		if( it == currentObjects.end() ) {
+			currentObjects.push_back(pName);
+			DoGetIncludesListFor( local_includes, object_imports , currentObjects , file.bases[i].second , options );
+			it = std::find( currentObjects.begin(), currentObjects.end(), pName );
+			currentObjects.erase(it);
 		}
 		
-		std::string inc = "#include \"") + pName + wxT(".h\"\n" ;
-		if( local_includes.Index(inc) == wxNOT_FOUND ) {
-			
-			local_includes.Add("#include \"") + pName + ".h\"\n"  ;
+		std::string inc = "#include \"" + pName + ".h\"\n" ;
+		it = std::find( local_includes.begin(), local_includes.end(), inc );
+		if( it == local_includes.end() ) {
 			pName = GetRealType(pName,options);
-			object_imports.Add("class ") + pName + ";\n"  ;
-		}			
-
+			local_includes.push_back("#include \"" + pName + ".h\"\n") ;
+		}
 	}
 	
 	for( unsigned int i = 0; i < file.dependencies.size() ; ++i )
 	{
-		if( !m_objectFiles[file.dependencies[i].second] ==options.ns + "_globals")) && !IsBaseType(file.dependencies[i].second   {
-			std::string inc = "#include \"") + file.dependencies[i].second + wxT(".h\"\n" ;
-			if( local_includes.Index(inc) == wxNOT_FOUND ) {
+		if( m_objectFiles[file.dependencies[i].second] != (options.ns + "_globals") && !m_objectFiles[file.dependencies[i].second].empty() )  {
+			std::string inc = "#include \"" + file.dependencies[i].second + ".h\"\n";
+
+			CXBindingsArrayString::iterator it = std::find( local_includes.begin(), local_includes.end(), inc );
+			if( it == local_includes.end() ) {
 				
-				if( currentObjects.Index(file.dependencies[i].first) == wxNOT_FOUND ) {
-					currentObjects.Add(file.dependencies[i].first);
-					DoGetIncludesListFor( local_includes , object_imports , currentObjects , m_objectInfos[file.dependencies[i].second] , options );
-					currentObjects.Remove(file.dependencies[i].first);
+				it = std::find( local_includes.begin(), local_includes.end(), file.dependencies[i].first );
+				if( it == local_includes.end() ) {
+					currentObjects.push_back(file.dependencies[i].first);
+					DoGetIncludesListFor( local_includes, object_imports , currentObjects , m_objectInfos[file.dependencies[i].second] , options );
+					it = std::find( currentObjects.begin(), currentObjects.end(), file.dependencies[i].first );
+					currentObjects.erase(it);
 				}
-		
-				local_includes.Add( "#include \"") + file.dependencies[i].second + ".h\"\n"   ;
-				std::string dependency = GetRealType( file.dependencies[i].second , options );
-				object_imports.Add( "class ") + dependency + ";\n"   ;
+				
+				local_includes.push_back( "#include \"" + file.dependencies[i].second + ".h\"\n"  ) ;
 			}
 		}
 	}

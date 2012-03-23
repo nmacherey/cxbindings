@@ -426,7 +426,7 @@ private :
 
 #define CXBINDINGS_REGISTER_GENERATOR( object , description ) \
 	namespace ns##object { \
-		CXBindingsGeneratorRegistrant<object> registrant( #object) , description  ; \
+		CXBindingsGeneratorRegistrant<object> registrant( #object , description)  ; \
 	};
 
 #endif

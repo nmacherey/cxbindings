@@ -13,10 +13,10 @@
 #include <vector>
 #include <map>
 #include <stack>
+#include <algorithm>
 
-
-
-
+#include <boost/algorithm/string/predicate.hpp>
+#include <boost/algorithm/string/replace.hpp>
 
 #include "CXBindingsDefinitions.h"
 #include "CXBindingsGlobals.h"
@@ -34,10 +34,7 @@
 /* Implements CXBindingsObjectBase RTTI information */
 IMPLEMENT_DYNAMIC_CLASS_CXBINDINGS( CXBindingsCppHandlersGenerator , CXBindingsGenerator );
 
-
 CXBINDINGS_REGISTER_GENERATOR( CXBindingsCppHandlersGenerator , "Generate CPP XML Handlers from CXBindings definition")  ;
-
-
 
 CXBindingsCppHandlersGenerator::~CXBindingsCppHandlersGenerator()
 {
@@ -97,11 +94,11 @@ bool CXBindingsCppHandlersGenerator::DoGenerateCode( CXBindingsGeneratorOptions&
 		
 		if( !header.empty() ) {
 			DoReplaceMacros( header );
-			SaveFile( hdrDir + "/") + fname + ".h"  , header  ;
+			SaveFile( hdrDir + "/" + fname + ".h"  , header );
 		}
 		if( !source.empty() ) {
 			DoReplaceMacros( source );
-			SaveFile( srcDir + "/") + fname + ".cpp"  , source  ;
+			SaveFile( srcDir + "/" + fname + ".cpp"  , source) ;
 		}
 	}
 	
@@ -112,10 +109,10 @@ bool CXBindingsCppHandlersGenerator::DoGenerateCode( CXBindingsGeneratorOptions&
 	CXBindingsHandlerFileInfoMap::iterator it = m_objectInfos.begin();
 	for( ; it != m_objectInfos.end() ; ++it )
 	{
-		if( !m_objectFiles[it->first] ==filename) && !m_objectFiles[it->first].empty() 
+		if( m_objectFiles[it->first]!=filename && !m_objectFiles[it->first].empty() )
 		{
-			std::string srcFile = srcDir + "/") + m_objectFiles[it->first] + "XmlHandler"  + wxT(".cpp" ;
-			std::string hdrFile = hdrDir + "/") + m_objectFiles[it->first] + "XmlHandler"  + wxT(".h" ;
+			std::string srcFile = srcDir + "/" + m_objectFiles[it->first] + "XmlHandler"  + ".cpp" ;
+			std::string hdrFile = hdrDir + "/" + m_objectFiles[it->first] + "XmlHandler"  + ".h" ;
 			
 			SaveFile( srcFile , it->second.srcInfo );
 			SaveFile( hdrFile , it->second.headerInfo );
@@ -131,11 +128,11 @@ void CXBindingsCppHandlersGenerator::DoGenerateCodeFor( CXBindingsObjectInfo& ob
 	// STEP 0 : APPEND OBJECT PROPERTIES IN THE MACRO MAP
 	CXBindingsStringStringMap& properties = objectInfo.properties;
 	
-	wxLogMessage( "\t STEP O : Calculating Object preliminar informations : ") + properties["name" ]  ;
+	//wxLogMessage( "\t STEP O : Calculating Object preliminar informations : ") + properties["name" ]  ;
 	
-	wxLogMessage( "\t\t STEP O.1 : Appending Object macro : ") + properties["name" ]  ;
+	//wxLogMessage( "\t\t STEP O.1 : Appending Object macro : ") + properties["name" ]  ;
 	
-	if( properties["name")].empty()  
+	if( properties["name"].empty() ) 
 		CXB_THROW( "Error object with no name cannot continue...")  ;
 
 	std::string objectName = properties["name" ];
@@ -145,21 +142,21 @@ void CXBindingsCppHandlersGenerator::DoGenerateCodeFor( CXBindingsObjectInfo& ob
 	upName += objectName;
 	to_upper( upName );
 	
-	SetMacro( "object") , objectName  ;
-	SetMacro( "OBJECT") , upName  ;
+	SetMacro( "object" , objectName );
+	SetMacro( "OBJECT" , upName );
 
 	// @todo here the file is not preoprely set
 	/* First set up some macros for the given file */
 	// filename macros
 	std::string filename = objectName + "XmlHandler" ;
-	SetMacro( "filename") , filename  ;
+	SetMacro( "filename" , filename) ;
 
 	// STEP 1 : CHECK CHILD CONTAINERS AND RULES
-	wxLogMessage( "\t STEP 1 : Checking for existing rules in the child containers ... ")  ;
+	//wxLogMessage( "\t STEP 1 : Checking for existing rules in the child containers ... ")  ;
         CXBindingsArrayGrammarChildContainerInfo& ccInfo = objectInfo.childs;
 	
-	std::string msg = std::string::Format( "\t\t Found %d childcontainers...") , ccInfo.size()  ;
-	wxLogMessage( msg );
+	//std::string msg = std::string::Format( "\t\t Found %d childcontainers...") , ccInfo.size()  ;
+	//wxLogMessage( msg );
 
 	CXBindingsHandlerFileInfo objectFileInfo;
 	
@@ -167,20 +164,20 @@ void CXBindingsCppHandlersGenerator::DoGenerateCodeFor( CXBindingsObjectInfo& ob
 	 	objectFileInfo += DoGenerateChildContainerCodeFor( ccInfo[i] , grammar , options ); 	
 	}
 		
-	wxLogMessage( "\t END STEP 1")  ;
+	//wxLogMessage( "\t END STEP 1")  ;
 
 	// STEP 2 : CHECK CATEGORIES AND RULES
-	wxLogMessage( "\t STEP 2 : Checking for existing rules in the child categories ... ")  ;
+	//wxLogMessage( "\t STEP 2 : Checking for existing rules in the child categories ... ")  ;
         CXBindingsArrayGrammarCategoryInfo& catInfo = objectInfo.categories;
 	
-	msg = std::string::Format( "\t\t Found %d categories...") , catInfo.size()  ;
-	wxLogMessage( msg );
+	//msg = std::string::Format( "\t\t Found %d categories...") , catInfo.size()  ;
+	//wxLogMessage( msg );
 	
 	for( unsigned int i = 0; i < catInfo.size() ; ++i ) {
 		objectFileInfo += DoGenerateCategoryCodeFor( catInfo[i] , grammar , options );
 	}
 		
-	wxLogMessage( "\t END STEP 2")  ;
+	//wxLogMessage( "\t END STEP 2")  ;
 
 	CXBindingsArrayGrammarChildInfo& childs = objectInfo.childInfos;
 	for( unsigned int j = 0; j < childs.size() ; ++j ) {
@@ -189,7 +186,7 @@ void CXBindingsCppHandlersGenerator::DoGenerateCodeFor( CXBindingsObjectInfo& ob
 		objectFileInfo += ruleContent;
 	}
 
-	wxLogMessage( "\t STEP 3 : create additional object macros for the given object if exists ... ")  ;
+	//wxLogMessage( "\t STEP 3 : create additional object macros for the given object if exists ... ")  ;
 
 	// Finally build the missing macrods for doc comments and other parameters info
 	CXBindingsHandlerFileParametersMacros params;
@@ -207,15 +204,15 @@ void CXBindingsCppHandlersGenerator::DoGenerateCodeFor( CXBindingsObjectInfo& ob
 		DoCreateParametersMacrosFor( inf , localp , options );
 
 		params += localp;
-		wxLogMessage( localp.property_readers );
+		//wxLogMessage( localp.property_readers );
 	}
 	
 	DoCreateParametersMacrosFor( objectFileInfo , params , options );
 
-	SetMacro( "objects_attribute_readers") , params.attribute_readers  ;
-	SetMacro( "objects_attribute_writers") , params.attribute_writers  ;
-	SetMacro( "objects_property_readers") , params.property_readers  ;
-	SetMacro( "objects_property_writers") , params.property_writers  ;
+	SetMacro( "objects_attribute_readers" , params.attribute_readers) ;
+	SetMacro( "objects_attribute_writers" , params.attribute_writers) ;
+	SetMacro( "objects_property_readers" , params.property_readers) ;
+	SetMacro( "objects_property_writers" , params.property_writers) ;
 	
 	
 	/* The next step is very important ! 
@@ -229,30 +226,30 @@ void CXBindingsCppHandlersGenerator::DoGenerateCodeFor( CXBindingsObjectInfo& ob
 	
 	CXBindingsArrayString lc;
 	CXBindingsArrayString currObj;
-	currObj.Add(objectName);
+	currObj.push_back(objectName);
 	DoGetIncludesListFor(lc,currObj,objectFileInfo,options);
 	
 	for( unsigned int i = 0; i < lc.size() ; ++i ) {
 		local_includes += lc[i];
 	}
 	
-	SetMacro( "local_includes") , local_includes  ;
-	wxLogMessage( "\t\t\t local_includes is :") + local_includes  ;
+	SetMacro( "local_includes" , local_includes) ;
+	//wxLogMessage( "\t\t\t local_includes is :") + local_includes  ;
 
 		
-	wxLogMessage( "\t END STEP 3...")  ;
+	//wxLogMessage( "\t END STEP 3...")  ;
 
 	// STEP 4 : CHECK EXISTING RULES IN THE GIVEN OBJECT
-	wxLogMessage( "\t STEP 4 : Checking for existing rules in the object ... ")  ;
+	//wxLogMessage( "\t STEP 4 : Checking for existing rules in the object ... ")  ;
 	CXBindingsArrayGrammarRuleInfo& rules = objectInfo.rules;
 	
-	msg = std::string::Format( "\t\t Found %d rules...") , rules.size()  ;
-	wxLogMessage( msg );
+	//msg = std::string::Format( "\t\t Found %d rules...") , rules.size()  ;
+	//wxLogMessage( msg );
 
 	CXBindingsHandlerFileInfo FinalInfo;
 	
 	if( filename ==options.ns + "_globals")   {
-		wxLogMessage( "Object is a typedef or an enumeration, no handler needs to be generated for.") ;
+		//wxLogMessage( "Object is a typedef or an enumeration, no handler needs to be generated for.") ;
 		return;
 	}
 	
@@ -262,8 +259,9 @@ void CXBindingsCppHandlersGenerator::DoGenerateCodeFor( CXBindingsObjectInfo& ob
 		CXB_THROW( "Error cannot find template object")  ;
 	
 	std::string objectNodeName = properties["name" ];
-	objectNodeName.Replace("Type"),"" ,true ;
-	SetMacro( "object_node_name") , objectNodeName  ;
+	boost::replace_all(objectNodeName,"Type","");
+
+	SetMacro( "object_node_name" , objectNodeName) ;
 	
 	CXBindingsArrayGrammarGeneratorFileObjectPart& objects = rTemplate->GetObjects();
 
@@ -279,13 +277,13 @@ void CXBindingsCppHandlersGenerator::DoGenerateCodeFor( CXBindingsObjectInfo& ob
 		else
 			FinalInfo.srcInfo += content;
 		
-		wxLogMessage( "\t\t\t Generated rule content is : ") + content  ;
+		//wxLogMessage( "\t\t\t Generated rule content is : ") + content  ;
 	}
 	
 	FinalInfo += objectFileInfo;
 	m_objectInfos[objectName] = FinalInfo;
 
-	wxLogMessage( "\t END STEP 4...")  ;
+	//wxLogMessage( "\t END STEP 4...")  ;
 }
 
 void CXBindingsCppHandlersGenerator::DoCreateParametersMacrosFor( CXBindingsHandlerFileInfo& file , CXBindingsHandlerFileParametersMacros& parameters  , CXBindingsGeneratorOptions& options)
@@ -295,14 +293,14 @@ void CXBindingsCppHandlersGenerator::DoCreateParametersMacrosFor( CXBindingsHand
 		std::string pName = file.properties[i].first;
 		std::string pType = file.properties[i].second;
 
-		wxLogMessage( pName + " - ") + pType  ;
+		//wxLogMessage( pName + " - ") + pType  ;
 		
 		std::string nameExt = pName;
 		nameExt = GetPropertyExtension( nameExt , options );
 		
-		SetMacro( "name_extension") , nameExt  ;
-		SetMacro( "name") , pName  ;
-		SetMacro( "type") , pType  ;
+		SetMacro( "name_extension", nameExt) ;
+		SetMacro( "name" , pName) ;
+		SetMacro( "type" , pType) ;
 		
 		/* Here we have to get the types of each properties and if it's not an object
 		 * get the "real" type of the given properties (i.e : a typedef or an enumeration)
@@ -313,7 +311,7 @@ void CXBindingsCppHandlersGenerator::DoCreateParametersMacrosFor( CXBindingsHand
 		if( it != m_types.end() )
 			pType = it->second;
 			
-		wxLogMessage( pName + " - ") + pType  ;
+		//wxLogMessage( pName + " - ") + pType  ;
 		
 		CXBindingsGeneratorFileTemplate* preader = NULL;
 		CXBindingsGeneratorFileTemplate* pwriter = NULL;
@@ -325,7 +323,7 @@ void CXBindingsCppHandlersGenerator::DoCreateParametersMacrosFor( CXBindingsHand
 		pwriter = m_genfile->FindTemplate( twName );
 			
 		if( preader == NULL || pwriter == NULL )
-			CXB_THROW( "Error cannot find property reader and writer template for object of type : ") + pType  ;
+			CXB_THROW( "Error cannot find property reader and writer template for object of type : " + pType );
 			
 		CXBindingsArrayGrammarGeneratorFileObjectPart& objects = preader->GetObjects();
 
@@ -357,14 +355,14 @@ void CXBindingsCppHandlersGenerator::DoCreateParametersMacrosFor( CXBindingsHand
 		std::string pName = file.attributes[i].first;
 		std::string pType = file.attributes[i].second;
 
-		wxLogMessage( pName + " - ") + pType  ;
+		//wxLogMessage( pName + " - ") + pType  ;
 		
 		std::string nameExt = pName;
 		nameExt = GetPropertyExtension( nameExt , options );
 		
-		SetMacro( "name_extension") , nameExt  ;
-		SetMacro( "name") , pName  ;
-		SetMacro( "type") , pType  ;
+		SetMacro( "name_extension" , nameExt) ;
+		SetMacro( "name" , pName) ;
+		SetMacro( "type" , pType) ;
 		
 		/* Here we have to get the types of each attributes and if it's not an object
 		 * get the "real" type of the given attributes (i.e : a typedef or an enumeration)
@@ -375,7 +373,7 @@ void CXBindingsCppHandlersGenerator::DoCreateParametersMacrosFor( CXBindingsHand
 		if( it != m_types.end() )
 			pType = it->second;
 		
-		wxLogMessage( pName + " - ") + pType  ;
+		//wxLogMessage( pName + " - ") + pType  ;
 		
 		CXBindingsGeneratorFileTemplate* preader = NULL;
 		CXBindingsGeneratorFileTemplate* pwriter = NULL;
@@ -387,7 +385,7 @@ void CXBindingsCppHandlersGenerator::DoCreateParametersMacrosFor( CXBindingsHand
 		pwriter = m_genfile->FindTemplate( twName );
 			
 		if( preader == NULL || pwriter == NULL )
-			CXB_THROW( "Error cannot find attribute reader and writer template for object of type : ") + pType  ;
+			CXB_THROW( "Error cannot find attribute reader and writer template for object of type : " + pType) ;
 			
 		CXBindingsArrayGrammarGeneratorFileObjectPart& objects = preader->GetObjects();
 
@@ -420,14 +418,14 @@ CXBindingsHandlerFileInfo CXBindingsCppHandlersGenerator::DoGenerateRuleCodeFor(
 {
 	CXBindingsHandlerFileInfo res;
 
-	wxLogMessage( "\t\t Rule make is : ") + ruleInfo.make  ;
-	wxLogMessage( "\t\t Rule name is : ") + ruleInfo.name.content  ;
-	wxLogMessage( "\t\t Rule type is : ") + ruleInfo.type.content  ;
+	//wxLogMessage( "\t\t Rule make is : ") + ruleInfo.make  ;
+	//wxLogMessage( "\t\t Rule name is : ") + ruleInfo.name.content  ;
+	//wxLogMessage( "\t\t Rule type is : ") + ruleInfo.type.content  ;
 
 	CXBindingsStringStringMap& types = m_genfile->GetTypeInfo().GetTypes();
 	std::string realType = ruleInfo.type.content;
 	
-	wxLogMessage( "\t\t Real type is : ") + realType  ;
+	//wxLogMessage( "\t\t Real type is : ") + realType  ;
 	
 	if( ruleInfo.make =="object")  
 		realType = ruleInfo.name.content;
@@ -444,12 +442,12 @@ CXBindingsHandlerFileInfo CXBindingsCppHandlersGenerator::DoGenerateRuleCodeFor(
 		//typeExt = realType;
 	}
 	
-	wxLogMessage( "\t\t Real type is : ") + realType  ;
+	//wxLogMessage( "\t\t Real type is : ") + realType  ;
 	
-	if( realType.Contains( ":") )  
-		realType = realType.AfterFirst( ':')  ; 
+	if( boost::contains(realType,":") )  
+		realType = after_first(realType, ':')  ; 
 	
-	wxLogMessage( "\t\t Real type is : ") + realType  ;
+	//wxLogMessage( "\t\t Real type is : ") + realType  ;
 	
 	std::string savedType = realType;
 	// Find here type corrspondances
@@ -466,7 +464,7 @@ CXBindingsHandlerFileInfo CXBindingsCppHandlersGenerator::DoGenerateRuleCodeFor(
 		rType = "array"  + rType;
 	}
 	
-	wxLogMessage( "Registering type for : ") + ruleInfo.name.content + " type is :") + realType + wxT(" ") + rType + wxT(" rule make is :"  + ruleInfo.make  ;
+	//wxLogMessage( "Registering type for : ") + ruleInfo.name.content + " type is :") + realType + wxT(" ") + rType + wxT(" rule make is :"  + ruleInfo.make  ;
 	m_types[ruleInfo.name.content] = rType;
 	
 	if( ruleInfo.make == "import")    {
@@ -494,12 +492,12 @@ CXBindingsHandlerFileInfo CXBindingsCppHandlersGenerator::DoGenerateRuleCodeFor(
 				std::string name = objectsInfo[j].properties["name" ];
 
 				name = GetRealType( name , options );
-				wxLogMessage( "Checking bases for") + name + "-") + typeExt + wxT("-"  + realType  ;
+				//wxLogMessage( "Checking bases for") + name + "-") + typeExt + wxT("-"  + realType  ;
 				
 				if( name == typeExt )  {
 					std::pair< std::string , CXBindingsHandlerFileInfo> inf( name , m_objectInfos[name] );
 					res.bases.push_back( inf );
-					wxLogMessage( "Adding bases for") + name  ;
+					//wxLogMessage( "Adding bases for") + name  ;
 					return res;
 				}
 
@@ -519,7 +517,7 @@ CXBindingsHandlerFileInfo CXBindingsCppHandlersGenerator::DoGenerateRuleCodeFor(
 		res.attributes.push_back( mpair );
 	}
 		
-	if( ruleInfo.make == "property") ) || ruleInfo.make == "attribute") ) || ruleInfo.make.IsSameAs( wxT("variant_accessor")  || ruleInfo.make.IsSameAs( wxT("variant_array_accessor"     {
+	if( ruleInfo.make == "property" || ruleInfo.make == "attribute" || ruleInfo.make == "variant_accessor" || ruleInfo.make == "variant_array_accessor")   {
 		std::pair< std::string , std::string > mpair( ruleInfo.name.content , realType );
 		res.dependencies.push_back( mpair );
 	}
@@ -528,18 +526,18 @@ CXBindingsHandlerFileInfo CXBindingsCppHandlersGenerator::DoGenerateRuleCodeFor(
 
 }
 
-CXBindingsHandlerFileInfo CXBindingsCppHandlersGenerator::DoGenerateRuleCodeFor( CXBindingsRuleInfo& ruleInfo , CXBindings& WXUNUSED(grammar) , CXBindingsGeneratorOptions& options )
+CXBindingsHandlerFileInfo CXBindingsCppHandlersGenerator::DoGenerateRuleCodeFor( CXBindingsRuleInfo& ruleInfo , CXBindings& grammar , CXBindingsGeneratorOptions& options )
 {
 	CXBindingsHandlerFileInfo res;
 
-	wxLogMessage( "\t\t Rule make is : ") + ruleInfo.make  ;
-	wxLogMessage( "\t\t Rule name is : ") + ruleInfo.name.content  ;
-	wxLogMessage( "\t\t Rule type is : ") + ruleInfo.type.content  ;
+	//wxLogMessage( "\t\t Rule make is : ") + ruleInfo.make  ;
+	//wxLogMessage( "\t\t Rule name is : ") + ruleInfo.name.content  ;
+	//wxLogMessage( "\t\t Rule type is : ") + ruleInfo.type.content  ;
 	
 	CXBindingsStringStringMap& types = m_genfile->GetTypeInfo().GetTypes();
 	std::string realType = ruleInfo.type.content;
 	
-	wxLogMessage( "\t\t Real type is : ") + realType  ;
+	//wxLogMessage( "\t\t Real type is : ") + realType  ;
 	
 	if( ruleInfo.make =="object")  
 		realType = ruleInfo.name.content;
@@ -556,12 +554,12 @@ CXBindingsHandlerFileInfo CXBindingsCppHandlersGenerator::DoGenerateRuleCodeFor(
 		//typeExt = realType;
 	}
 	
-	wxLogMessage( "\t\t Real type is : ") + realType  ;
+	//wxLogMessage( "\t\t Real type is : ") + realType  ;
 	
-	if( realType.Contains( ":") )  
-		realType = realType.AfterFirst( ':')  ; 
+	if( boost::contains(realType,":") )  
+		realType = after_first(realType,':')  ; 
 	
-	wxLogMessage( "\t\t Real type is : ") + realType  ;
+	//wxLogMessage( "\t\t Real type is : ") + realType  ;
 	
 	std::string savedType = realType;
 	// Find here type corrspondances
@@ -579,7 +577,7 @@ CXBindingsHandlerFileInfo CXBindingsCppHandlersGenerator::DoGenerateRuleCodeFor(
 	}
 	
 	
-	wxLogMessage( "Registering type for : ") + ruleInfo.name.content + " type is :") + realType + wxT(" ") + rType + wxT(" rule make is :"  + ruleInfo.make  ;
+	//wxLogMessage( "Registering type for : ") + ruleInfo.name.content + " type is :") + realType + wxT(" ") + rType + wxT(" rule make is :"  + ruleInfo.make  ;
 	m_types[ruleInfo.name.content] = rType;
 
 	if( ruleInfo.make == "import")    {
@@ -607,11 +605,11 @@ CXBindingsHandlerFileInfo CXBindingsCppHandlersGenerator::DoGenerateRuleCodeFor(
 				std::string name = objectsInfo[j].properties["name" ];
 
 				name = GetRealType( name , options );
-				wxLogMessage( "Checking bases for") + name + "-") + typeExt + wxT("-"  + realType  ;
+				//wxLogMessage( "Checking bases for") + name + "-") + typeExt + wxT("-"  + realType  ;
 				if( name == typeExt )  {
 					std::pair< std::string , CXBindingsHandlerFileInfo> inf( name , m_objectInfos[name] );
 					res.bases.push_back( inf );
-					wxLogMessage( "Adding bases for") + name + "-") + typeExt + wxT("-"  + realType  ;
+					//wxLogMessage( "Adding bases for") + name + "-") + typeExt + wxT("-"  + realType  ;
 					return res;
 				}
 
@@ -633,7 +631,7 @@ CXBindingsHandlerFileInfo CXBindingsCppHandlersGenerator::DoGenerateRuleCodeFor(
 		res.attributes.push_back( mpair );
 	}
 	
-	if( ruleInfo.make == "property") ) || ruleInfo.make == "attribute") ) || ruleInfo.make.IsSameAs( wxT("variant_accessor")  || ruleInfo.make.IsSameAs( wxT("variant_array_accessor"     {
+	if( ruleInfo.make == "property" || ruleInfo.make == "attribute" || ruleInfo.make == "variant_accessor"  || ruleInfo.make == "variant_array_accessor")   {
 		std::pair< std::string , std::string > mpair( ruleInfo.name.content , typeExt );
 		res.dependencies.push_back( mpair );
 	}
@@ -657,7 +655,7 @@ CXBindingsHandlerFileInfo CXBindingsCppHandlersGenerator::DoGenerateChildRuleCod
 	return ret;
 }
 
-CXBindingsHandlerFileInfo CXBindingsCppHandlersGenerator::DoGenerateForEachChildRuleCodeFor( CXBindingsChildContainerInfo& WXUNUSED(childContainer) , CXBindingsForEachChildInfo& ruleInfo , CXBindings& grammar , CXBindingsGeneratorOptions& options )
+CXBindingsHandlerFileInfo CXBindingsCppHandlersGenerator::DoGenerateForEachChildRuleCodeFor( CXBindingsChildContainerInfo& , CXBindingsForEachChildInfo& ruleInfo , CXBindings& grammar , CXBindingsGeneratorOptions& options )
 {
 	CXBindingsHandlerFileInfo ret;
 	
@@ -684,31 +682,38 @@ void CXBindingsCppHandlersGenerator::DoGetIncludesListFor( CXBindingsArrayString
 	for( unsigned int i = 0; i < file.bases.size() ; ++i ) {
 		std::string pName = file.bases[i].first;
 		
-		if( currentObjects.Index(pName) == wxNOT_FOUND ) {
-			currentObjects.Add(pName);
+		CXBindingsArrayString::iterator it = std::find( currentObjects.begin(), currentObjects.end(), pName );
+		if( it == currentObjects.end() ) {
+			currentObjects.push_back(pName);
 			DoGetIncludesListFor( local_includes , currentObjects , file.bases[i].second , options );
-			currentObjects.Remove(pName);
+			it = std::find( currentObjects.begin(), currentObjects.end(), pName );
+			currentObjects.erase(it);
 		}
 		
-		std::string inc = "#include \"") + pName + wxT(".h\"\n" ;
-		if( local_includes.Index(inc) == wxNOT_FOUND ) {
-			local_includes.Add("#include \"") + pName + ".h\"\n"  ;
+		std::string inc = "#include \"" + pName + ".h\"\n" ;
+		it = std::find( local_includes.begin(), local_includes.end(), inc );
+		if( it == local_includes.end() ) {
+			local_includes.push_back("#include \"" + pName + ".h\"\n") ;
 		}
 	}
 	
 	for( unsigned int i = 0; i < file.dependencies.size() ; ++i )
 	{
-		if( !m_objectFiles[file.dependencies[i].second] ==options.ns + "_globals")) && !m_objectFiles[file.dependencies[i].second].IsEmpty(   {
-			std::string inc = "#include \"") + file.dependencies[i].second + wxT(".h\"\n" ;
-			if( local_includes.Index(inc) == wxNOT_FOUND ) {
+		if( m_objectFiles[file.dependencies[i].second] != (options.ns + "_globals") && !m_objectFiles[file.dependencies[i].second].empty() )  {
+			std::string inc = "#include \"" + file.dependencies[i].second + ".h\"\n";
+
+			CXBindingsArrayString::iterator it = std::find( local_includes.begin(), local_includes.end(), inc );
+			if( it == local_includes.end() ) {
 				
-				if( currentObjects.Index(file.dependencies[i].first) == wxNOT_FOUND ) {
-					currentObjects.Add(file.dependencies[i].first);
+				it = std::find( local_includes.begin(), local_includes.end(), file.dependencies[i].first );
+				if( it == local_includes.end() ) {
+					currentObjects.push_back(file.dependencies[i].first);
 					DoGetIncludesListFor( local_includes , currentObjects , m_objectInfos[file.dependencies[i].second] , options );
-					currentObjects.Remove(file.dependencies[i].first);
+					it = std::find( currentObjects.begin(), currentObjects.end(), file.dependencies[i].first );
+					currentObjects.erase(it);
 				}
 				
-				local_includes.Add( "#include \"") + file.dependencies[i].second + ".h\"\n"   ;
+				local_includes.push_back( "#include \"" + file.dependencies[i].second + ".h\"\n"  ) ;
 			}
 		}
 	}
@@ -726,16 +731,16 @@ std::string CXBindingsCppHandlersGenerator::FindRealTypeFor( const std::string& 
 	} else {
 		CXBindingsStringStringMap::iterator it = m_types.find( type );
 		
-		while( it != m_types.end() && !newType ==oldType)  {
+		while( it != m_types.end() && newType != oldType)  {
 			oldType = newType;
 			newType = it->second;
 			it = m_types.find( newType );
 		}
 	}
 	
-	wxLogMessage( "oldtype is :") + type + ", new type is : "  + newType  ;
+	//wxLogMessage( "oldtype is :") + type + ", new type is : "  + newType  ;
 	
-	if( newType =="std::string")) || newType =="std::string") || newType.IsSameAs(wxT("string"   
+	if( newType =="std::string" || newType =="std::string" || newType == "string")   
 		newType = "string" ;
 	else if( newType =="wxDateTime")  
 		newType = "datetime" ;
@@ -757,9 +762,9 @@ std::string CXBindingsCppHandlersGenerator::FindRealTypeFor( const std::string& 
 		newType = "duration" ;
 	else if( newType =="wxAny")  
 		newType = "any" ;
-	else if( newType =="unsigned int")) || newType.IsSameAs("uint"   
+	else if( newType =="unsigned int" || newType == "uint" )   
 		newType = "uint" ;
-	else if( newType =="unsigned long")) || newType.IsSameAs("ulong"   
+	else if( newType =="unsigned long" || newType == "ulong")   
 		newType = "ulong" ;
 	else if( newType =="bool")  
 		newType = "bool" ;
@@ -773,14 +778,14 @@ std::string CXBindingsCppHandlersGenerator::FindRealTypeFor( const std::string& 
 		newType = "float" ;
 	else if( newType =="double")  
 		newType = "double" ;
-	else if( type.Contains("Enum"))  
+	else if( boost::contains(type,"Enum"))  
 		newType = "enum" ;
 	else
 		newType = "object" ;
 		
 	
 		
-	wxLogMessage( "oldtype is :") + type + ", new type is : "  + newType  ;
+	//wxLogMessage( "oldtype is :") + type + ", new type is : "  + newType  ;
 	
 	realType = newType;
 	return realType;

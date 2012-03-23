@@ -12,10 +12,14 @@
 #include <vector>
 #include <map>
 #include <stack>
+#include <algorithm>
 
 #include <boost/date_time/gregorian/gregorian.hpp>
 #include <boost/algorithm/string/replace.hpp>
-
+#include <boost/filesystem/fstream.hpp> 
+#include <boost/regex.hpp>
+#include <boost/algorithm/string/predicate.hpp>
+ 
 #include "CXBindingsDefinitions.h"
 #include "CXBindingsGlobals.h"
 #include "CXBindingsException.h"
@@ -217,71 +221,42 @@ void CXBindingsGenerator::SetDefaultMacros(CXBindingsGeneratorOptions& options)
 	m_macros["date" ] = sDate;
 }
 
+// FIXME: I need to unit test this class in order to validate the new regex system
 int CXBindingsGenerator::DoReplaceMacros( std::string& str )
 {
-	std::string expr = "$(\\([a-z_A-Z0-9]*\\))" ;
-	
-	wxRegEx re;
-	re.Compile( expr , wxRE_BASIC );
+	boost::regex re( "\\$\\(([a-z_A-Z0-9]*)\\)" );
 	
 	std::string text=str;
 	int pos,start,end;
 	size_t beg,len;
 	start = 0;
-	end = text.Length();
+	end = text.size();
 
 	int notfound = 0;
+	boost::cmatch what;
+	str = text;
 
-	while(1) {
-		if (re.Matches(text)) {
-
-			re.GetMatch(&beg,&len,0);
-			pos=beg+start;
-
-			if (beg==0 && len==0) {
-
-				text=text.Mid(1);
-
-				if (re.Matches(text)) {
-
-					re.GetMatch(&beg,&len,0);
-					pos=beg+start+1;
-				}
-				else
-					pos=-1;
-			}
-		}
-		else
-			pos=-1;
-
-		if( pos != -1 && start != end ) {
-			// if we have found something, get the macro name and replace it in the string
-			std::string macroName = text.Mid( beg , len );
-			
-			boost::replace_all(macroName, "$" , "")  ;
-			boost::replace_all(macroName, "(" , "")  ;
-			boost::replace_all(macroName, ")" , "")  ;
+	if (boost::regex_match(text.c_str(), what, re)) {
+		for( unsigned int i = 0; i < what.size() ; ++i ) {
+			std::string macroName;
+			macroName.assign( what[i].first, what[i].second );
 
 			std::string macroValue = GetMacro( macroName );
 			if( !MacroExists(macroName) )
 				CXB_THROW( "Error missing macro (preventing infinity loops): "+ macroName );
 			else
-				boost::replace_all(text,  "$(" + macroName + ")" , "")  ;
-
-		}//end if( pos != -1 && start != end )
-		else
-			break;
-	}// end while(1)
-
-	str = text;
+				boost::replace_all(str,  "$(" + macroName + ")" , "")  ;
+		}
+	}
+	
 	return notfound;
 }
 
 void CXBindingsGenerator::SaveFile( const std::string& file , const std::string& content )
 {
-	wxFile sourceFile;
-    sourceFile.Open( file , wxFile::write );
-    sourceFile.Write( content );
+	boost::filesystem::path p(file.c_str());
+	 boost::filesystem::ofstream ofs(p); 
+	ofs << content;
 }
 
 void CXBindingsGenerator::DoCreateObjectDependencyList( CXBindingsArrayString& dependencyList , CXBindingsObjectInfo& objectInfo , CXBindings& grammar , CXBindingsGeneratorOptions& options )
@@ -299,14 +274,16 @@ void CXBindingsGenerator::DoCreateObjectDependencyList( CXBindingsArrayString& d
 	std::string realName = properties["name" ];
 	realName = GetRealType( realName  , options );
 	
-	if( dependencyList.Index( realName ) != wxNOT_FOUND )
+	CXBindingsArrayString::iterator it = std::find( dependencyList.begin() , dependencyList.end(), realName );
+		
+	if( it != dependencyList.end() )
 		return;
 
 	// STEP 1 : CHECK CHILD CONTAINERS AND RULES
 	//wxLogMessage( "\t STEP 1 : Checking for existing child containers dependencies ... ")  ;
         CXBindingsArrayGrammarChildContainerInfo& ccInfo = objectInfo.childs;
 	
-	std::string msg = std::string::Format( "\t\t Found %d childcontainers...") , ccInfo.size()  ;
+	//std::string msg = std::string::Format( "\t\t Found %d childcontainers...") , ccInfo.size()  ;
 	//wxLogMessage( msg );
 	
 	for( unsigned int i = 0; i < ccInfo.size() ; ++i ) 
@@ -318,7 +295,7 @@ void CXBindingsGenerator::DoCreateObjectDependencyList( CXBindingsArrayString& d
 	//wxLogMessage( "\t STEP 2 : Checking for existing dependencies in the child categories ... ")  ;
         CXBindingsArrayGrammarCategoryInfo& catInfo = objectInfo.categories;
 	
-	msg = std::string::Format( "\t\t Found %d categories...") , catInfo.size()  ;
+	//msg = std::string::Format( "\t\t Found %d categories...") , catInfo.size()  ;
 	//wxLogMessage( msg );
 	
 	for( unsigned int i = 0; i < catInfo.size() ; ++i ) 
@@ -333,7 +310,7 @@ void CXBindingsGenerator::DoCreateObjectDependencyList( CXBindingsArrayString& d
 
 	// Add me in the dependencyList
 
-	dependencyList.Add( realName );
+	dependencyList.push_back( realName );
 
 }
 
@@ -385,7 +362,8 @@ void CXBindingsGenerator::DoCreateChildDependencyList(CXBindingsArrayString& dep
 
 	type = GetRealType( type , options );
 
-	if( dependencyList.Index( type ) != wxNOT_FOUND || type ==parentType) 
+	CXBindingsArrayString::iterator it = std::find( dependencyList.begin() , dependencyList.end(), type );
+	if( it != dependencyList.end() || type ==parentType) 
 		return;
 	
 
@@ -420,7 +398,7 @@ void CXBindingsGenerator::DoCreateChildDependencyList(CXBindingsArrayString& dep
 		
 	}
 
-	dependencyList.Add( type );
+	dependencyList.push_back( type );
 }
 
 
@@ -447,9 +425,9 @@ void CXBindingsGenerator::DoCreateContainerDependencyList( CXBindingsArrayString
 		std::string make = crules[j].make;
 
 		type = GetRealType( type , options );
-
-		if( (make == "import"|| make == "child_enumerator" || make == "typedef" )    && dependencyList.Index( type )  == wxNOT_FOUND )   {
-			dependencyList.Add( type );
+		CXBindingsArrayString::iterator it = std::find( dependencyList.begin() , dependencyList.end(), type );	
+		if( (make == "import"|| make == "child_enumerator" || make == "typedef" ) && it != dependencyList.end() )   {
+			dependencyList.push_back( type );
 		}
 	}
 	
@@ -548,9 +526,9 @@ std::string CXBindingsGenerator::GetRealType( const std::string& type , CXBindin
 		return it->second;
 	}
 
-	if( realType.Contains( ":") )   {
-		ns = realType.BeforeFirst( ':')  ;
-		realType = realType.AfterFirst( ':')  ;
+	if( boost::algorithm::contains(realType,":") )   {
+		ns = before_first( realType , ':' );
+		realType = after_first( realType, ':' );
 	}
 	
 	if( ns.empty() )
