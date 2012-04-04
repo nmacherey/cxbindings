@@ -34,7 +34,7 @@
 /* Implements CXBindingsObjectBase RTTI information */
 IMPLEMENT_DYNAMIC_CLASS_CXBINDINGS( CXBindingsCppHandlersGenerator , CXBindingsGenerator );
 
-CXBINDINGS_REGISTER_GENERATOR( CXBindingsCppHandlersGenerator , "Generate CPP XML Handlers from CXBindings definition")  ;
+CXBINDINGS_REGISTER_GENERATOR( CXBindingsCppHandlersGenerator, "CPPHandlers" , "Generate CPP XML Handlers from CXBindings definition")  ;
 
 CXBindingsCppHandlersGenerator::~CXBindingsCppHandlersGenerator()
 {

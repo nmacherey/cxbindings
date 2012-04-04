@@ -98,7 +98,8 @@ if(ENABLE_DOC)
   add_subdirectory(doc)
 endif()
 
-add_subdirectory(cxbindings)
+add_subdirectory(libcxbindings)
+add_subdirectory(cxb)
 
 ## tests
 #if(ENABLE_TESTING)

@@ -5,7 +5,7 @@ macro(add_lib _NAME)
 
 	#include_directories(${PROJECT_SOURCE_DIR}/${_NAME}/include)
 	include_directories( 
-		${PROJECT_SOURCE_DIR}/${_NAME}/include
+		${PROJECT_SOURCE_DIR}/lib${_NAME}/include
 	)
 
 	add_library(${_NAME} ${ARGN})

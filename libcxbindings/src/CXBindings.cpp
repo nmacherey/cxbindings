@@ -14,14 +14,13 @@
 #include <map>
 #include <stack>
 
+/* Boost specific includes */
 #include <boost/algorithm/string/replace.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string/predicate.hpp>
 
-
-
+/* Local includes */
 #include "CXBindingsDefinitions.h"
-
 #include "CXBindingsGlobals.h"
 #include "CXBindingsException.h"
 #include "CXBindingsExpressionParser.h"

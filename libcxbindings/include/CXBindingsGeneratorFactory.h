@@ -424,9 +424,9 @@ private :
 	std::string m_name;
 };
 
-#define CXBINDINGS_REGISTER_GENERATOR( object , description ) \
+#define CXBINDINGS_REGISTER_GENERATOR( object , name , description ) \
 	namespace ns##object { \
-		CXBindingsGeneratorRegistrant<object> registrant( #object , description)  ; \
+		CXBindingsGeneratorRegistrant<object> registrant( name , description)  ; \
 	};
 
 #endif

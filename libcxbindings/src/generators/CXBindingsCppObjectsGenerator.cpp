@@ -39,7 +39,7 @@
 IMPLEMENT_DYNAMIC_CLASS_CXBINDINGS( CXBindingsCppObjectsGenerator , CXBindingsGenerator );
 
 
-CXBINDINGS_REGISTER_GENERATOR( CXBindingsCppObjectsGenerator , "Generate CPP objects from CXBindings definition")  ;
+CXBINDINGS_REGISTER_GENERATOR( CXBindingsCppObjectsGenerator, "CPPObjects" , "Generate CPP objects from CXBindings definition")  ;
 
 CXBindingsCppObjectsGenerator::~CXBindingsCppObjectsGenerator()
 {

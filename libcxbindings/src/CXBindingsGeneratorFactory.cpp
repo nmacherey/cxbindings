@@ -211,14 +211,14 @@ void CXBindingsGenerator::ClearMacros()
 
 void CXBindingsGenerator::SetDefaultMacros(CXBindingsGeneratorOptions& options)
 {
-	m_macros["generationdir" ] = options.genDir;
-	m_macros["generationname" ] = options.genName;
-	m_macros["ns" ] = options.ns;
-	m_macros["exportmacro" ] = options.exportMacro;
+	m_macros["generationdir"] = options.genDir;
+	m_macros["generationname"] = options.genName;
+	m_macros["ns"] = options.ns;
+	m_macros["exportmacro"] = options.exportMacro;
 
 	boost::gregorian::date date = boost::gregorian::day_clock::local_day();
     	std::string sDate =  boost::gregorian::to_simple_string(date)   ;
-	m_macros["date" ] = sDate;
+	m_macros["date"] = sDate;
 }
 
 // FIXME: I need to unit test this class in order to validate the new regex system

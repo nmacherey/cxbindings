@@ -15,8 +15,10 @@
  * library
  * @author Nicolas Macherey (nicolas.macherey@gmail.com)
  */
-class CXBindingsAny : public boost::any
+class CXBindingsAny
 {
+    boost::any m_var;
+
 public:
 	/* Constructors */
 	/** Default constructor */
@@ -42,4 +44,13 @@ public:
 	/** Returns the content of the object as a boolean value */
 	bool GetBool();
 };
+
+
+template<typename ValueType> CXBindingsAny::CXBindingsAny(const ValueType & value):m_var(value){}
+
+template<typename ValueType> CXBindingsAny& CXBindingsAny::operator=(const ValueType & value) {
+    boost::any(value).swap(m_var);
+    return *this;
+}
+
 #endif //CXBINDINGS_ANY_H

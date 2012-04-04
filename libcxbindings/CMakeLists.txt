@@ -8,4 +8,4 @@ INCLUDE_DIRECTORIES (SYSTEM "${LIBXML2_INCLUDE_DIR}")
 ADD_DEFINITIONS ("${LIBXML2_DEFINITIONS}")
 
 add_lib(cxbindings ${SRCS})
-target_link_libraries(cxbindings ${LIBXML2_LIBRARIES})
+target_link_libraries(cxbindings ${LIBXML2_LIBRARIES} ${Boost_LIBRARIES})
