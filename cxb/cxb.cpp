@@ -136,9 +136,10 @@ int main(int argc, char **argv, char **ppenv) {
         if( cxb != NULL )
             delete cxb;
     } catch( CXBindingsException& e ) {
-        return -1;
+        std::cerr << e.GetErrorMessage() << std::endl;
+        return 1;
     }
 
-    return 1;
+    return 0;
 }
 

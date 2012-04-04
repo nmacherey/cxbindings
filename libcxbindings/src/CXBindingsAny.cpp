@@ -44,5 +44,10 @@ bool CXBindingsAny::GetBool() {
 }
 
 std::string CXBindingsAny::GetType() {
+    try {
+        boost::any_cast<std::string>(m_var);
+        return "string";
+    } catch(const boost::bad_any_cast &) {}
+    
     return m_var.type().name();
 }

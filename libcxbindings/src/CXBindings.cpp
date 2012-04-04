@@ -151,8 +151,9 @@ CXBindingsAny CXBindingsCondition::EvaluateVar( CXBindingsTreeNode& item , xmlNo
 				
 			CXBindingsAny var =  EvaluateVar( childs[0] , node , grammar );
 			
-			if( var.GetType() !="string")  
+			if( var.GetType() !="string") {
 					CXB_THROW("hasParent expected string argument in function") ;
+            }
 					
 			std::string pname = var.GetString();
 			if( node->parent == NULL )
