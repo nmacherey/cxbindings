@@ -120,6 +120,13 @@ install(FILES "${PROJECT_BINARY_DIR}/utils/cxbindings.pc"
   DESTINATION ${PKG_CONFIG_INSTALL_DIR}
   COMPONENT development)
 
+configure_file("utils/stdxmlbindings.pc.in"
+  "${PROJECT_BINARY_DIR}/utils/stdxmlbindings.pc"
+  @ONLY)
+install(FILES "${PROJECT_BINARY_DIR}/utils/stdxmlbindings.pc"
+  DESTINATION ${PKG_CONFIG_INSTALL_DIR}
+  COMPONENT development)
+
 install(FILES "utils/FindCXBindings.cmake"
   DESTINATION ${CMAKE_MODULES_INSTALL_DIR}
   COMPONENT development)

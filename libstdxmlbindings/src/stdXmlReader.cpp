@@ -127,16 +127,16 @@ stdObject *stdXmlReader::DoCreateResFromNode(xmlNode *node, const std::string& c
 	return result;
 }
 
-xmlNode* stdXmlReader::DoWriteResource( stdObject* resource , stdXmlHandler* handlerToUse )
+xmlNode* stdXmlReader::DoWriteResource( stdObject* resource, const char* nodename , stdXmlHandler* handlerToUse )
 {
 	if( handlerToUse != NULL )
-		return handlerToUse->WriteResource( resource );
+		return handlerToUse->WriteResource( resource, nodename );
 
 	xmlNode* node = NULL;
 
 	for( unsigned int i = 0; i < m_handlers.size() ; ++i )
 		if( m_handlers[i]->CanHandle( resource ) ) {
-			node = m_handlers[i]->WriteResource( resource );
+			node = m_handlers[i]->WriteResource( resource, nodename );
 			break;
 		}
 
@@ -278,11 +278,16 @@ stdObject *stdXmlHandler::CreateResource(xmlNode *node, const std::string& class
     return returned;
 }
 
-xmlNode* stdXmlHandler::WriteResource( stdObject* resource )
+xmlNode* stdXmlHandler::WriteResource( stdObject* resource, const char* nodename )
 {
 	stdObject* myInstance = m_instance;
 
 	m_instance = resource;
+    
+    if( nodename )
+        m_nodename = nodename;
+    else
+        m_nodename = "";
 
 	xmlNode* node = DoWriteResource( );
 

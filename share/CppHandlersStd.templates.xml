@@ -156,8 +156,9 @@ $(objects_property_readers)
 xmlNode* $(object)XmlHandler::DoWriteResource()
 {
 	$(object)* $(object)Instance = dynamic_cast&lt;$(object)*&gt;(m_instance);
+    const xmlChar* nodeName = m_nodename.empty() ? ((const xmlChar*) "$(object_node_name)") : ((const xmlChar*) m_nodename.c_str());
+	xmlNode* node = xmlNewNode( NULL , (const xmlChar*) nodeName );
 
-	xmlNode* node = xmlNewNode( NULL , (const xmlChar*) "$(object_node_name)" );
 	xmlNode* childnode;
 	
 $(objects_attribute_writers)
@@ -778,7 +779,7 @@ bool $(object)XmlHandler::CanHandle(stdObject *resource)
 	<template name="property_writer_object">
 		<objectpart file="src">
 	if( $(object)Instance->Has$(name_extension)() ) {
-		childnode = stdXmlReader::Get()->WriteResource( &amp;($(object)Instance->Get$(name_extension)()) );
+		childnode = stdXmlReader::Get()->WriteResource( &amp;($(object)Instance->Get$(name_extension)()), "$(name)");
 		if( childnode != NULL )
 			xmlAddChild( node , childnode );
 	}
@@ -789,7 +790,7 @@ bool $(object)XmlHandler::CanHandle(stdObject *resource)
 	if( $(object)Instance->Has$(name_extension)() ) {
 		for( unsigned int i = 0; i &lt; $(object)Instance-&gt;Get$(name_extension)().size() ; ++i )
 		{
-			childnode = stdXmlReader::Get()->WriteResource( &amp;( $(object)Instance-&gt;Get$(name_extension)()[i] ) );
+			childnode = stdXmlReader::Get()->WriteResource( &amp;( $(object)Instance-&gt;Get$(name_extension)()[i]),"$(name)");
 			if( childnode != NULL )
 				xmlAddChild( node , childnode );
 		}

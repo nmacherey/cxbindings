@@ -1,0 +1,10 @@
+prefix=@CMAKE_INSTALL_PREFIX@
+exec_prefix=${prefix}
+includedir=${prefix}/@INCLUDE_INSTALL_DIR@/cxbindings/stdxmlbindings
+libdir=${exec_prefix}/@LIB_INSTALL_DIR@
+
+Name: stdxmlbindings
+Description: STD XML BINDINGS is part of CXBINDINGS, its the library you have to include for compiling std generated code
+Version: @CXBINDINGS_VERSION@
+Libs: -L${libdir} -lstdxmlbindings
+Cflags: -I${includedir}

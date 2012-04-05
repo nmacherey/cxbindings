@@ -14,7 +14,7 @@ if(NOT WIN32)
 endif()
 
 find_path(CXBINDINGS_INCLUDE_DIR
-  NAMES cxbindings/CXBindings.h
+  NAMES cxbindings/cxbindings/CXBindings.h
   PATHS ${CXBINDINGS_INSTALL_DIR}/include
   ${CXBINDINGS_INCLUDE_DIR}
 )

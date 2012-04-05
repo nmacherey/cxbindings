@@ -827,8 +827,9 @@ void CXBindingsCppObjectsGenerator::DoGetIncludesListFor( CXBindingsArrayString&
 		std::string inc = "#include \"" + pName + ".h\"\n" ;
 		it = std::find( local_includes.begin(), local_includes.end(), inc );
 		if( it == local_includes.end() ) {
-			pName = GetRealType(pName,options);
 			local_includes.push_back("#include \"" + pName + ".h\"\n") ;
+			pName = GetRealType(pName,options);
+			object_imports.push_back("class " + pName + ";\n") ;
 		}
 	}
 	
@@ -849,6 +850,8 @@ void CXBindingsCppObjectsGenerator::DoGetIncludesListFor( CXBindingsArrayString&
 				}
 				
 				local_includes.push_back( "#include \"" + file.dependencies[i].second + ".h\"\n"  ) ;
+                std::string dependency = GetRealType( file.dependencies[i].second, options );
+                object_imports.push_back( "class " + dependency + ";\n");
 			}
 		}
 	}

@@ -183,9 +183,9 @@ public :
 	bool HasHandlerFor( xmlNode* node );
 
 	/** This method is used to write resource to into a node */
-	xmlNode* WriteResource( stdObject* resource , stdXmlHandler* handlerToUse = NULL )
+	xmlNode* WriteResource( stdObject* resource, const char* nodename = NULL , stdXmlHandler* handlerToUse = NULL )
 	{
-		return resource ? DoWriteResource(resource, handlerToUse)
+		return resource ? DoWriteResource(resource, nodename, handlerToUse)
 			: NULL;
 	}
 
@@ -215,7 +215,7 @@ private :
                                   stdXmlHandler *handlerToUse = NULL);
 
 	/** This method is used to write resource to into a node */
-	xmlNode* DoWriteResource( stdObject* resource , stdXmlHandler* handlerToUse = NULL );
+	xmlNode* DoWriteResource( stdObject* resource, const char* nodename = NULL , stdXmlHandler* handlerToUse = NULL );
 
 	/** container of all registered handlers */
 	stdXmlHandlerRegistrationMap m_registeredHandlers;
@@ -272,7 +272,7 @@ public :
 	  * each handler which is handling child nodes will have to add the
 	  * returned node if not NULL to its xml tree.
 	  */
-	xmlNode* WriteResource( stdObject* resource );
+	xmlNode* WriteResource( stdObject* resource, const char* nodename = NULL );
 
     	/** This one is called from CreateResource after variables
     	  * were filled.
@@ -305,6 +305,7 @@ protected:
     	// Variables (filled by CreateResource)
     	xmlNode *m_node;
     	std::string m_class;
+        std::string m_nodename;
     	stdObject *m_instance;
 
 protected:
