@@ -17,9 +17,9 @@
  */
 class CXBindingsAny
 {
-    boost::any m_var;
 
 public:
+    boost::any m_var;
 	/* Constructors */
 	/** Default constructor */
 	CXBindingsAny();

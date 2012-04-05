@@ -20,8 +20,8 @@
   </set>
   
   <set var="ENUMRULE">
-    <if cond="hasChild('enumeration') == 1">child_enumerator</if>
-    <if cond="hasChild('enumeration') == 0">typedef</if>
+    <if cond="hasChild('enumeration') == '1'">child_enumerator</if>
+    <if cond="hasChild('enumeration') == '0'">typedef</if>
   </set>
   
   <set var="VARIANTRULE">

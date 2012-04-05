@@ -227,26 +227,27 @@ int CXBindingsGenerator::DoReplaceMacros( std::string& str )
 	boost::regex re( "\\$\\(([a-z_A-Z0-9]*)\\)" );
 	
 	std::string text=str;
-	int pos,start,end;
-	size_t beg,len;
-	start = 0;
-	end = text.size();
-
 	int notfound = 0;
 	boost::cmatch what;
 	str = text;
+    
+    boost::sregex_token_iterator iter(text.begin(), text.end(), re, 0);
+    boost::sregex_token_iterator end;
+    for( ; iter != end; ++iter ) {        
+		std::string macroName = *iter;
+        if( macroName[0] == '$' ){
+            std::string temp;
+            for( unsigned int i = 2; i < macroName.size()-1 ; ++i )
+                temp += macroName[i];
 
-	if (boost::regex_match(text.c_str(), what, re)) {
-		for( unsigned int i = 0; i < what.size() ; ++i ) {
-			std::string macroName;
-			macroName.assign( what[i].first, what[i].second );
-
-			std::string macroValue = GetMacro( macroName );
-			if( !MacroExists(macroName) )
-				CXB_THROW( "Error missing macro (preventing infinity loops): "+ macroName );
-			else
-				boost::replace_all(str,  "$(" + macroName + ")" , "")  ;
-		}
+            macroName = temp;
+        }
+		std::string macroValue = GetMacro( macroName );
+		if( !MacroExists(macroName) )
+			CXB_THROW( "Error missing macro (preventing infinity loops): "+ macroName );
+		else {
+			boost::replace_all(str,  "$(" + macroName + ")" , macroValue )  ;
+        }
 	}
 	
 	return notfound;

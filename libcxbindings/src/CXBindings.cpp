@@ -150,8 +150,7 @@ CXBindingsAny CXBindingsCondition::EvaluateVar( CXBindingsTreeNode& item , xmlNo
 				CXB_THROW("hasParent expect only 1 child !") ;
 				
 			CXBindingsAny var =  EvaluateVar( childs[0] , node , grammar );
-			
-			if( var.GetType() !="string") {
+			if( var.m_var.type() != typeid(std::string)) {
 					CXB_THROW("hasParent expected string argument in function") ;
             }
 					
@@ -172,7 +171,7 @@ CXBindingsAny CXBindingsCondition::EvaluateVar( CXBindingsTreeNode& item , xmlNo
 				
 			CXBindingsAny var =  EvaluateVar( childs[0] , node , grammar );
 			
-			if( var.GetType() !="string")  
+			if( var.m_var.type() != typeid(std::string))
 					CXB_THROW("hasChild expected string argument in function") ;
 					
 			std::string pname = var.GetString();
@@ -202,7 +201,7 @@ CXBindingsAny CXBindingsCondition::EvaluateVar( CXBindingsTreeNode& item , xmlNo
 				
 			CXBindingsAny var = EvaluateVar( childs[0] , node , grammar );
 			
-			if( var.GetType() !="string")  
+			if( var.m_var.type() != typeid(std::string))
 					CXB_THROW("$ expected string argument in function") ;
 					
 			std::string pname = var.GetString();
@@ -262,13 +261,12 @@ CXBindingsAny CXBindingsCondition::EvaluateVar( CXBindingsTreeNode& item , xmlNo
 			
 			////wxLogMessage( " Var 1 type : " ) + var1.GetType() + "-") + var1.GetString(   ;
 			////wxLogMessage( " Var 2 type : " ) + var2.GetType() + "-") + var2.GetString(   ;
-			
-				
-			if( var1.GetType() =="bool")  
+		    
+			if( var1.m_var.type() == typeid(bool))  
 				returned = (var1.GetBool() == var2.GetBool());
-			else if( var1.GetType() =="double")  
+			else if( var1.m_var.type() == typeid(double))  
 				returned = (var1.GetDouble() == var2.GetDouble());
-			else if( var1.GetType() =="long")  
+			else if( var1.m_var.type() == typeid(long))  
 				returned = (var1.GetLong() == var2.GetLong());
 			else
 				CXB_THROW("Operator Greather Than unsuported variable type !") ;
@@ -285,11 +283,11 @@ CXBindingsAny CXBindingsCondition::EvaluateVar( CXBindingsTreeNode& item , xmlNo
 			CXBindingsAny var2 =  EvaluateVar( childs[1] , node , grammar );
 			
 				
-			if( var1.GetType() =="bool")  
+			if( var1.m_var.type() == typeid(bool))  
 				returned = (var1.GetBool() != var2.GetBool());
-			else if( var1.GetType() =="double")  
+			else if( var1.m_var.type() == typeid(double))  
 				returned = (var1.GetDouble() != var2.GetDouble());
-			else if( var1.GetType() =="long")  
+			else if( var1.m_var.type() == typeid(long))  
 				returned = (var1.GetLong() != var2.GetLong());
 			else
 				CXB_THROW("Operator Greather Than unsuported variable type !") ;
@@ -305,11 +303,11 @@ CXBindingsAny CXBindingsCondition::EvaluateVar( CXBindingsTreeNode& item , xmlNo
 			CXBindingsAny var2 =  EvaluateVar( childs[0] , node , grammar );
 			
 				
-			if( var1.GetType() =="bool")  
+			if( var1.m_var.type() == typeid(bool))  
 				returned = (var1.GetBool() > var2.GetBool());
-			else if( var1.GetType() =="double")  
+			else if( var1.m_var.type() == typeid(double))  
 				returned = (var1.GetDouble() > var2.GetDouble());
-			else if( var1.GetType() =="long")  
+			else if( var1.m_var.type() == typeid(long))  
 				returned = (var1.GetLong() > var2.GetLong());
 			else
 				CXB_THROW("Operator Greather Than unsuported variable type !") ;
@@ -326,11 +324,11 @@ CXBindingsAny CXBindingsCondition::EvaluateVar( CXBindingsTreeNode& item , xmlNo
 			CXBindingsAny var2 =  EvaluateVar( childs[0] , node , grammar );
 			
 				
-			if( var1.GetType() =="bool")  
+			if( var1.m_var.type() == typeid(bool))  
 				returned = (var1.GetBool() < var2.GetBool());
-			else if( var1.GetType() =="double")  
+			else if( var1.m_var.type() == typeid(double))  
 				returned = (var1.GetDouble() < var2.GetDouble());
-			else if( var1.GetType() =="long")  
+			else if( var1.m_var.type() == typeid(long))  
 				returned = (var1.GetLong() < var2.GetLong());
 			else
 				CXB_THROW("Operator Less Than unsuported variable type !") ;
@@ -347,11 +345,11 @@ CXBindingsAny CXBindingsCondition::EvaluateVar( CXBindingsTreeNode& item , xmlNo
 			CXBindingsAny var2 =  EvaluateVar( childs[0] , node , grammar );
 			
 				
-			if( var1.GetType() =="bool")  
+			if( var1.m_var.type() == typeid(bool))  
 				returned = (var1.GetBool() >= var2.GetBool());
-			else if( var1.GetType() =="double")  
+			else if( var1.m_var.type() == typeid(double))  
 				returned = (var1.GetDouble() >= var2.GetDouble());
-			else if( var1.GetType() =="long")  
+			else if( var1.m_var.type() == typeid(long))  
 				returned = (var1.GetLong() >= var2.GetLong());
 			else
 				CXB_THROW("Operator Greather Than or Equal unsuported variable type !") ;
@@ -371,11 +369,11 @@ CXBindingsAny CXBindingsCondition::EvaluateVar( CXBindingsTreeNode& item , xmlNo
 			////wxLogMessage( " Var 2 type : " ) + var2.GetType() + "-") + var2.GetString(   ;
 			
 				
-			if( var1.GetType() =="bool")  
+			if( var1.m_var.type() == typeid(bool))  
 				returned = (var1.GetBool() <= var2.GetBool());
-			else if( var1.GetType() =="double")  
+			else if( var1.m_var.type() == typeid(double))  
 				returned = (var1.GetDouble() <= var2.GetDouble());
-			else if( var1.GetType() =="long")  
+			else if( var1.m_var.type() == typeid(long))  
 				returned = (var1.GetLong() <= var2.GetLong());
 			else
 				CXB_THROW("Operator Less Than or Equal unsuported variable type !") ;
@@ -416,7 +414,6 @@ CXBindingsAny CXBindingsCondition::EvaluateVar( CXBindingsTreeNode& item , xmlNo
 			    {
 				// if it throws, it's not a number.
 			    }
-			
 			if( !number && !isInt )
 			{
 				// if the value is a string, we have to check if it is not a reference to an object property
@@ -476,7 +473,7 @@ CXBindingsAny CXBindingsCondition::EvaluateVar( CXBindingsTreeNode& item , xmlNo
 				{
 					try
 					    {
-						long val = boost::lexical_cast<long>(value);
+						long val = boost::lexical_cast<long>(result);
 						returned = val;
 					    }
 					    catch(boost::bad_lexical_cast &)
@@ -515,7 +512,7 @@ bool CXBindingsCondition::Matches( xmlNode* node  , CXBindings& grammar )
 	// once the expressions have been compiled, we can try
 	// to evaluate them.
 	CXBindingsAny res = EvaluateVar( m_conditionTree.GetChild() , node , grammar );
-	if( res.GetType() !="bool")  
+	if( res.m_var.type() != typeid(bool))  
 		CXB_THROW( "Error conditions are expected to be boolean !")  ;
 	
 	/*if( res.GetBool() )
