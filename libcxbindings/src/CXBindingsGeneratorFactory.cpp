@@ -224,26 +224,28 @@ void CXBindingsGenerator::SetDefaultMacros(CXBindingsGeneratorOptions& options)
 // FIXME: I need to unit test this class in order to validate the new regex system
 int CXBindingsGenerator::DoReplaceMacros( std::string& str )
 {
-	boost::regex re( "\\$\\((.[^\\)]*)\\)" );
+	boost::regex re( "\\$([a-z_A-Z0-9]*)" , boost::regex::basic|boost::regex::icase);
 	
 	std::string text=str;
 	int notfound = 0;
 	boost::cmatch what;
 	str = text;
     
-    boost::sregex_token_iterator iter(text.begin(), text.end(), re, 0);
+    boost::sregex_token_iterator iter(text.begin(), text.end(), re, boost::match_default);
     boost::sregex_token_iterator end;
     for( ; iter != end; ++iter ) {        
 		std::string macroName = *iter;
         if( macroName[0] == '$' ){
             std::string temp;
-            for( unsigned int i = 2; i < macroName.size()-1 ; ++i )
-                temp += macroName[i];
+            for( unsigned int i = 0; i < macroName.size(); ++i )
+                if( macroName[i] != '$' && macroName[i] != '(' && macroName[i] != ')' )
+                    temp += macroName[i];
 
             macroName = temp;
         }
 		std::string macroValue = GetMacro( macroName );
-		if( !MacroExists(macroName) )
+		DoReplaceMacros(macroValue);
+        if( !MacroExists(macroName) )
 			CXB_THROW( "Error missing macro (preventing infinity loops): "+ macroName );
 		else {
 			boost::replace_all(str,  "$(" + macroName + ")" , macroValue )  ;
