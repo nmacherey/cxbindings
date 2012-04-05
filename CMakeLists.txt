@@ -99,6 +99,7 @@ if(ENABLE_DOC)
 endif()
 
 add_subdirectory(libcxbindings)
+add_subdirectory(libstdxmlbindings)
 add_subdirectory(cxb)
 
 ## tests
