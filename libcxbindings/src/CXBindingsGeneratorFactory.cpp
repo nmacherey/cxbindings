@@ -224,7 +224,7 @@ void CXBindingsGenerator::SetDefaultMacros(CXBindingsGeneratorOptions& options)
 // FIXME: I need to unit test this class in order to validate the new regex system
 int CXBindingsGenerator::DoReplaceMacros( std::string& str )
 {
-	boost::regex re( "\\$\\(([a-z_A-Z0-9]*)\\)" );
+	boost::regex re( "\\$\\((.[^\\)]*)\\)" );
 	
 	std::string text=str;
 	int notfound = 0;
