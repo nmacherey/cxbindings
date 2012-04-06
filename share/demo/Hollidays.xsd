@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.example.org/Hollidays" xmlns:wxg="http://www.example.org/Hollidays" elementFormDefault="qualified">
+<schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.example.org/Hollidays" xmlns:cxbDemo="http://www.example.org/Hollidays" elementFormDefault="qualified">
 
     <complexType name="personType">
     	<sequence>
@@ -34,18 +34,18 @@
 
     <complexType name="holidaysType">
     	<sequence>
-    		<element name="personHolidays" type="wxg:personHolidaysType" minOccurs="0" maxOccurs="unbounded"></element>
+    		<element name="personHolidays" type="cxbDemo:personHolidaysType" minOccurs="0" maxOccurs="unbounded"></element>
     	</sequence>
     </complexType>
 
-    <element name="holidays" type="wxg:holidaysType"></element>
+    <element name="holidays" type="cxbDemo:holidaysType"></element>
 
     <complexType name="personHolidaysType">
     	<sequence>
-    		<element name="person" type="wxg:personType" minOccurs="1"
+    		<element name="person" type="cxbDemo:personType" minOccurs="1"
     			maxOccurs="1">
     		</element>
-    		<element name="holiday" type="wxg:holidayType" minOccurs="0" maxOccurs="unbounded"></element>
+    		<element name="holiday" type="cxbDemo:holidayType" minOccurs="0" maxOccurs="unbounded"></element>
     	</sequence>
     </complexType>
 </schema>

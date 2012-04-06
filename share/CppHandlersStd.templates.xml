@@ -2,14 +2,14 @@
 <wxgrammar_generator_file lang="cpp">
 	<var name="header_doc">
 /** @file $(filename).h
- * @author Nicolas Macherey (nm@graymat.fr) http://www.rheia-framework.com
+ * @author Nicolas Macherey (nicolas.macherey@gmail.com)
  * This file is the handler for reading and writing $(object)'s into xml files.
  * @date $(date)
  */
 	</var>
 	<var name="src_doc">
 /** @file $(filename).cpp
-  * @author Nicolas Macherey (nm@graymat.fr) http://www.rheia-framework.com
+  * @author Nicolas Macherey (nicolas.macherey@gmail.com)
   * This file is the handler for reading and writing $(object)'s into xml files.
   * @date $(date)
   */
@@ -35,7 +35,7 @@ $(object_defines)
 
 /** @class $(object)XmlHandler
   * @brief Main class for reading and writing $(object) nodes information in xml files
-  * @author Nicolas Macherey (nm@graymat.fr) http://www.rheia-framework.com
+  * @author Nicolas Macherey (nicolas.macherey@gmail.com)
   * @date $(date)
   */
 class $(exportmacro) $(object)XmlHandler : public stdXmlHandler

@@ -72,6 +72,34 @@ stdObject* stdXmlReader::LoadFile( const std::string& file )
 	return resource;
 }
 
+stdObject* stdXmlReader::Load( const std::string& data ) {
+
+	m_doc = xmlParseMemory( data.c_str(), data.size() );
+	
+	if( m_doc == NULL )
+		STD_THROW("Error cannot open document!");
+	
+	m_root = xmlDocGetRootElement( m_doc );
+	
+	if( m_root == NULL )
+		STD_THROW("Error cannot get your document root !");
+		
+	std::string n_root = (char*) m_root->name;
+
+	if( n_root.empty() )
+		STD_THROW( "Error document root is empty" );
+
+	/* Once we have extracted the root from the document, we have to 
+   	 * find a handler which is able to return an object associated to
+	 * this root.
+	 */
+	stdObject* resource = CreateResFromNode( m_root , stdEmptyString , NULL , NULL );
+	
+	xmlFreeDoc(m_doc);
+
+	return resource;
+}
+
 void stdXmlReader::SaveFile( const std::string& file , stdObject* resource )
 {
 	m_doc = xmlNewDoc((const xmlChar*) "1.0");
@@ -88,6 +116,29 @@ void stdXmlReader::SaveFile( const std::string& file , stdObject* resource )
 	xmlSaveFormatFileEnc( file.c_str() , m_doc , "UTF-8" , 1 );
 	
 	xmlFreeDoc(m_doc);
+}
+
+std::string stdXmlReader::StringSerialize( stdObject* resource ) {
+	
+    m_doc = xmlNewDoc((const xmlChar*) "1.0");
+	
+	if( m_doc == NULL )
+		STD_THROW("Error cannot open document!");
+	
+	m_root = WriteResource( resource );
+	
+	if( m_root == NULL )
+		STD_THROW("Error cannot get your document root !");
+		
+	xmlDocSetRootElement(m_doc,m_root);
+    xmlChar* data;
+    int size;
+    xmlDocDumpMemory(m_doc,&data,&size);
+    std::string ret = (char*) data;
+	xmlFreeDoc(m_doc);
+    xmlFree(data);
+
+    return ret;
 }
 
 bool stdXmlReader::HasHandlerFor( xmlNode* node )

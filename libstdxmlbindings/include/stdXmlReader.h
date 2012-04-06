@@ -162,12 +162,22 @@ public :
 	  * The stdObject shall corresponds to your root node of your xml file.
 	  */
 	stdObject* LoadFile( const std::string& file );
+
+    /**
+     * This is the main stuff if you want to load xml from a string
+     */
+    stdObject* Load( const std::string& data );
 	
 	/** Save the resource in the given file 
 	 * @param file file in which the resource shall be saved 
 	 * @param resource resrouce to save in the file 
 	 */
 	void SaveFile( const std::string& file , stdObject* resource );
+
+    /**
+     * Get the xml string from your resource
+     */
+    std::string StringSerialize( stdObject* resource );
 
 	/** This is a convenience function made for helping stdXmlHandler's to
 	  * load resource from children of theirs but which they cannot handle.

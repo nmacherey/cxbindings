@@ -2,20 +2,20 @@
 <wxgrammar_generator_file lang="cpp">
 	<var name="header_doc">
 /** @file $(filename).h
- * @author Nicolas Macherey (nm@graymat.fr) http://www.rheia-framework.com
+ * @author Nicolas Macherey (nicolas.macherey@gmail.com)
  * @date $(date)
  */
 	</var>
 	<var name="src_doc">
 /** @file $(filename).cpp
-  * @author Nicolas Macherey (nm@graymat.fr) http://www.rheia-framework.com
+  * @author Nicolas Macherey (nicolas.macherey@gmail.com)
   * @date $(date)
   */
 	</var>
 	<var name="extended_enumeration_hdr">
 /** @class stdEnumeration
   * @brief Main class from which any enumeration class shall derive from
-  * @author Nicolas Macherey (nm@graymat.fr) http://www.rheia-framework.com
+  * @author Nicolas Macherey (nicolas.macherey@gmail.com)
   * @date $(date)
   */
 class stdEnumeration : public stdObject
@@ -129,7 +129,7 @@ $(header_doc)
 	<var name="global_file_src">
 /** @file $(ns)_globals.cpp
   * @breif Main file for implementing globals informations
-  * @author Nicolas Macherey (nm@graymat.fr) http://www.rheia-framework.com
+  * @author Nicolas Macherey (nicolas.macherey@gmail.com)
   * @date $(date)
   */
 #include "$(ns)_globals.h"
