@@ -195,7 +195,7 @@ $(object_imports)
 
 /** @class $(object)
   * @brief Main class for handling $(object) nodes information in xml files
-  * @author Nicolas Macherey (nm@graymat.fr) http://www.rheia-framework.com
+  * @author Nicolas Macherey (nicolas.macherey@gmail.com)
   * @date $(date)
   */
 class $(exportmacro) $(object) : $(object_bases)

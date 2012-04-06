@@ -258,16 +258,16 @@ void CXBindingsCppObjectsGenerator::DoGenerateCodeFor(
 		if( i != 0 ) {
 			object_bases += " , public "  + pName;
 			object_bases_list += " , "  + pName;
-			object_bases_default_ctor += ",\n\t\t" + pName + "( " ;
-			object_bases_copy_list += ",\n\t\t" + pName + "(rhs " ;
-			object_bases_init_list += ",\n\t\t" + pName + "(" + localp.parameters_ctor_list2 + " " ;
+			object_bases_default_ctor += ",\n\t\t" + pName + "()" ;
+			object_bases_copy_list += ",\n\t\t" + pName + "(rhs)" ;
+			object_bases_init_list += ",\n\t\t" + pName + "(" + localp.parameters_ctor_list2 + ")" ;
 		}
 		else {
 			object_bases += " public "  + pName;
 			object_bases_list += pName;
-			object_bases_default_ctor += "\t\t" + pName + "( " ;
-			object_bases_copy_list += "\t\t" + pName + "(rhs " ;
-			object_bases_init_list += " \t\t" + pName + "(" + localp.parameters_ctor_list2 + " " ;
+			object_bases_default_ctor += "\t\t" + pName + "()" ;
+			object_bases_copy_list += "\t\t" + pName + "(rhs)" ;
+			object_bases_init_list += " \t\t" + pName + "(" + localp.parameters_ctor_list2 + ")" ;
 		}
 	}
 
@@ -279,16 +279,13 @@ void CXBindingsCppObjectsGenerator::DoGenerateCodeFor(
 		object_bases_init_list = "\t\t$(base_object)()" ;
 	}
 	
-	if( !params.parameters_ctor_list.empty() )
-		params.parameters_ctor_list += " ," ;
-	
 	SetMacro( "object_bases" , object_bases ) ;
 	SetMacro( "object_bases_list" , object_bases_list) ;
 	SetMacro( "object_bases_default_ctor" , object_bases_default_ctor) ;
 	SetMacro( "object_bases_init_list" , object_bases_init_list) ;
 	SetMacro( "object_bases_copy_list" , object_bases_copy_list) ;
 	
-	DoCreateParametersMacrosFor( objectFileInfo , params , options );
+    DoCreateParametersMacrosFor( objectFileInfo , params , options );
 
 	SetMacro( "parameters_doc_list" , params.parameters_doc_list ) ;
 	SetMacro( "parameters_ctor_list" , params.parameters_ctor_list ) ;
@@ -389,11 +386,11 @@ void CXBindingsCppObjectsGenerator::DoCreateParametersMacrosFor( CXBindingsFileI
 		DoReplaceMacros(str);
 		DoReplaceMacros(str2);
 		
-		if( i == 0 ) {
+		if( parameters.parameters_copy_list.empty() && !str.empty() ) {
 			parameters.parameters_ctor_list += str;
 			parameters.parameters_ctor_list2 += str2;
 		}
-		else {
+		else if( !str.empty() ) {
 			parameters.parameters_ctor_list += " ,"  + str;
 			parameters.parameters_ctor_list2 += " ,"  + str2;
 		}
