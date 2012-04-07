@@ -20,8 +20,8 @@
   </set>
   
   <set var="ENUMRULE">
-    <if cond="hasChild('enumeration') == '1'">child_enumerator</if>
-    <if cond="hasChild('enumeration') == '0'">typedef</if>
+    <if cond="hasChild('enumeration') == 'true'">child_enumerator</if>
+    <if cond="hasChild('enumeration') == 'false'">typedef</if>
   </set>
   
   <set var="VARIANTRULE">
@@ -33,7 +33,7 @@
   <model type="typeBase">
   
     <property name="name" required="true">
-        <if cond="hasParent('element')">{parent}{name}[Type]</if>
+        <if cond="hasParent('element')">{parent}{name}</if>
     </property>
 	
     <rule make="object">
@@ -48,8 +48,8 @@
         <property name="name" required="true"/>
 		
         <property name="type" required="true">
-          <if cond="hasChild('complexType')">{name}[Type]</if>
-          <if cond="hasChild('simpleType')">{name}[Type]</if>
+          <if cond="hasChild('complexType')">{name}</if>
+          <if cond="hasChild('simpleType')">{name}</if>
         </property>
 		
         <property name="minOccurs" default="0"/>
@@ -125,8 +125,8 @@
         <property name="name" required="true"/>
 		
         <property name="type" required="true">
-          <if cond="hasChild('complexType')">{name}[Type]</if>
-          <if cond="hasChild('simpleType')">{name}[Type]</if>
+          <if cond="hasChild('complexType')">{name}</if>
+          <if cond="hasChild('simpleType')">{name}</if>
         </property>
 		
         <property name="minOccurs" default="0"/>
@@ -181,8 +181,8 @@
 				<property name="name" required="true"/>
 				
 				<property name="type" required="true">
-				  <if cond="hasChild('complexType')">{name}[Type]</if>
-				  <if cond="hasChild('simpleType')">{name}[Type]</if>
+				  <if cond="hasChild('complexType')">{name}</if>
+				  <if cond="hasChild('simpleType')">{name}</if>
 				</property>
 				
 				<property name="minOccurs" default="0"/>
@@ -253,7 +253,7 @@
   <object type="simpleType">
   
 	<property name="name" required="true">
-        <if cond="hasParent('element')">{parent}{name}[Type]</if>
+        <if cond="hasParent('element')">{parent}{name}</if>
 		<if cond="hasParent('attribute')">{parent}{name}[Enum]</if>
     </property>
     

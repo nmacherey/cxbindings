@@ -160,7 +160,7 @@ CXBindingsAny CXBindingsCondition::EvaluateVar( CXBindingsTreeNode& item , xmlNo
 			
 			std::string parentName = cxC2U( (char*) node->parent->name );
 			
-			returned = pname ==parentName;
+			returned = pname==parentName;
 			return returned;
 			break;
 		}
@@ -255,10 +255,10 @@ CXBindingsAny CXBindingsCondition::EvaluateVar( CXBindingsTreeNode& item , xmlNo
 		{
 			if( childs.size() != 2 )
 				CXB_THROW("Operator == expected two arguments please fix !") ;
-				
+			
 			CXBindingsAny var1 =  EvaluateVar( childs[0] , node , grammar );
 			CXBindingsAny var2 =  EvaluateVar( childs[1] , node , grammar );
-			
+
 			////wxLogMessage( " Var 1 type : " ) + var1.GetType() + "-") + var1.GetString(   ;
 			////wxLogMessage( " Var 2 type : " ) + var2.GetType() + "-") + var2.GetString(   ;
 		    
@@ -387,7 +387,6 @@ CXBindingsAny CXBindingsCondition::EvaluateVar( CXBindingsTreeNode& item , xmlNo
 		case opVALUE :
 		{
 			std::string value = item.GetContent();
-			
 			boost::replace_all ( value, "'", "" );
 			//value.replace("'","" );
 			
@@ -469,6 +468,12 @@ CXBindingsAny CXBindingsCondition::EvaluateVar( CXBindingsTreeNode& item , xmlNo
 				////wxLogMessage( "Result : ") + result  ;
 				if( result =="unbounded")  
 					returned = (long) 100000;
+                else if( result == "true" ) {
+                    returned = true;
+                }
+                else if( result == "false" ) {
+                    returned = false;
+                }
 				else
 				{
 					try

@@ -61,7 +61,7 @@ bool CXBindingsCppObjectsGenerator::DoGenerateCode( CXBindingsGeneratorOptions& 
 	
 	//wxLogMessage( "Generation List is : ")  ;
 
-	for( unsigned int i = 0 ; i < dependencies.size() ; ++i )
+	//for( unsigned int i = 0 ; i < dependencies.size() ; ++i )
 		//wxLogMessage( std::string::Format( "object to begenrated in %d position is :") , i ) + dependencies[i]  ;
 
 	/** @todo here generate object in their dependencies order is this really usefull .??? */
@@ -360,6 +360,7 @@ void CXBindingsCppObjectsGenerator::DoGenerateCodeFor(
 	objectFileInfo.srcInfo = stdEmptyString;
 		
 	FinalInfo += objectFileInfo;
+    //std::cout << objectName << std::endl;
 	m_objectInfos[objectName] = FinalInfo;
 
 	//wxLogMessage( "\t END STEP 4...")  ;
@@ -841,9 +842,14 @@ void CXBindingsCppObjectsGenerator::DoGetIncludesListFor( CXBindingsArrayString&
 				it = std::find( local_includes.begin(), local_includes.end(), file.dependencies[i].first );
 				if( it == local_includes.end() ) {
 					currentObjects.push_back(file.dependencies[i].first);
-					DoGetIncludesListFor( local_includes, object_imports , currentObjects , m_objectInfos[file.dependencies[i].second] , options );
-					it = std::find( currentObjects.begin(), currentObjects.end(), file.dependencies[i].first );
-					currentObjects.erase(it);
+					
+                    CXBindingsFileInfoMap::iterator oi = m_objectInfos.find(file.dependencies[i].second);
+                    if( oi != m_objectInfos.end() ) 
+                        DoGetIncludesListFor( local_includes, object_imports , currentObjects , oi->second , options );
+					
+                    it = std::find( currentObjects.begin(), currentObjects.end(), file.dependencies[i].first );
+                    if( it != currentObjects.end() )
+    					currentObjects.erase(it);
 				}
 				
 				local_includes.push_back( "#include \"" + file.dependencies[i].second + ".h\"\n"  ) ;

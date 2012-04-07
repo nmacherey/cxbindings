@@ -534,11 +534,11 @@ std::string CXBindingsGenerator::GetRealType( const std::string& type , CXBindin
 		realType = after_first( realType, ':' );
 	}
 	
-	if( ns.empty() )
-		ns = options.ns;
+	//if( ns.empty() )
+	//ns = options.ns;
 
 	realType = GetObjectName( realType , options );
-	realType = ns + realType;
+	//realType = ns + realType;
 
 	CXBindingsStringStringMap& types = m_genfile->GetTypeInfo().GetTypes();
 	types[type] = realType;

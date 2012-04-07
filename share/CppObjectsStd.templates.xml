@@ -755,6 +755,7 @@ std::vector&lt; $(property_type) &gt; $(object)::Get$(name_extension)$(property_
 		<typeinfo source="positiveInteger" destination="unsigned int"/>
 		<typeinfo source="variant" destination="stdObject"/>
 		<typeinfo source="string" destination="std::string"/>
+		<typeinfo source="xs:string" destination="std::string"/>
 		<typeinfo source="boolean" destination="bool"/>
 		<typeinfo source="float" destination="double"/>
 		<typeinfo source="integer" destination="int"/>
@@ -768,5 +769,6 @@ std::vector&lt; $(property_type) &gt; $(object)::Get$(name_extension)$(property_
 		<typeinfo source="gMonth" destination="std::string"/>
 		<typeinfo source="gMonthDay" destination="std::string"/>
 		<typeinfo source="ID" destination="std::string"/>
+		<typeinfo source="xs:ID" destination="std::string"/>
 	</types_info>
 </wxgrammar_generator_file>
