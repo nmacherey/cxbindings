@@ -58,11 +58,6 @@ bool CXBindingsCppObjectsGenerator::DoGenerateCode( CXBindingsGeneratorOptions& 
 	 * So that object will be generated in the right order...
 	 */
 	CXBindingsArrayString dependencies = DoCreateDependencyList( options );
-	
-	//wxLogMessage( "Generation List is : ")  ;
-
-	//for( unsigned int i = 0 ; i < dependencies.size() ; ++i )
-		//wxLogMessage( std::string::Format( "object to begenrated in %d position is :") , i ) + dependencies[i]  ;
 
 	/** @todo here generate object in their dependencies order is this really usefull .??? */
 	for( unsigned int k = 0; k < dependencies.size() ; ++k ) {
@@ -73,7 +68,7 @@ bool CXBindingsCppObjectsGenerator::DoGenerateCode( CXBindingsGeneratorOptions& 
 
 			for( unsigned int j = 0; j < objectsInfo.size() ; ++j ) {
 			        
-				std::string realName = objectsInfo[j].properties["name" ];
+				std::string realName = objectsInfo[j].properties["name"];
 				realName = GetRealType( realName , options );
 
 				if( realName == dependencies[k] )  {
@@ -287,6 +282,9 @@ void CXBindingsCppObjectsGenerator::DoGenerateCodeFor(
 	
     DoCreateParametersMacrosFor( objectFileInfo , params , options );
 
+    if( params.parameters_eqeqop_list.empty() )
+        params.parameters_eqeqop_list = "\t\ttrue";
+
 	SetMacro( "parameters_doc_list" , params.parameters_doc_list ) ;
 	SetMacro( "parameters_ctor_list" , params.parameters_ctor_list ) ;
 	SetMacro( "parameters_dtor_list" , params.parameters_dtor_list ) ;
@@ -440,11 +438,6 @@ void CXBindingsCppObjectsGenerator::DoCreateParametersMacrosFor( CXBindingsFileI
 CXBindingsFileInfo CXBindingsCppObjectsGenerator::DoGenerateRuleCodeFor( CXBindingsChildContainerInfo& childContainer , CXBindingsRuleInfo& ruleInfo , CXBindings& grammar , CXBindingsGeneratorOptions& options )
 {
 	CXBindingsFileInfo res;
-
-	//wxLogMessage( "\t\t Rule make is : ") + ruleInfo.make  ;
-	//wxLogMessage( "\t\t Rule name is : ") + ruleInfo.name.content  ;
-	//wxLogMessage( "\t\t Rule type is : ") + ruleInfo.type.content  ;
-
 	CXBindingsStringStringMap& types = m_genfile->GetTypeInfo().GetTypes();
 	std::string realType = ruleInfo.type.content;
 	std::string typeTemplate = ruleInfo.type.stemplate;

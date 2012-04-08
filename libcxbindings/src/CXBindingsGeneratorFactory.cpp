@@ -513,8 +513,14 @@ std::string CXBindingsGenerator::GetBaseType( const std::string& type ) {
 	return stdEmptyString;
 }
 
-std::string CXBindingsGenerator::GetRealType( const std::string& type , CXBindingsGeneratorOptions& options )
+std::string CXBindingsGenerator::GetRealType( const std::string& typeBase , CXBindingsGeneratorOptions& options )
 {
+    std::string type = typeBase;
+    
+	if( boost::algorithm::contains(type,":") )   {
+		type = after_first( type, ':' );
+	}
+
 	std::string realType = type;
 	std::string ns;
 	

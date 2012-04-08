@@ -79,7 +79,7 @@ int main(int argc, char **argv, char **ppenv) {
     }
 
     if( !vm.count("export-macro") ) {
-        std::cout << "Error missing export macro using DLLEXPORT as default..." << std::endl;
+        std::cout << "WARNING: Missing export macro using DLLEXPORT as default..." << std::endl;
         exportMacro = "DLLEXPORT";
     } else {
         exportMacro = vm["export-macro"].as<std::string>();

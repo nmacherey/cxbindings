@@ -759,6 +759,7 @@ std::vector&lt; $(property_type) &gt; $(object)::Get$(name_extension)$(property_
 		<typeinfo source="boolean" destination="bool"/>
 		<typeinfo source="float" destination="double"/>
 		<typeinfo source="integer" destination="int"/>
+		<typeinfo source="long" destination="long"/>
 		<typeinfo source="duration" destination="std::string"/>
 		<typeinfo source="datetime" destination="std::string"/>
 		<typeinfo source="dateTime" destination="std::string"/>
