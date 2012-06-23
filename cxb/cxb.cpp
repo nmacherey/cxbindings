@@ -33,7 +33,7 @@ int main(int argc, char **argv, char **ppenv) {
     /** Read program options from command line */
     po::options_description desc("CXBindigns program options");
     desc.add_options()
-        ("help,h",po::value<std::string>(), "display this message")
+        ("help,h","display this message")
         ("file,f",po::value<std::string>(), "File to generate C++ from")
         ("interpreter,i",po::value<std::string>(), "Interpreter/Grammar XML file to use")
         ("namespace,n",po::value<std::string>(), "Namespace prefix to your objects to use")
