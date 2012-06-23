@@ -59,8 +59,8 @@ IMPLEMENT_ABSTRACT_CLASS_STD( stdEnumeration , stdObject )
 	</var>
 	<var name="base_object">stdObject</var>
 	<var name="string_composer">"$(content)"</var>
-	<var name="ctor_var_composer"> const $(content_type)&amp; $(content)</var>
-	<var name="ctor_var_composer2"> $(content)</var>
+	<var name="ctor_var_composer"> const $(content_type)&amp; _$(content)</var>
+	<var name="ctor_var_composer2"> _$(content)</var>
 	<var name="var_eqop_composer">	m_$(content) = rhs.m_$(content);
 	m_has$(content) = rhs.m_has$(content);
 	</var>
@@ -69,7 +69,7 @@ IMPLEMENT_ABSTRACT_CLASS_STD( stdEnumeration , stdObject )
 	<var name="var_definit_composer">,
 			m_has$(content)(false)</var>
 	<var name="var_init_composer">,
-			m_$(content)($(content)),
+			m_$(content)(_$(content)),
 			m_has$(content)(true)</var>
 	<var name="var_copy_composer">,
 			m_$(content)(rhs.m_$(content)),
@@ -282,7 +282,7 @@ $(childs_src_code)
 	/** Set the $(name) property
   	  * @param $(name) property value to set
   	  */
-	void Set$(name_extension)( const $(type)&amp; $(name) );
+	void Set$(name_extension)( const $(type)&amp; value );
 
 	/** Get the $(name) property
   	  * @return The property value as a $(type) object
@@ -298,9 +298,9 @@ $(childs_src_code)
 	bool Has$(name_extension)() const { return m_has$(name);};
 		</objectpart>
 		<objectpart file="src">
-void $(object)::Set$(name_extension)( const $(type)&amp; $(name) )
+void $(object)::Set$(name_extension)( const $(type)&amp; value )
 {
-	m_$(name) = $(name);
+	m_$(name) = value;
 	m_has$(name) = true;
 }
 
@@ -318,7 +318,7 @@ $(type)&amp; $(object)::Get$(name_extension)( )
 	/** Set the $(name) property
   	  * @param $(name) property value to set
   	  */
-	void Set$(name_extension)( const $(type)&amp; $(name) );
+	void Set$(name_extension)( const $(type)&amp; value );
 
 	/** Get the $(name) property
   	  * @return The property value as a $(type) object
@@ -334,9 +334,9 @@ $(type)&amp; $(object)::Get$(name_extension)( )
 	bool Has$(name_extension)() const {return m_has$(name);};
 		</objectpart>
 		<objectpart file="src">
-void $(object)::Set$(name_extension)( const $(type)&amp; $(name) )
+void $(object)::Set$(name_extension)( const $(type)&amp; value )
 {
-	m_$(name) = $(name);
+	m_$(name) = value;
 	m_has$(name) = true;
 }
 
@@ -354,7 +354,7 @@ $(type)&amp; $(object)::Get$(name_extension)( )
 	/** Set the $(name) property
   	  * @param $(name) property value to set
   	  */
-	void Set$(name_extension)( $(type)* $(name) );
+	void Set$(name_extension)( $(type)* value );
 
 	/** Get the $(name) property
   	  * @return The property value as a $(type) object
@@ -370,9 +370,9 @@ $(type)&amp; $(object)::Get$(name_extension)( )
 	bool Has$(name_extension)() const {return m_has$(name);};
 		</objectpart>
 		<objectpart file="src">
-void $(object)::Set$(name_extension)( $(type)* $(name) )
+void $(object)::Set$(name_extension)( $(type)* value )
 {
-	m_$(name) = $(name);
+	m_$(name) = value;
 	m_has$(name) = true;
 }
 
@@ -391,7 +391,7 @@ $(type)* $(object)::Get$(name_extension)( )
 	/** Set the $(name) property
   	 * @param $(name) property value to set
   	 */
-	void Set$(name_extension)( const std::vector&lt;$(type)*&gt;&amp; $(name) );
+	void Set$(name_extension)( const std::vector&lt;$(type)*&gt;&amp; value );
 
 	/** Get the $(name) property
   	 * @return The property value as a $(type) object
@@ -402,12 +402,12 @@ $(type)* $(object)::Get$(name_extension)( )
   	 * @param $(name) property value to set
 	 * @param index index of the element to set in the array
   	 */
-	void Set$(name_extension)( $(type)* $(name) , unsigned int index );
+	void Set$(name_extension)( $(type)* $value , unsigned int index );
 	
 	/** Add the $(name) property at the end of the array
   	 * @param $(name) property value to set
   	 */
-	void Add$(name_extension)( $(type)* $(name) );
+	void Add$(name_extension)( $(type)* value );
 
 	/** Get the $(name) property at the given index
 	 * @param index property index to get
@@ -424,9 +424,9 @@ $(type)* $(object)::Get$(name_extension)( )
 	bool Has$(name_extension)() const {return m_has$(name);};
 		</objectpart>
 		<objectpart file="src">
-void $(object)::Set$(name_extension)( const std::vector&lt;$(type)*&gt;&amp; $(name) )
+void $(object)::Set$(name_extension)( const std::vector&lt;$(type)*&gt;&amp; value )
 {
-	m_$(name) = $(name);
+	m_$(name) = value;
 	m_has$(name) = m_$(name).size() &gt; 0;
 }
 
@@ -435,7 +435,7 @@ std::vector&lt;$(type)*&gt;&amp; $(object)::Get$(name_extension)( )
 	return m_$(name);
 }
 
-void $(object)::Set$(name_extension)( $(type)* $(name) , unsigned int index )
+void $(object)::Set$(name_extension)( $(type)* value , unsigned int index )
 {
 	if( index >= m_$(name).size() )
 		throw "error in $(object)::Set$(name) , index out of bounds";
@@ -443,12 +443,12 @@ void $(object)::Set$(name_extension)( $(type)* $(name) , unsigned int index )
 	if( m_$(name)[index] != NULL )
 		delete m_$(name)[index];
 		
-	m_$(name)[index] = $(name);
+	m_$(name)[index] = value;
 }
 
-void $(object)::Add$(name_extension)( $(type)* $(name) )
+void $(object)::Add$(name_extension)( $(type)* value )
 {		
-	m_$(name).push_back($(name));
+	m_$(name).push_back(value);
 }
 
 $(type)* $(object)::Get$(name_extension)( unsigned int index )
@@ -598,7 +598,7 @@ typedef $(type) $(name);
 	/** Add a $(real_type) object in the container
 	 * @param $(name) object to add in the container
 	 */
-	virtual void Add$(name_extension)( const $(real_type)&amp; $(name) );
+	virtual void Add$(name_extension)( const $(real_type)&amp; value );
 	
 	/** Remove a $(real_type) object from the container at the given index
 	 * @param index Index of the object to remove from the container
@@ -609,7 +609,7 @@ typedef $(type) $(name);
   	 * @param $(name) property value to set
 	 * @param index index of the element to set in the array
   	 */
-	virtual void Set$(name_extension)At( const $(real_type)&amp; $(name) , unsigned int index );
+	virtual void Set$(name_extension)At( const $(real_type)&amp; value , unsigned int index );
 
 	/** Get the $(name) property at the given index
 	 * @param index property index to get
@@ -621,13 +621,13 @@ typedef $(type) $(name);
 	 * @param $(name) Object to find the index for
 	 * @return stdNOT_FOUND if the object wasn't found
 	 */
-	virtual int FindIndexBy$(name_extension)( const $(real_type)&amp; $(name) );
+	virtual int FindIndexBy$(name_extension)( const $(real_type)&amp; value );
 	
 	/** Check the existance of the given $(real_type) object
 	 * @param $(name) Object to check the existance for
 	 * @return false if the object does not exists in the m_$(name) container
 	 */
-	virtual bool ExistsBy$(name_extension)( const $(real_type)&amp; $(name) );
+	virtual bool ExistsBy$(name_extension)( const $(real_type)&amp; value );
 	
 	/** Get the number of $(name) elements */
 	virtual unsigned int Get$(name_extension)Count() {return m_$(name).size();}
@@ -636,9 +636,9 @@ typedef $(type) $(name);
 	virtual void Clear$(name_extension)() {m_$(name).clear();}
 		</objectpart>
 		<objectpart file="src">
-void $(object)::Add$(name_extension)( const $(real_type)&amp; $(name) )
+void $(object)::Add$(name_extension)( const $(real_type)&amp; value )
 {
-	m_$(name).push_back($(name));
+	m_$(name).push_back(value);
 	m_has$(name) = true;
 }
 
@@ -651,12 +651,12 @@ void $(object)::Remove$(name_extension)ByIndex( unsigned int index )
 	m_$(name).erase(it);
 }
 
-void $(object)::Set$(name_extension)At( const $(real_type)&amp; $(name) , unsigned int index )
+void $(object)::Set$(name_extension)At( const $(real_type)&amp; value , unsigned int index )
 {
 	if( index >= m_$(name).size() )
 		STD_THROW( "Error in $(object)::Set$(name_extension)At , index out of bounds" );
 	
-	m_$(name)[index] = $(name);
+	m_$(name)[index] = value;
 }
 
 $(real_type)&amp; $(object)::Get$(name_extension)At( unsigned int index )
@@ -667,23 +667,23 @@ $(real_type)&amp; $(object)::Get$(name_extension)At( unsigned int index )
 	return m_$(name)[index];
 }
 
-int $(object)::FindIndexBy$(name_extension)( const $(real_type)&amp; $(name) )
+int $(object)::FindIndexBy$(name_extension)( const $(real_type)&amp; value )
 {
 	std::vector&lt; $(real_type) &gt;::iterator it = m_$(name).begin();
 		
 	for( int i = 0 ; it != m_$(name).end() ; ++it, ++i )
-		if( (*it) == $(name) )
+		if( (*it) == value )
 			return i;
 
 	return stdNOT_FOUND;
 }
 
-bool $(object)::ExistsBy$(name_extension)( const $(real_type)&amp; $(name) )
+bool $(object)::ExistsBy$(name_extension)( const $(real_type)&amp; value )
 {
 	std::vector&lt; $(real_type) &gt;::iterator it = m_$(name).begin();
 		
 	for( int i = 0 ; it != m_$(name).end() ; ++it, ++i )
-		if( (*it) == $(name) )
+		if( (*it) == value )
 			return true;
 
 	return false;

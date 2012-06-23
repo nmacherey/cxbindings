@@ -187,8 +187,8 @@ bool $(object)XmlHandler::CanHandle(stdObject *resource)
 	<!-- ATTRIBUTES READER AND WRITER TEMPLATES -->
 	<template name="attribute_reader_string">
 		<objectpart file="src">
-	std::string $(name) = GetXmlAttr( m_node , "$(name)" );
-	$(object)Instance->Set$(name_extension)($(name));
+	std::string _$(name) = GetXmlAttr( m_node , "$(name)" );
+	$(object)Instance->Set$(name_extension)(_$(name));
 		</objectpart>
 	</template>
 	<template name="attribute_reader_int">
@@ -196,9 +196,9 @@ bool $(object)XmlHandler::CanHandle(stdObject *resource)
 	std::string $(name)str = GetXmlAttr( m_node , "$(name)" );
 	std::stringstream strm$(name_extension);
 	strm$(name_extension) &lt;&lt; $(name)str;
-	int $(name);
-	strm$(name_extension) &gt;&gt; $(name);
-	$(object)Instance->Set$(name_extension)($(name));
+	int _$(name);
+	strm$(name_extension) &gt;&gt; _$(name);
+	$(object)Instance->Set$(name_extension)(_$(name));
 		</objectpart>
 	</template>
 	<template name="attribute_reader_enum">
@@ -216,9 +216,9 @@ bool $(object)XmlHandler::CanHandle(stdObject *resource)
 	std::string $(name)str = GetXmlAttr( m_node , "$(name)" );
 	std::stringstream strm$(name_extension);
 	strm$(name_extension) &lt;&lt; $(name)str;
-	unsigned int $(name);
-	strm$(name_extension) &gt;&gt; $(name);
-	$(object)Instance->Set$(name_extension)($(name));
+	unsigned int _$(name);
+	strm$(name_extension) &gt;&gt; _$(name);
+	$(object)Instance->Set$(name_extension)(_$(name));
 		</objectpart>
 	</template>
 	<template name="attribute_reader_long">
@@ -227,9 +227,9 @@ bool $(object)XmlHandler::CanHandle(stdObject *resource)
 	
 	std::stringstream strm$(name_extension);
 	strm$(name_extension) &lt;&lt; $(name)str;
-	long $(name);
-	strm$(name_extension) &gt;&gt; $(name);
-	$(object)Instance->Set$(name_extension)($(name));
+	long _$(name);
+	strm$(name_extension) &gt;&gt; _$(name);
+	$(object)Instance->Set$(name_extension)(_$(name));
 		</objectpart>
 	</template>
 	<template name="attribute_reader_ulong">
@@ -238,17 +238,17 @@ bool $(object)XmlHandler::CanHandle(stdObject *resource)
 	
 	std::stringstream strm$(name_extension);
 	strm$(name_extension) &lt;&lt; $(name)str;
-	long $(name);
-	strm$(name_extension) &gt;&gt; $(name);
-	$(object)Instance->Set$(name_extension)((unsigned long)$(name));
+	long _$(name);
+	strm$(name_extension) &gt;&gt; _$(name);
+	$(object)Instance->Set$(name_extension)((unsigned long)_$(name));
 		</objectpart>
 	</template>
 	<template name="attribute_reader_bool">
 		<objectpart file="src">
 	std::string $(name)str = GetXmlAttr( m_node , "$(name)" );
 	
-	bool $(name) = ( $(name)str.compare("true") == 0 );
-	$(object)Instance->Set$(name_extension)($(name));
+	bool _$(name) = ( $(name)str.compare("true") == 0 );
+	$(object)Instance->Set$(name_extension)(_$(name));
 		</objectpart>
 	</template>
 	<template name="attribute_reader_double">
@@ -257,9 +257,9 @@ bool $(object)XmlHandler::CanHandle(stdObject *resource)
 	
 	std::stringstream strm$(name_extension);
 	strm$(name_extension) &lt;&lt; $(name)str;
-	double $(name);
-	strm$(name_extension) &gt;&gt; $(name);
-	$(object)Instance->Set$(name_extension)($(name));
+	double _$(name);
+	strm$(name_extension) &gt;&gt; _$(name);
+	$(object)Instance->Set$(name_extension)(_$(name));
 		</objectpart>
 	</template>
 	<template name="attribute_reader_float">
@@ -268,16 +268,16 @@ bool $(object)XmlHandler::CanHandle(stdObject *resource)
 	
 	std::stringstream strm$(name_extension);
 	strm$(name_extension) &lt;&lt; $(name)str;
-	double $(name);
-	strm$(name_extension) &gt;&gt; $(name);
-	$(object)Instance->Set$(name_extension)((float)$(name));
+	double _$(name);
+	strm$(name_extension) &gt;&gt; _$(name);
+	$(object)Instance->Set$(name_extension)((float)_$(name));
 		</objectpart>
 	</template>
 	<template name="attribute_writer_string">
 		<objectpart file="src">
 	if( $(object)Instance->Has$(name_extension)() ) {
-		std::string $(name) = $(object)Instance->Get$(name_extension)();
-		xmlNewProp( node , (const xmlChar*) "$(name)" , stdx2C($(name)) ); 
+		std::string _$(name) = $(object)Instance->Get$(name_extension)();
+		xmlNewProp( node , (const xmlChar*) "$(name)" , stdx2C(_$(name)) ); 
 	}
 		</objectpart>
 	</template>
@@ -371,16 +371,16 @@ bool $(object)XmlHandler::CanHandle(stdObject *resource)
 	<template name="property_reader_string">
 		<objectpart file="src">
 		if( cname.compare("$(name)") == 0 ) {
-			std::string $(name) = GetXmlContent( childnode );
-			$(object)Instance->Set$(name_extension)($(name));
+			std::string _$(name) = GetXmlContent( childnode );
+			$(object)Instance->Set$(name_extension)(_$(name));
 		}
 		</objectpart>
 	</template>
 	<template name="property_reader_arraystring">
 		<objectpart file="src">
 		if( cname.compare("$(name)") == 0 ) {
-			std::string $(name) = GetXmlContent( childnode );
-			$(object)Instance->Add$(name_extension)($(name));
+			std::string _$(name) = GetXmlContent( childnode );
+			$(object)Instance->Add$(name_extension)(_$(name));
 		}
 		</objectpart>
 	</template>
@@ -391,9 +391,9 @@ bool $(object)XmlHandler::CanHandle(stdObject *resource)
 			
 			std::stringstream strm$(name_extension);
 			strm$(name_extension) &lt;&lt; $(name)str;
-			int $(name);
-			strm$(name_extension) &gt;&gt; $(name);
-			$(object)Instance->Set$(name_extension)($(name));
+			int _$(name);
+			strm$(name_extension) &gt;&gt; _$(name);
+			$(object)Instance->Set$(name_extension)(_$(name));
 		}
 		</objectpart>
 	</template>
@@ -404,9 +404,9 @@ bool $(object)XmlHandler::CanHandle(stdObject *resource)
 			
 			std::stringstream strm$(name_extension);
 			strm$(name_extension) &lt;&lt; $(name)str;
-			int $(name);
-			strm$(name_extension) &gt;&gt; $(name);
-			$(object)Instance->Add$(name_extension)($(name));
+			int _$(name);
+			strm$(name_extension) &gt;&gt; _$(name);
+			$(object)Instance->Add$(name_extension)(_$(name));
 		}
 		</objectpart>
 	</template>
@@ -427,9 +427,9 @@ bool $(object)XmlHandler::CanHandle(stdObject *resource)
 			
 			std::stringstream strm$(name_extension);
 			strm$(name_extension) &lt;&lt; $(name)str;
-			unsigned int $(name);
-			strm$(name_extension) &gt;&gt; $(name);
-			$(object)Instance->Set$(name_extension)($(name));
+			unsigned int _$(name);
+			strm$(name_extension) &gt;&gt; _$(name);
+			$(object)Instance->Set$(name_extension)(_$(name));
 		}
 		</objectpart>
 	</template>
@@ -440,9 +440,9 @@ bool $(object)XmlHandler::CanHandle(stdObject *resource)
 			
 			std::stringstream strm$(name_extension);
 			strm$(name_extension) &lt;&lt; $(name)str;
-			long $(name);
-			strm$(name_extension) &gt;&gt; $(name);
-			$(object)Instance->Set$(name_extension)($(name));
+			long _$(name);
+			strm$(name_extension) &gt;&gt; _$(name);
+			$(object)Instance->Set$(name_extension)(_$(name));
 		}
 		</objectpart>
 	</template>
@@ -453,9 +453,9 @@ bool $(object)XmlHandler::CanHandle(stdObject *resource)
 			
 			std::stringstream strm$(name_extension);
 			strm$(name_extension) &lt;&lt; $(name)str;
-			long $(name);
-			strm$(name_extension) &gt;&gt; $(name);
-			$(object)Instance->Add$(name_extension)($(name));
+			long _$(name);
+			strm$(name_extension) &gt;&gt; _$(name);
+			$(object)Instance->Add$(name_extension)(_$(name));
 		}
 		</objectpart>
 	</template>
@@ -466,9 +466,9 @@ bool $(object)XmlHandler::CanHandle(stdObject *resource)
 			
 			std::stringstream strm$(name_extension);
 			strm$(name_extension) &lt;&lt; $(name)str;
-			long $(name);
-			strm$(name_extension) &gt;&gt; $(name);
-			$(object)Instance->Set$(name_extension)((unsigned long)$(name));
+			long _$(name);
+			strm$(name_extension) &gt;&gt; _$(name);
+			$(object)Instance->Set$(name_extension)((unsigned long)_$(name));
 		}
 		</objectpart>
 	</template>
@@ -479,9 +479,9 @@ bool $(object)XmlHandler::CanHandle(stdObject *resource)
 			
 			std::stringstream strm$(name_extension);
 			strm$(name_extension) &lt;&lt; $(name)str;
-			long $(name);
-			strm$(name_extension) &gt;&gt; $(name);
-			$(object)Instance->Add$(name_extension)((unsigned long)$(name));
+			long _$(name);
+			strm$(name_extension) &gt;&gt; _$(name);
+			$(object)Instance->Add$(name_extension)((unsigned long)_$(name));
 		}
 		</objectpart>
 	</template>
@@ -490,8 +490,8 @@ bool $(object)XmlHandler::CanHandle(stdObject *resource)
 		if( cname.compare("$(name)") == 0 ) {
 			std::string $(name)str = GetXmlContent( childnode );
 			
-			bool $(name) = ( $(name)str.compare("true") == 0 );
-			$(object)Instance->Set$(name_extension)($(name));
+			bool _$(name) = ( $(name)str.compare("true") == 0 );
+			$(object)Instance->Set$(name_extension)(_$(name));
 		}
 		</objectpart>
 	</template>
@@ -500,8 +500,8 @@ bool $(object)XmlHandler::CanHandle(stdObject *resource)
 		if( cname.compare("$(name)") == 0 ) {
 			std::string $(name)str = GetXmlContent( childnode );
 			
-			bool $(name) = ($(name)str.compare("true") == 0);
-			$(object)Instance->Add$(name_extension)($(name));
+			bool _$(name) = ($(name)str.compare("true") == 0);
+			$(object)Instance->Add$(name_extension)(_$(name));
 		}
 		</objectpart>
 	</template>
@@ -512,9 +512,9 @@ bool $(object)XmlHandler::CanHandle(stdObject *resource)
 			
 			std::stringstream strm$(name_extension);
 			strm$(name_extension) &lt;&lt; $(name)str;
-			double $(name);
-			strm$(name_extension) &gt;&gt; $(name);
-			$(object)Instance->Set$(name_extension)($(name));
+			double _$(name);
+			strm$(name_extension) &gt;&gt; _$(name);
+			$(object)Instance->Set$(name_extension)(_$(name));
 		}
 		</objectpart>
 	</template>
@@ -525,9 +525,9 @@ bool $(object)XmlHandler::CanHandle(stdObject *resource)
 			
 			std::stringstream strm$(name_extension);
 			strm$(name_extension) &lt;&lt; $(name)str;
-			double $(name);
-			strm$(name_extension) &gt;&gt; $(name);
-			$(object)Instance->Add$(name_extension)($(name));
+			double _$(name);
+			strm$(name_extension) &gt;&gt; _$(name);
+			$(object)Instance->Add$(name_extension)(_$(name));
 		}
 		</objectpart>
 	</template>
@@ -538,9 +538,9 @@ bool $(object)XmlHandler::CanHandle(stdObject *resource)
 			
 			std::stringstream strm$(name_extension);
 			strm$(name_extension) &lt;&lt; $(name)str;
-			double $(name);
-			strm$(name_extension) &gt;&gt; $(name);
-			$(object)Instance->Set$(name_extension)((float)$(name));
+			double _$(name);
+			strm$(name_extension) &gt;&gt; _$(name);
+			$(object)Instance->Set$(name_extension)((float)_$(name));
 		}
 		</objectpart>
 	</template>
@@ -551,26 +551,26 @@ bool $(object)XmlHandler::CanHandle(stdObject *resource)
 			
 			std::stringstream strm$(name_extension);
 			strm$(name_extension) &lt;&lt; $(name)str;
-			double $(name);
-			strm$(name_extension) &gt;&gt; $(name);
-			$(object)Instance->Add$(name_extension)((float)$(name));
+			double _$(name);
+			strm$(name_extension) &gt;&gt; _$(name);
+			$(object)Instance->Add$(name_extension)((float)_$(name));
 		}
 		</objectpart>
 	</template>
 	<template name="property_writer_string">
 		<objectpart file="src">
 	if( $(object)Instance->Has$(name_extension)() ) {
-		std::string $(name) = $(object)Instance->Get$(name_extension)();
-		xmlNewChild( node , NULL , (const xmlChar*) "$(name)" , stdx2C($(name)) ); 
+		std::string _$(name) = $(object)Instance->Get$(name_extension)();
+		xmlNewChild( node , NULL , (const xmlChar*) "$(name)" , stdx2C(_$(name)) ); 
 	}
 		</objectpart>
 	</template>
 	<template name="property_writer_arraystring">
 		<objectpart file="src">
 	if( $(object)Instance->Has$(name_extension)() ) {
-		std::vector&lt;std::string&gt;&amp; $(name) = $(object)Instance->Get$(name_extension)();
-		for( unsigned int i = 0; i &lt; $(name).size() ; ++ i )
-			xmlNewChild( node , NULL , (const xmlChar*) "$(name)" , stdx2C($(name)[i]) ); 
+		std::vector&lt;std::string&gt;&amp; _$(name) = $(object)Instance->Get$(name_extension)();
+		for( unsigned int i = 0; i &lt; _$(name).size() ; ++ i )
+			xmlNewChild( node , NULL , (const xmlChar*) "$(name)" , stdx2C(_$(name)[i]) ); 
 	}
 		</objectpart>
 	</template>
@@ -588,10 +588,10 @@ bool $(object)XmlHandler::CanHandle(stdObject *resource)
 	<template name="property_writer_arrayint">
 		<objectpart file="src">
 	if( $(object)Instance->Has$(name_extension)() ) {
-		std::vector&lt;int&gt;&amp; $(name) = $(object)Instance->Get$(name_extension)();
-		for( unsigned int i = 0; i &lt; $(name).size() ; ++ i ) {
+		std::vector&lt;int&gt;&amp; _$(name) = $(object)Instance->Get$(name_extension)();
+		for( unsigned int i = 0; i &lt; _$(name).size() ; ++ i ) {
 			std::stringstream strm$(name_extension);
-			strm$(name_extension) &lt;&lt; $(name)[i];
+			strm$(name_extension) &lt;&lt; _$(name)[i];
 			std::string $(name)str;
 			strm$(name_extension) >> $(name)str;
 			xmlNewChild( node , NULL , (const xmlChar*) "$(name)" , stdx2C($(name)str) );
@@ -621,10 +621,10 @@ bool $(object)XmlHandler::CanHandle(stdObject *resource)
 	<template name="property_writer_arrayuint">
 		<objectpart file="src">
 	if( $(object)Instance->Has$(name_extension)() ) {
-		std::vector&lt;unsigned int&gt;&amp; $(name) = $(object)Instance->Get$(name_extension)();
-		for( unsigned int i = 0; i &lt; $(name).size() ; ++ i ) {
+		std::vector&lt;unsigned int&gt;&amp; _$(name) = $(object)Instance->Get$(name_extension)();
+		for( unsigned int i = 0; i &lt; _$(name).size() ; ++ i ) {
 			std::stringstream strm$(name_extension);
-			strm$(name_extension) &lt;&lt; $(name)[i];
+			strm$(name_extension) &lt;&lt; _$(name)[i];
 			std::string $(name)str;
 			strm$(name_extension) >> $(name)str;
 			xmlNewChild( node , NULL , (const xmlChar*) "$(name)" , stdx2C($(name)str) );
@@ -646,10 +646,10 @@ bool $(object)XmlHandler::CanHandle(stdObject *resource)
 	<template name="property_writer_arraylong">
 		<objectpart file="src">
 	if( $(object)Instance->Has$(name_extension)() ) {
-		std::vector&lt;long&gt;&amp; $(name) = $(object)Instance->Get$(name_extension)();
-		for( unsigned int i = 0; i &lt; $(name).size() ; ++ i ) {
+		std::vector&lt;long&gt;&amp; _$(name) = $(object)Instance->Get$(name_extension)();
+		for( unsigned int i = 0; i &lt; _$(name).size() ; ++ i ) {
 			std::stringstream strm$(name_extension);
-			strm$(name_extension) &lt;&lt; $(name)[i];
+			strm$(name_extension) &lt;&lt; _$(name)[i];
 			std::string $(name)str;
 			strm$(name_extension) >> $(name)str;
 			xmlNewChild( node , NULL , (const xmlChar*) "$(name)" , stdx2C($(name)str) );
@@ -671,10 +671,10 @@ bool $(object)XmlHandler::CanHandle(stdObject *resource)
 	<template name="property_writer_arrayulong">
 		<objectpart file="src">
 	if( $(object)Instance->Has$(name_extension)() ) {
-		std::vector&lt;unsigned long&gt;&amp; $(name) = $(object)Instance->Get$(name_extension)();
-		for( unsigned int i = 0; i &lt; $(name).size() ; ++ i ) {
+		std::vector&lt;unsigned long&gt;&amp; _$(name) = $(object)Instance->Get$(name_extension)();
+		for( unsigned int i = 0; i &lt; _$(name).size() ; ++ i ) {
 			std::stringstream strm$(name_extension);
-			strm$(name_extension) &lt;&lt; $(name)[i];
+			strm$(name_extension) &lt;&lt; _$(name)[i];
 			std::string $(name)str;
 			strm$(name_extension) >> $(name)str;
 			xmlNewChild( node , NULL , (const xmlChar*) "$(name)" , stdx2C($(name)str) );
@@ -693,9 +693,9 @@ bool $(object)XmlHandler::CanHandle(stdObject *resource)
 	<template name="property_writer_arraybool">
 		<objectpart file="src">
 	if( $(object)Instance->Has$(name_extension)() ) {
-		std::vector&lt;bool&gt;&amp; $(name) = $(object)Instance->Get$(name_extension)();
-		for( unsigned int i = 0; i &lt; $(name).size() ; ++ i ) {
-			std::string $(name)str = $(name)[i] ? "true" : "false";
+		std::vector&lt;bool&gt;&amp; _$(name) = $(object)Instance->Get$(name_extension)();
+		for( unsigned int i = 0; i &lt; _$(name).size() ; ++ i ) {
+			std::string $(name)str = _$(name)[i] ? "true" : "false";
 			xmlNewChild( node , NULL , (const xmlChar*) "$(name)" , stdx2C($(name)str) );
 		}
 	}
@@ -715,10 +715,10 @@ bool $(object)XmlHandler::CanHandle(stdObject *resource)
 	<template name="property_writer_arraydouble">
 		<objectpart file="src">
 	if( $(object)Instance->Has$(name_extension)() ) {
-		std::vector&lt;double&gt;&amp; $(name) = $(object)Instance->Get$(name_extension)();
-		for( unsigned int i = 0; i &lt; $(name).size() ; ++ i ) {
+		std::vector&lt;double&gt;&amp; _$(name) = $(object)Instance->Get$(name_extension)();
+		for( unsigned int i = 0; i &lt; _$(name).size() ; ++ i ) {
 			std::stringstream strm$(name_extension);
-			strm$(name_extension) &lt;&lt; $(name)[i];
+			strm$(name_extension) &lt;&lt; _$(name)[i];
 			std::string $(name)str;
 			strm$(name_extension) >> $(name)str;
 			xmlNewChild( node , NULL , (const xmlChar*) "$(name)" , stdx2C($(name)str) );
@@ -740,10 +740,10 @@ bool $(object)XmlHandler::CanHandle(stdObject *resource)
 	<template name="property_writer_arrayfloat">
 		<objectpart file="src">
 	if( $(object)Instance->Has$(name_extension)() ) {
-		std::vector&lt;float&gt;&amp; $(name) = $(object)Instance->Get$(name_extension)();
-		for( unsigned int i = 0; i &lt; $(name).size() ; ++ i ) {
+		std::vector&lt;float&gt;&amp; _$(name) = $(object)Instance->Get$(name_extension)();
+		for( unsigned int i = 0; i &lt; _$(name).size() ; ++ i ) {
 			std::stringstream strm$(name_extension);
-			strm$(name_extension) &lt;&lt; $(name)[i];
+			strm$(name_extension) &lt;&lt; _$(name)[i];
 			std::string $(name)str;
 			strm$(name_extension) >> $(name)str;
 			xmlNewChild( node , NULL , (const xmlChar*) "$(name)" , stdx2C($(name)str) );
@@ -757,10 +757,10 @@ bool $(object)XmlHandler::CanHandle(stdObject *resource)
 	<template name="property_reader_object">
 		<objectpart file="src">
 		if( cname.compare("$(name)") == 0 ) {
-			$(type)* $(name) = ($(type)*) CreateResFromNode(childnode,"$(type)",NULL);
-			if( $(name) != NULL ) {
-				$(object)Instance->Set$(name_extension)(*$(name));
-				delete $(name);
+			$(type)* _$(name) = ($(type)*) CreateResFromNode(childnode,"$(type)",NULL);
+			if( _$(name) != NULL ) {
+				$(object)Instance->Set$(name_extension)(*_$(name));
+				delete _$(name);
 			}
 		}
 		</objectpart>
@@ -768,10 +768,10 @@ bool $(object)XmlHandler::CanHandle(stdObject *resource)
 	<template name="property_reader_arrayobject">
 		<objectpart file="src">
 		if( cname.compare("$(name)") == 0 ) {
-			$(type)* $(name) = ($(type)*) CreateResFromNode(childnode,"$(type)",NULL);
-			if( $(name) != NULL ) {
-				$(object)Instance->Add$(name_extension)(*$(name));
-				delete $(name);
+			$(type)* _$(name) = ($(type)*) CreateResFromNode(childnode,"$(type)",NULL);
+			if( _$(name) != NULL ) {
+				$(object)Instance->Add$(name_extension)(*_$(name));
+				delete _$(name);
 			}
 		}
 		</objectpart>
@@ -803,9 +803,9 @@ bool $(object)XmlHandler::CanHandle(stdObject *resource)
 	<template name="property_reader_any">
 		<objectpart file="src">
 		else if( !cname.IsEmpty() ) {
-			stdObject* $(name) = CreateResFromNode(childnode,stdEmptyString,NULL);
+			stdObject* _$(name) = CreateResFromNode(childnode,stdEmptyString,NULL);
 			if( $(name) != NULL ) {
-				wxAny anyObject = $(name);
+				wxAny anyObject = _$(name);
 				$(object)Instance->Set$(name_extension)(anyObject);
 			}
 		}
@@ -814,9 +814,9 @@ bool $(object)XmlHandler::CanHandle(stdObject *resource)
 	<template name="property_reader_arrayany">
 		<objectpart file="src">
 		else if( !cname.IsEmpty() ) {
-			stdObject* $(name) = CreateResFromNode(childnode,stdEmptyString,NULL);
-			if( $(name) != NULL ) {
-				$(object)Instance->Add$(name_extension)($(name));
+			stdObject* _$(name) = CreateResFromNode(childnode,stdEmptyString,NULL);
+			if( _$(name) != NULL ) {
+				$(object)Instance->Add$(name_extension)(_$(name));
 			}
 		}
 		</objectpart>

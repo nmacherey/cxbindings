@@ -12,14 +12,14 @@ if(NOT WIN32)
   # returns STDXMLBINDINGS_INCLUDE_DIRS and STDXMLBINDINGS_LIBRARY_DIRS
 endif()
 
-find_path(STDXMLBINDINGS_INCLUDE_DIR
-  NAMES stdxmlbindings/stdObject.h
-  PATHS ${STDXMLBINDINGS_INSTALL_DIR}/include
-  ${STDXMLBINDINGS_INCLUDE_DIR}
+find_path(StdXmlbindings_INCLUDE_DIR
+  NAMES stdObject.h
+  PATHS ${STDXMLBINDINGS_INSTALL_DIR}/include/cxbindings
+  ${STDXMLBINDINGS_INCLUDE_DIRS}
 )
 
-find_library(STDXMLBINDINGS_LIBRARIES
-  NAMES $stdxmlbindings
+find_library(StdXmlbindings_LIBRARIES
+  NAMES stdxmlbindings
   PATHS_SUFFIXES stdxmlbindings
   PATHS ${STDXMLBINDINGS_INSTALL_DIR}/lib
   ${STDXMLBINDINGS_LIBRARY_DIRS}
@@ -28,4 +28,4 @@ find_library(STDXMLBINDINGS_LIBRARIES
 # defines our variables
 include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(STDXMLBINDINGS DEFAULT_MSG
-  STDXMLBINDINGS_LIBRARIES STDXMLBINDINGS_INCLUDE_DIR)
+  StdXmlbindings_LIBRARIES StdXmlbindings_INCLUDE_DIR)

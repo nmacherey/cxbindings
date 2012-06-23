@@ -279,7 +279,8 @@ void CXBindingsCppHandlersGenerator::DoCreateParametersMacrosFor( CXBindingsHand
 		SetMacro( "name_extension", nameExt) ;
 		SetMacro( "name" , pName) ;
 		SetMacro( "type" , pType) ;
-		
+	    
+        std::string ot = pType;
 		/* Here we have to get the types of each properties and if it's not an object
 		 * get the "real" type of the given properties (i.e : a typedef or an enumeration)
 		 */
@@ -301,7 +302,7 @@ void CXBindingsCppHandlersGenerator::DoCreateParametersMacrosFor( CXBindingsHand
 		pwriter = m_genfile->FindTemplate( twName );
 			
 		if( preader == NULL || pwriter == NULL )
-			CXB_THROW( "Error cannot find property reader and writer template for object of type : " + pType );
+			CXB_THROW( "Error cannot find property reader and writer template for object of type : " + pType + " for variable " + pName + " original type is " + ot);
 			
 		CXBindingsArrayGrammarGeneratorFileObjectPart& objects = preader->GetObjects();
 
